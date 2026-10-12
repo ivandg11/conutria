@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime  @default(now())
+  patients     Patient[]
+}
+
+model Patient {
+  id           Int            @id @default(autoincrement())
+  userId       Int
+  firstName    String
+  lastName     String
+  birthDate    DateTime?
+  sex          String?
+  phone        String?
+  email        String?
+  goal         String?        @db.Text
+  allergies    String?        @db.Text
+  notes        String?        @db.Text
+  createdAt    DateTime       @default(now())
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  consults     Consultation[]
+  mealPlans    MealPlan[]
+  appointments Appointment[]
+ medicalHistory Json?
+  @@index([userId, lastName])
+  status       String    @default("ACTIVE")
+dischargedAt DateTime?
+}
+
+model Consultation {
+  id         Int      @id @default(autoincrement())
+  patientId  Int
+  date       DateTime
+  notes      String?  @db.Text
+  weightKg   Decimal? @db.Decimal(5, 2)
+  heightCm   Decimal? @db.Decimal(5, 1)
+  measures  Json?
+  patient    Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+ type          String   @default("FOLLOWUP")
+  bodyFatPct    Decimal? @db.Decimal(4, 1)
+  recall24h     Json?
+  foodFrequency Json?
+  @@index([patientId, date])
+}
+
+model Appointment {
+  id        Int      @id @default(autoincrement())
+  patientId Int
+  startsAt  DateTime
+  status    String   @default("SCHEDULED")
+  reason    String?
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([startsAt])
+}
+
+model MealPlan {
+  id        Int      @id @default(autoincrement())
+  patientId Int
+  title     String
+  startDate DateTime
+  content   Json
+  createdAt DateTime @default(now())
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+}
