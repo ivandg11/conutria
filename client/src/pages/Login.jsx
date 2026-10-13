@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 
 export default function Login() {
@@ -10,7 +10,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  if (user) return <Navigate to="/" replace />;
+  if (user) return <Navigate to="/dashboard" replace />;
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -18,7 +18,7 @@ export default function Login() {
     setSubmitting(true);
     try {
       await login(name.trim(), password);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'No se pudo iniciar sesión');
     } finally {
@@ -29,11 +29,11 @@ export default function Login() {
   return (
     <main className="login-shell">
       <section className="login-intro">
-        <div className="login-brand">
-          <span className="login-brand-mark" aria-hidden="true">
-            ✳
-          </span>
-          <span>NutriControl</span>
+        <div className="login-intro-header">
+          <div className="login-brand">
+            <span className="login-brand-mark" aria-hidden="true">✳</span>
+            <span>NutriControl</span>
+          </div>
         </div>
         <div className="login-intro-copy">
           <span className="login-eyebrow">Tu consulta, en equilibrio</span>
@@ -96,12 +96,25 @@ export default function Login() {
             {submitting ? 'Entrando…' : 'Entrar'}
             {!submitting && <span aria-hidden="true">→</span>}
           </button>
+          <Link to="/" className="login-home-link">
+            <span aria-hidden="true">←</span> Volver a la página inicial
+          </Link>
           <p className="login-secure-note">
             <span aria-hidden="true">●</span> Acceso privado a tu espacio de
             trabajo
           </p>
         </form>
       </section>
-    </main>
+      </main>
   );
 }
+
+
+
+
+
+
+
+
+
+

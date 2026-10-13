@@ -8,14 +8,14 @@ export default function Layout() {
     <div className="min-h-screen bg-slate-50">
       <header className="app-navbar">
         <div className="app-navbar-inner">
-          <Link to="/" className="app-brand" aria-label="NutriControl, inicio">
+          <Link to="/dashboard" className="app-brand" aria-label="NutriControl, dashboard">
             <span className="app-brand-mark" aria-hidden="true">✳</span>
             <span>NutriControl</span>
           </Link>
 
           <nav className="app-navbar-nav" aria-label="Navegación principal">
             <NavLink
-              to="/"
+              to="/dashboard"
               end
               className={({ isActive }) => `app-nav-link ${isActive ? 'is-active' : ''}`}
             >
@@ -38,3 +38,4 @@ export default function Layout() {
     </div>
   );
 }
+
