@@ -143,6 +143,9 @@ router.post('/account/cancel-subscription', requireAuth, async (req, res) => {
   if (!latest || latest.status !== 'ACTIVE') {
     return res.status(409).json({ error: 'No tienes una suscripción activa para cancelar.' });
   }
+  if (latest.plan === 'LIFETIME') {
+    return res.status(409).json({ error: 'La membresía de por vida no se puede cancelar desde la cuenta.' });
+  }
 
   const canceledAt = new Date();
   const result = await prisma.subscription.updateMany({

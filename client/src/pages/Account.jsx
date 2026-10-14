@@ -6,7 +6,7 @@ const date = (value) => value
   ? new Date(value).toLocaleDateString('es-MX', { timeZone: 'UTC', day: '2-digit', month: 'long', year: 'numeric' })
   : 'Sin fecha registrada';
 const money = (value) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value ?? 0);
-const planName = (plan) => ({ MONTHLY: 'Mensual', ANNUAL: 'Anual' }[plan] ?? plan ?? 'Sin plan');
+const planName = (plan) => ({ MONTHLY: 'Mensual', ANNUAL: 'Anual', LIFETIME: 'De por vida' }[plan] ?? plan ?? 'Sin plan');
 const statusName = (status) => ({ ACTIVE: 'Activa', CANCELED: 'Cancelada', PAST_DUE: 'Pago pendiente', TRIAL: 'Prueba' }[status] ?? status);
 const paymentStatus = (status) => ({ PAID: 'Pagado', FAILED: 'Fallido', PENDING: 'Pendiente' }[status] ?? status);
 
@@ -46,13 +46,14 @@ export default function Account() {
   }
 
   const subscription = account?.subscription;
+  const isLifetime = subscription?.plan === 'LIFETIME';
 
   return (
     <div className="account-page">
       {confirmCancel && (
         <ConfirmDialog
           title="Cancelar suscripción"
-          message="La suscripción quedará cancelada ahora en Nutria. Esto no procesa reembolsos ni modifica pagos ya realizados. Esta acción no se puede deshacer desde aquí."
+          message="La cancelación detendrá la renovación. Conservarás el acceso hasta que termine el periodo que ya pagaste. No procesa reembolsos ni modifica pagos anteriores."
           confirmLabel={canceling ? 'Cancelando…' : 'Sí, cancelar'}
           danger
           onCancel={() => !canceling && setConfirmCancel(false)}
@@ -80,12 +81,12 @@ export default function Account() {
             <div className="account-card-heading"><span className="account-icon">✳</span><div><h2>Suscripción</h2><p>Plan y estado actual</p></div></div>
             {subscription ? <>
               <div className="account-plan-line"><strong>{planName(subscription.plan)}</strong><span className={`account-status ${subscription.status === 'ACTIVE' ? 'is-active' : ''}`}>{statusName(subscription.status)}</span></div>
-              <p className="account-price">{money(subscription.price)} <span>/ {subscription.plan === 'ANNUAL' ? 'año' : 'mes'}</span></p>
+              <p className="account-price">{isLifetime ? 'Acceso sin costo' : <>{money(subscription.price)} <span>/ {subscription.plan === 'ANNUAL' ? 'año' : 'mes'}</span></>}</p>
               <dl className="account-details account-sub-details">
                 <div><dt>Inicio</dt><dd>{date(subscription.startedAt)}</dd></div>
-                <div><dt>{subscription.status === 'CANCELED' ? 'Cancelada el' : 'Próxima renovación'}</dt><dd>{date(subscription.status === 'CANCELED' ? subscription.canceledAt : subscription.renewsAt)}</dd></div>
+                <div><dt>{isLifetime ? 'Vigencia' : subscription.status === 'CANCELED' ? 'Cancelada el' : 'Próxima renovación'}</dt><dd>{isLifetime ? 'De por vida' : date(subscription.status === 'CANCELED' ? subscription.canceledAt : subscription.renewsAt)}</dd></div>
               </dl>
-              {subscription.status === 'ACTIVE' && <button className="account-cancel" type="button" onClick={() => setConfirmCancel(true)}>Cancelar suscripción</button>}
+              {subscription.status === 'ACTIVE' && !isLifetime && <button className="account-cancel" type="button" onClick={() => setConfirmCancel(true)}>Cancelar suscripción</button>}
               {subscription.status === 'CANCELED' && <p className="account-muted">Tu suscripción está cancelada.</p>}
             </> : <div className="account-no-plan"><strong>No tienes una suscripción registrada</strong><p>Si esperabas ver un plan aquí, contacta a soporte para revisar tu cuenta.</p></div>}
           </section>
