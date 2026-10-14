@@ -1,17 +1,43 @@
 export const HISTORY_FIELDS = [
-  {
-    key: 'familiares',
-    label: 'Antecedentes familiares (diabetes, hipertensión, etc.)',
-  },
-  { key: 'patologicos', label: 'Antecedentes patológicos personales' },
-  { key: 'medicamentos', label: 'Medicamentos y suplementos' },
-  { key: 'cirugias', label: 'Cirugías' },
-  { key: 'digestivo', label: 'Salud digestiva (reflujo, estreñimiento, etc.)' },
-  { key: 'ciclo', label: 'Ciclo menstrual' },
-  { key: 'actividad', label: 'Actividad física' },
-  { key: 'sueno', label: 'Sueño' },
-  { key: 'habitos', label: 'Agua, alcohol y tabaco' },
+  { key: 'familiares', label: '¿Hay antecedentes familiares relevantes?', detailPrompt: 'Indica el familiar y el antecedente (por ejemplo: madre, diabetes).' },
+  { key: 'patologicos', label: '¿Tienes antecedentes médicos personales?', detailPrompt: 'Describe el diagnóstico y desde cuándo.' },
+  { key: 'medicamentos', label: '¿Tomas medicamentos o suplementos?', detailPrompt: 'Indica cuáles, dosis y frecuencia.' },
+  { key: 'cirugias', label: '¿Te han realizado alguna cirugía?', detailPrompt: 'Describe cuál y cuándo.' },
+  { key: 'digestivo', label: '¿Presentas molestias digestivas?', detailPrompt: 'Describe los síntomas y con qué frecuencia aparecen.' },
+  { key: 'ciclo', label: '¿Presentas irregularidades o molestias en tu ciclo menstrual?', detailPrompt: 'Describe la duración, regularidad o molestias.' },
+  { key: 'actividad', label: '¿Realizas actividad física?', detailPrompt: 'Indica el tipo de actividad, duración y frecuencia.' },
+  { key: 'sueno', label: '¿Tienes dificultades para dormir?', detailPrompt: 'Describe el problema y cuántas horas duermes.' },
+  { key: 'agua', label: '¿Consumes agua durante el día?', detailPrompt: 'Indica aproximadamente cuántos vasos o litros al día.' },
+  { key: 'alcohol', label: '¿Consumes bebidas alcohólicas?', details: false },
+  { key: 'tabaco', label: '¿Consumes tabaco?', details: false },
 ];
+
+export function parseHistoryValue(value) {
+  if (!value) return { answer: '', details: '' };
+  if (value === 'No') return { answer: 'no', details: '' };
+  const yesPrefix = `S\u00ed:`;
+  if (value === `S\u00ed`) return { answer: 'yes', details: '' };
+  if (value.startsWith(yesPrefix)) {
+    return { answer: 'yes', details: value.slice(yesPrefix.length).trim() };
+  }
+  // Treat existing free-text history as a yes answer with its text as details.
+  return { answer: 'yes', details: value };
+}
+
+export function serializeHistoryValue(answer, details = '') {
+  if (answer === 'no') return 'No';
+  if (answer === 'yes') return `S\u00ed: ${details.trim()}`;
+  return '';
+}
+
+export function displayHistoryValue(value) {
+  const entry = parseHistoryValue(value);
+  if (entry.answer === 'no') return 'No';
+  if (entry.answer === 'yes') {
+    return entry.details ? `S\u00ed — ${entry.details}` : `S\u00ed`;
+  }
+  return value;
+}
 
 export const DEFAULT_MEALS = [
   'Desayuno',

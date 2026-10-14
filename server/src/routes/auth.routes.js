@@ -9,7 +9,17 @@ import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
 
-const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10 });
+const createAuthLimiter = () => rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: process.env.NODE_ENV === 'production' ? 10 : 100,
+  skipSuccessfulRequests: true,
+  handler: (_req, res) => res.status(429).json({
+    error: 'Demasiados intentos. Espera 15 minutos antes de volver a intentar.',
+  }),
+});
+
+const loginLimiter = createAuthLimiter();
+const passwordSetupLimiter = createAuthLimiter();
 
 const cookieOptions = {
   httpOnly: true,
@@ -30,7 +40,7 @@ router.post('/register', async (_req, res) => {
   res.status(410).json({ error: 'Elige un plan para iniciar el registro y el pago.' });
 });
 
-router.post('/setup-password', loginLimiter, async (req, res) => {
+router.post('/setup-password', passwordSetupLimiter, async (req, res) => {
   const { token, password } = z.object({
     token: z.string().min(32),
     password: z.string().min(8),

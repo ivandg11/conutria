@@ -8,6 +8,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -60,7 +61,7 @@ export default function Login() {
           <label className="login-field">
             <span>Contraseña</span>
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               name="password"
               autoComplete="current-password"
               placeholder="Tu contraseña"
@@ -68,6 +69,14 @@ export default function Login() {
               onChange={(event) => setPassword(event.target.value)}
               required
             />
+            <button
+              type="button"
+              className="login-password-toggle"
+              aria-pressed={showPassword}
+              onClick={() => setShowPassword((visible) => !visible)}
+            >
+              {showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            </button>
           </label>
           <button type="submit" className="login-submit" disabled={submitting}>
             {submitting ? 'Entrando…' : 'Entrar'}

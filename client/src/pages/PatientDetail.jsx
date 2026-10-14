@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
   LineChart,
@@ -12,7 +12,7 @@ import {
 import { api } from '../lib/api';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { ALL_MEASURES, MEASURE_GROUPS } from '../lib/measures';
-import { HISTORY_FIELDS, FREQ_GROUPS, FREQ_OPTIONS } from '../lib/clinical';
+import { HISTORY_FIELDS, FREQ_GROUPS, FREQ_OPTIONS, displayHistoryValue } from '../lib/clinical';
 import EnergyCalculator from '../components/EnergyCalculator';
 import SomatotypePanel from '../components/SomatotypePanel';
 const fmtDate = (iso) =>
@@ -187,10 +187,13 @@ export default function PatientDetail() {
             Historia clínica
           </summary>
           <div className="mt-3 space-y-2 text-sm">
+            {patient.medicalHistory.habitos && (
+              <p><b>Registro anterior de agua, alcohol y tabaco:</b> {patient.medicalHistory.habitos}</p>
+            )}
             {HISTORY_FIELDS.filter((f) => patient.medicalHistory[f.key]).map(
               (f) => (
                 <p key={f.key}>
-                  <b>{f.label}:</b> {patient.medicalHistory[f.key]}
+                  <b>{f.label}</b> {displayHistoryValue(patient.medicalHistory[f.key])}
                 </p>
               ),
             )}

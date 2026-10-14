@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     allowedHosts: ['unfrozen-theatrics-alumni.ngrok-free.dev'],
     proxy: {
-      '/api': 'http://localhost:4000',
+      '/api': 'http://127.0.0.1:4000',
     },
   },
 });

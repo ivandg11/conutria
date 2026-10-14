@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../lib/api';
-import { HISTORY_FIELDS } from '../lib/clinical';
+import { HISTORY_FIELDS, parseHistoryValue, serializeHistoryValue } from '../lib/clinical';
 const empty = {
   firstName: '',
   lastName: '',
@@ -36,10 +36,13 @@ export default function PatientForm() {
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
-  function handleHistory(key, value) {
+  function handleHistory(key, answer, details = '') {
     setForm((f) => ({
       ...f,
-      medicalHistory: { ...f.medicalHistory, [key]: value },
+      medicalHistory: {
+        ...f.medicalHistory,
+        [key]: serializeHistoryValue(answer, details),
+      },
     }));
   }
 
@@ -156,24 +159,50 @@ export default function PatientForm() {
         className={input}
         rows="3"
       />
-      <details className="rounded border p-3">
-        <summary className="cursor-pointer font-medium">
+      <details className="history-panel">
+        <summary className="history-summary">
           Historia clínica
         </summary>
-        <div className="mt-3 space-y-3">
-          {HISTORY_FIELDS.map((f) => (
-            <div key={f.key}>
-              <label className="mb-1 block text-sm text-gray-600">
-                {f.label}
-              </label>
-              <textarea
-                value={form.medicalHistory?.[f.key] ?? ''}
-                onChange={(e) => handleHistory(f.key, e.target.value)}
-                className={input}
-                rows={2}
-              />
-            </div>
-          ))}
+        <p className="history-hint">Selecciona una respuesta. Si eliges Sí, describe los detalles.</p>
+        <div className="history-grid">
+          {form.medicalHistory?.habitos && (
+            <p className="history-legacy">
+              Registro anterior de agua, alcohol y tabaco: {form.medicalHistory.habitos}
+            </p>
+          )}
+          {HISTORY_FIELDS.map((f) => {
+            const entry = parseHistoryValue(form.medicalHistory?.[f.key]);
+            return (
+              <fieldset key={f.key} className="history-question">
+                <legend className="history-question-title">{f.label}</legend>
+                <div className="history-options">
+                  {[[ 'yes', 'S\u00ed' ], [ 'no', 'No' ]].map(([value, label]) => (
+                    <label key={value} className={`history-option ${entry.answer === value ? 'is-selected' : ''}`}>
+                      <input
+                        type="radio"
+                        name={`history-${f.key}`}
+                        value={value}
+                        checked={entry.answer === value}
+                        onChange={() => handleHistory(f.key, value, entry.details)}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+                {entry.answer === 'yes' && f.details !== false && (
+                  <textarea
+                    value={entry.details}
+                    onChange={(e) => handleHistory(f.key, 'yes', e.target.value)}
+                    placeholder={f.detailPrompt}
+                    className="history-detail"
+                    rows={2}
+                    maxLength={1995}
+                    required
+                  />
+                )}
+              </fieldset>
+            );
+          })}
         </div>
       </details>
       <div className="flex gap-3">
