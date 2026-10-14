@@ -377,7 +377,7 @@ export default function SuperadminDashboard() {
                   cells: [
                     u.name,
                     u.email,
-                    u.plan ?? '—',
+                    u.plan === 'LIFETIME' ? 'De por vida' : u.plan ?? '—',
                     statusText[u.status] ?? u.status,
                     date(u.createdAt),
                     date(u.lastLoginAt),

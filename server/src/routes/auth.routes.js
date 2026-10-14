@@ -74,13 +74,9 @@ router.post('/login', loginLimiter, async (req, res) => {
   const ok = user?.passwordHash && (await bcrypt.compare(password, user.passwordHash));
   if (!ok) return res.status(401).json({ error: 'Credenciales incorrectas' });
 
-  const isConfiguredAdmin = user.email.toLowerCase() === process.env.SUPERADMIN_EMAIL?.toLowerCase();
   const updatedUser = await prisma.user.update({
     where: { id: user.id },
-    data: {
-      lastLoginAt: new Date(),
-      ...(isConfiguredAdmin ? { role: 'SUPERADMIN' } : {}),
-    },
+    data: { lastLoginAt: new Date() },
   });
   setSession(res, updatedUser.id);
   res.json({ id: updatedUser.id, name: updatedUser.name, email: updatedUser.email, role: updatedUser.role });
