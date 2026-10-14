@@ -1,4 +1,4 @@
-﻿import { Router } from 'express';
+import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
@@ -66,11 +66,11 @@ router.post('/setup-password', loginLimiter, async (req, res) => {
 });
 
 router.post('/login', loginLimiter, async (req, res) => {
-  const { name, password } = z
-    .object({ name: z.string().trim().min(2), password: z.string() })
+  const { email, password } = z
+    .object({ email: z.string().trim().email(), password: z.string() })
     .parse(req.body);
 
-  const user = await prisma.user.findFirst({ where: { name } });
+  const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
   const ok = user?.passwordHash && (await bcrypt.compare(password, user.passwordHash));
   if (!ok) return res.status(401).json({ error: 'Credenciales incorrectas' });
 

@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import Logo from '../components/Logo';
@@ -6,7 +6,7 @@ import Logo from '../components/Logo';
 export default function Login() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
-  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -18,7 +18,7 @@ export default function Login() {
     setError('');
     setSubmitting(true);
     try {
-      const signedInUser = await login(name.trim(), password);
+      const signedInUser = await login(email.trim(), password);
       navigate(signedInUser.role === 'SUPERADMIN' ? '/admin' : '/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'No se pudo iniciar sesión');
@@ -30,51 +30,31 @@ export default function Login() {
   return (
     <main className="login-shell">
       <section className="login-intro">
-        <div className="login-intro-header">
-          <div className="login-brand">
-            <Logo size={38} />
-          </div>
-        </div>
+        <div className="login-intro-header"><div className="login-brand"><Logo size={38} /></div></div>
         <div className="login-intro-copy">
           <span className="login-eyebrow">Tu consulta, en equilibrio</span>
           <h1>Un espacio claro para acompañar cada progreso.</h1>
-          <p>
-            Organiza pacientes, consultas y su evolución desde un solo lugar.
-          </p>
+          <p>Organiza pacientes, consultas y su evolución desde un solo lugar.</p>
         </div>
-        <div className="login-decor" aria-hidden="true">
-          <span className="login-decor-leaf">✳</span>
-        </div>
+        <div className="login-decor" aria-hidden="true"><span className="login-decor-leaf">✳</span></div>
       </section>
-
       <section className="login-form-side">
         <form onSubmit={handleSubmit} className="login-form">
-          <div className="login-mobile-brand">
-            <Logo size={38} />
-          </div>
+          <div className="login-mobile-brand"><Logo size={38} /></div>
           <span className="login-eyebrow">Bienvenida de nuevo</span>
           <h2>Inicia sesión</h2>
-          <p className="login-form-description">
-            Ingresa tus datos para continuar con tu consulta.
-          </p>
-
-          {error && (
-            <p className="login-error" role="alert">
-              {error}
-            </p>
-          )}
-
+          <p className="login-form-description">Ingresa tus datos para continuar con tu consulta.</p>
+          {error && <p className="login-error" role="alert">{error}</p>}
           <label className="login-field">
-            <span>Nombre</span>
+            <span>Correo electrónico</span>
             <input
-              type="text"
-              name="name"
-              autoComplete="username"
-              placeholder="Tu nombre"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
+              type="email"
+              name="email"
+              autoComplete="email"
+              placeholder="tu@correo.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
               required
-              minLength={2}
             />
           </label>
           <label className="login-field">
@@ -93,25 +73,10 @@ export default function Login() {
             {submitting ? 'Entrando…' : 'Entrar'}
             {!submitting && <span aria-hidden="true">→</span>}
           </button>
-          <Link to="/" className="login-home-link">
-            <span aria-hidden="true">←</span> Volver a la página inicial
-          </Link>
-          <p className="login-secure-note">
-            <span aria-hidden="true">●</span> Acceso privado a tu espacio de
-            trabajo
-          </p>
+          <Link to="/" className="login-home-link"><span aria-hidden="true">←</span> Volver a la página inicial</Link>
+          <p className="login-secure-note"><span aria-hidden="true">●</span> Acceso privado a tu espacio de trabajo</p>
         </form>
       </section>
-      </main>
+    </main>
   );
 }
-
-
-
-
-
-
-
-
-
-
