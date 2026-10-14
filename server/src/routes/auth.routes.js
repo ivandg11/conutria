@@ -2,6 +2,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
+import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth } from '../middleware/auth.js';
@@ -25,24 +26,43 @@ function setSession(res, userId) {
   res.cookie('token', token, cookieOptions);
 }
 
-const registerSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  password: z.string().min(8),
+router.post('/register', async (_req, res) => {
+  res.status(410).json({ error: 'Elige un plan para iniciar el registro y el pago.' });
 });
 
-// Solo permite crear la primera cuenta (la de tu novia)
-router.post('/register', async (req, res) => {
-  const data = registerSchema.parse(req.body);
-  if ((await prisma.user.count()) > 0) {
-    return res.status(403).json({ error: 'Registro deshabilitado' });
-  }
-  const passwordHash = await bcrypt.hash(data.password, 12);
-  const user = await prisma.user.create({
-    data: { name: data.name, email: data.email, passwordHash },
+router.post('/setup-password', loginLimiter, async (req, res) => {
+  const { token, password } = z.object({
+    token: z.string().min(32),
+    password: z.string().min(8),
+  }).parse(req.body);
+  const tokenHash = createHash('sha256').update(token).digest('hex');
+  const setup = await prisma.passwordSetupToken.findUnique({
+    where: { tokenHash },
+    include: { user: true },
   });
-  setSession(res, user.id);
-  res.status(201).json({ id: user.id, name: user.name, email: user.email });
+  if (!setup || setup.usedAt || setup.expiresAt <= new Date()) {
+    return res.status(400).json({ error: 'El enlace no es válido o ya venció.' });
+  }
+  const passwordHash = await bcrypt.hash(password, 12);
+  const now = new Date();
+  const updated = await prisma.$transaction(async (tx) => {
+    const claimed = await tx.passwordSetupToken.updateMany({
+      where: { id: setup.id, usedAt: null, expiresAt: { gt: now } },
+      data: { usedAt: now },
+    });
+    if (claimed.count !== 1) return null;
+    const user = await tx.user.update({
+      where: { id: setup.userId },
+      data: { passwordHash },
+    });
+    await tx.auditLog.create({
+      data: { actorId: user.id, action: 'Configuró contraseña', details: 'Activación de cuenta desde enlace de pago' },
+    });
+    return user;
+  });
+  if (!updated) return res.status(400).json({ error: 'El enlace no es válido o ya venció.' });
+  setSession(res, updated.id);
+  res.json({ id: updated.id, name: updated.name, email: updated.email, role: updated.role });
 });
 
 router.post('/login', loginLimiter, async (req, res) => {
@@ -51,14 +71,22 @@ router.post('/login', loginLimiter, async (req, res) => {
     .parse(req.body);
 
   const user = await prisma.user.findFirst({ where: { name } });
-  const ok = user && (await bcrypt.compare(password, user.passwordHash));
+  const ok = user?.passwordHash && (await bcrypt.compare(password, user.passwordHash));
   if (!ok) return res.status(401).json({ error: 'Credenciales incorrectas' });
 
-  setSession(res, user.id);
-  res.json({ id: user.id, name: user.name, email: user.email });
+  const isConfiguredAdmin = user.email.toLowerCase() === process.env.SUPERADMIN_EMAIL?.toLowerCase();
+  const updatedUser = await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      lastLoginAt: new Date(),
+      ...(isConfiguredAdmin ? { role: 'SUPERADMIN' } : {}),
+    },
+  });
+  setSession(res, updatedUser.id);
+  res.json({ id: updatedUser.id, name: updatedUser.name, email: updatedUser.email, role: updatedUser.role });
 });
 
-router.post('/logout', (req, res) => {
+router.post('/logout', async (req, res) => {
   res.clearCookie('token', cookieOptions);
   res.json({ ok: true });
 });
@@ -66,15 +94,116 @@ router.post('/logout', (req, res) => {
 router.get('/me', requireAuth, async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: req.userId },
-    select: { id: true, name: true, email: true },
+    select: { id: true, name: true, email: true, role: true },
   });
   res.json(user);
 });
+
+router.get('/account', requireAuth, async (req, res) => {
+  const [user, subscriptions] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { id: true, name: true, email: true, createdAt: true },
+    }),
+    prisma.subscription.findMany({
+      where: { userId: req.userId },
+      orderBy: { createdAt: 'desc' },
+      include: { payments: { orderBy: { createdAt: 'desc' }, take: 20 } },
+    }),
+  ]);
+
+  const current = subscriptions[0] ?? null;
+  res.json({
+    user,
+    subscription: current ? {
+      id: current.id,
+      plan: current.plan,
+      status: current.status,
+      price: Number(current.price),
+      startedAt: current.startedAt,
+      renewsAt: current.renewsAt,
+      canceledAt: current.canceledAt,
+    } : null,
+    payments: subscriptions.flatMap((subscription) => subscription.payments.map((payment) => ({
+      id: payment.id,
+      amount: Number(payment.amount),
+      status: payment.status,
+      paidAt: payment.paidAt,
+      createdAt: payment.createdAt,
+      plan: subscription.plan,
+    }))).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 20),
+  });
+});
+
+router.post('/account/cancel-subscription', requireAuth, async (req, res) => {
+  const latest = await prisma.subscription.findFirst({
+    where: { userId: req.userId },
+    orderBy: { createdAt: 'desc' },
+  });
+  if (!latest || latest.status !== 'ACTIVE') {
+    return res.status(409).json({ error: 'No tienes una suscripción activa para cancelar.' });
+  }
+
+  const canceledAt = new Date();
+  const result = await prisma.subscription.updateMany({
+    where: { id: latest.id, userId: req.userId, status: 'ACTIVE' },
+    data: { status: 'CANCELED', canceledAt },
+  });
+  if (!result.count) return res.status(409).json({ error: 'La suscripción ya fue modificada.' });
+
+  await prisma.auditLog.create({
+    data: { actorId: req.userId, action: 'Canceló su suscripción', details: `Suscripción ${latest.id}` },
+  });
+  res.json({ ok: true, canceledAt });
+});
+
+router.get('/support-tickets', requireAuth, async (req, res) => {
+  const tickets = await prisma.supportTicket.findMany({
+    where: { userId: req.userId },
+    include: {
+      messages: { orderBy: { createdAt: 'asc' }, include: { author: { select: { name: true } } } },
+    },
+    orderBy: { updatedAt: 'desc' },
+  });
+  res.json(tickets);
+});
+
+router.post('/support-tickets', requireAuth, async (req, res) => {
+  const { subject, message } = z.object({
+    subject: z.string().trim().min(4).max(160),
+    message: z.string().trim().min(5).max(5000),
+  }).parse(req.body);
+  const ticket = await prisma.supportTicket.create({
+    data: {
+      userId: req.userId,
+      subject,
+      messages: { create: { authorId: req.userId, authorRole: 'CUSTOMER', content: message } },
+    },
+    include: { messages: { orderBy: { createdAt: 'asc' }, include: { author: { select: { name: true } } } } },
+  });
+  res.status(201).json(ticket);
+});
+
+router.post('/support-tickets/:id/messages', requireAuth, async (req, res) => {
+  const ticketId = Number(req.params.id);
+  const { message } = z.object({ message: z.string().trim().min(1).max(5000) }).parse(req.body);
+  if (!Number.isInteger(ticketId) || ticketId < 1) return res.status(400).json({ error: 'Ticket inválido.' });
+  const ticket = await prisma.supportTicket.findFirst({ where: { id: ticketId, userId: req.userId } });
+  if (!ticket) return res.status(404).json({ error: 'No encontramos este ticket.' });
+  if (ticket.status === 'CLOSED') return res.status(409).json({ error: 'Este ticket está cerrado. Crea uno nuevo para solicitar más ayuda.' });
+
+  const [, created] = await prisma.$transaction([
+    prisma.supportTicket.update({ where: { id: ticketId }, data: { updatedAt: new Date(), status: 'OPEN' } }),
+    prisma.supportMessage.create({ data: { ticketId, authorId: req.userId, authorRole: 'CUSTOMER', content: message } }),
+  ]);
+  res.status(201).json(created);
+});
+
 router.delete('/me', requireAuth, async (req, res) => {
   const { password } = z.object({ password: z.string() }).parse(req.body);
 
   const user = await prisma.user.findUnique({ where: { id: req.userId } });
-  const ok = user && (await bcrypt.compare(password, user.passwordHash));
+  const ok = user?.passwordHash && (await bcrypt.compare(password, user.passwordHash));
   if (!ok) return res.status(401).json({ error: 'Contraseña incorrecta' });
 
   await prisma.user.delete({ where: { id: req.userId } });

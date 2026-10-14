@@ -10,10 +10,124 @@ datasource db {
 model User {
   id           Int       @id @default(autoincrement())
   email        String    @unique
-  passwordHash String
+  passwordHash String?
   name         String
   createdAt    DateTime  @default(now())
+  role         String    @default("NUTRITIONIST")
+  lastLoginAt  DateTime?
   patients     Patient[]
+  subscriptions Subscription[]
+  auditLogs    AuditLog[]
+  pendingSignups PendingSignup[]
+  passwordSetupTokens PasswordSetupToken[]
+  supportTickets SupportTicket[]
+  supportMessages SupportMessage[]
+}
+
+model Subscription {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  plan      String
+  status    String
+  price     Decimal   @db.Decimal(10, 2)
+  startedAt DateTime  @default(now())
+  renewsAt  DateTime?
+  canceledAt DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments  Payment[]
+  @@index([userId, createdAt])
+  @@index([status, renewsAt])
+}
+
+model Payment {
+  id             Int          @id @default(autoincrement())
+  subscriptionId Int
+  amount         Decimal      @db.Decimal(10, 2)
+  status         String
+  paidAt         DateTime?
+  dueAt          DateTime?
+  providerPaymentId String? @unique
+  createdAt      DateTime     @default(now())
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  @@index([status, createdAt])
+  @@index([dueAt])
+}
+
+model PendingSignup {
+  id                  String   @id @default(cuid())
+  name                String
+  email               String
+  plan                String
+  amount              Decimal  @db.Decimal(10, 2)
+  status              String   @default("PENDING")
+  expiresAt           DateTime
+  createdAt           DateTime @default(now())
+  providerPreferenceId String? @unique
+  userId              Int?     @unique
+  paidAt              DateTime?
+  emailSentAt          DateTime?
+  processingStartedAt DateTime?
+  user                User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email, status, expiresAt])
+}
+
+model PasswordSetupToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  actorId   Int?
+  action    String
+  details   String?  @db.Text
+  ip        String?
+  createdAt DateTime @default(now())
+  actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  @@index([createdAt])
+}
+
+model SystemError {
+  id        Int      @id @default(autoincrement())
+  message   String   @db.Text
+  createdAt DateTime @default(now())
+  @@index([createdAt])
+}
+
+model SupportTicket {
+  id        Int             @id @default(autoincrement())
+  userId    Int
+  subject   String          @db.VarChar(160)
+  status    String          @default("OPEN")
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  SupportMessage[]
+
+  @@index([status, updatedAt])
+  @@index([userId, updatedAt])
+}
+
+model SupportMessage {
+  id        Int           @id @default(autoincrement())
+  ticketId  Int
+  authorId  Int?
+  authorRole String
+  content   String        @db.Text
+  createdAt DateTime      @default(now())
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author    User?         @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([ticketId, createdAt])
 }
 
 model Patient {

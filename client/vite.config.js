@@ -5,8 +5,10 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
+    allowedHosts: ['unfrozen-theatrics-alumni.ngrok-free.dev'],
     proxy: {
       '/api': 'http://localhost:4000',
     },
   },
 });
+

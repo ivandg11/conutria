@@ -1,0 +1,127 @@
+.sa-shell{min-height:100vh;background:#f5f7f3;color:#173b32;font-family:'DM Sans',sans-serif}.sa-header{height:76px;padding:0 4vw;display:flex;align-items:center;justify-content:space-between;background:#103f34;color:#fff}.sa-brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none;font-weight:800}.sa-brand>span{margin-left:8px;padding-left:16px;border-left:1px solid #ffffff44;color:#b7d4c6;font-size:13px;font-weight:500}.sa-account{display:flex;align-items:center;gap:18px;font-size:14px}.sa-account button,.sa-refresh{padding:10px 14px;border:1px solid #d9e5dd;border-radius:9px;background:#fff;color:#174c3a;font-weight:700;cursor:pointer}.sa-layout{display:grid;grid-template-columns:230px minmax(0,1fr);max-width:1500px;margin:auto}.sa-sidebar{min-height:calc(100vh - 76px);padding:34px 20px;border-right:1px solid #e3e9e2;background:#fff}.sa-eyebrow{color:#198265;font-size:10px;font-weight:800;letter-spacing:.13em}.sa-sidebar nav{display:grid;gap:7px;margin-top:20px}.sa-sidebar nav button{padding:12px 14px;border:0;border-radius:9px;background:transparent;color:#456359;text-align:left;font:inherit;font-weight:650;cursor:pointer}.sa-sidebar nav button:hover,.sa-sidebar nav button.is-active{background:#e9f3ed;color:#0e7254}.sa-content{min-width:0;padding:36px clamp(20px,4vw,58px)}.sa-title{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:26px}.sa-title h1{margin:6px 0 0;font-size:30px;letter-spacing:-.04em}.sa-card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px}.sa-stat,.sa-panel{padding:20px;border:1px solid #e1e8df;border-radius:14px;background:#fff;box-shadow:0 5px 20px #183d2f08}.sa-stat{display:grid;gap:14px}.sa-stat>span{color:#71847b;font-size:13px}.sa-stat strong{font-size:27px;letter-spacing:-.04em}.sa-stat .sa-stat-small{font-size:18px;letter-spacing:0}.sa-panel{margin-bottom:18px;overflow:hidden}.sa-panel h2{margin:0 0 16px;font-size:17px}.sa-panel>p{color:#667b70}.sa-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.sa-empty,.sa-note{color:#76877f;font-size:13px;line-height:1.6}.sa-note{margin:4px 0 20px}.sa-table-wrap{overflow:auto}.sa-table{width:100%;border-collapse:collapse;text-align:left;font-size:13px}.sa-table th{padding:10px 12px;border-bottom:1px solid #e5ebe4;color:#71847b;font-size:11px;white-space:nowrap}.sa-table td{padding:12px;border-bottom:1px solid #edf0ec;white-space:nowrap}.sa-renewals{margin:0;padding:0;list-style:none}.sa-renewals li{display:flex;justify-content:space-between;gap:15px;padding:12px 0;border-bottom:1px solid #edf0ec}.sa-renewals li span{display:grid;gap:5px}.sa-renewals small{color:#74867d}.sa-error{padding:14px;border:1px solid #edc5bd;border-radius:10px;color:#8b342b;background:#fff5f3}@media(max-width:850px){.sa-layout{grid-template-columns:1fr}.sa-sidebar{min-height:0;padding:15px 18px;border-right:0;border-bottom:1px solid #e3e9e2}.sa-sidebar nav{display:flex;overflow:auto;margin-top:10px}.sa-sidebar nav button{white-space:nowrap}.sa-content{padding-top:25px}.sa-columns{grid-template-columns:1fr}}@media(max-width:520px){.sa-header{height:auto;min-height:68px;padding:12px 16px}.sa-brand{gap:7px;font-size:14px}.sa-brand>span{margin-left:2px;padding-left:8px;font-size:11px}.sa-account{gap:8px;font-size:12px}.sa-account button{padding:8px;font-size:11px}.sa-title h1{font-size:25px}.sa-refresh{padding:9px;font-size:11px}.sa-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sa-stat{padding:16px}.sa-stat strong{font-size:23px}}
+
+/* Superadmin dashboard refinements */
+main.sa-shell {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 100vh;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #f4f7f5;
+}
+
+.sa-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: 72px;
+  padding: 0 clamp(20px, 4vw, 64px);
+  background: #103f34 !important;
+  color: #fff !important;
+  border: 0 !important;
+  box-shadow: 0 5px 20px rgba(16, 63, 52, .12) !important;
+}
+
+.sa-header > div {
+  max-width: none !important;
+  min-height: 0 !important;
+}
+
+.sa-header a::before { display: none !important; }
+.sa-header .sa-brand { gap: 11px; color: #fff !important; font-size: 15px !important; }
+.sa-brand-mark { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 11px; color: #fff; background: #14805f; font-size: 20px; }
+.sa-brand-name { letter-spacing: -.02em; }
+.sa-brand-section { margin-left: 8px; padding-left: 17px; border-left: 1px solid rgba(255,255,255,.25); color: #c4ded2; font-size: 13px; font-weight: 550; }
+.sa-account { color: #fff; }
+.sa-account button { border: 1px solid rgba(255,255,255,.27) !important; color: #fff !important; background: rgba(255,255,255,.1) !important; }
+.sa-account button:hover { background: rgba(255,255,255,.18) !important; }
+.sa-avatar { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; color: #164535; background: #d8eee2; font-weight: 800; }
+
+.sa-layout { max-width: none; min-height: calc(100vh - 72px); grid-template-columns: 250px minmax(0, 1fr); }
+.sa-sidebar { position: sticky; top: 72px; height: calc(100vh - 72px); padding: 30px 18px 22px; border-right: 1px solid #e2e9e4; }
+.sa-sidebar nav { gap: 5px; margin-top: 16px; }
+.sa-sidebar nav button { display: flex; min-height: 46px; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid transparent; color: #536b60; font-size: 14px; transition: background .16s, color .16s, border-color .16s; }
+.sa-sidebar nav button:hover { background: #f4f8f5; }
+.sa-sidebar nav button.is-active { border-color: #dcebe1; color: #0e7254; background: #eaf4ed; font-weight: 750; }
+.sa-nav-icon { display: grid; width: 27px; height: 27px; flex: 0 0 27px; place-items: center; border-radius: 8px; color: #638176; background: #f1f5f1; font-size: 15px; }
+.sa-sidebar nav button.is-active .sa-nav-icon { color: #fff; background: #13805e; }
+.sa-sidebar-help { margin-top: 34px; padding: 15px; border: 1px solid #e4ebe5; border-radius: 12px; background: #f8faf8; }
+.sa-sidebar-help strong { color: #285042; font-size: 12px; }
+.sa-sidebar-help p { margin: 7px 0 0; color: #73857b; font-size: 11px; line-height: 1.55; }
+
+.sa-content { width: min(100%, 1380px); padding: clamp(26px, 4vw, 54px) clamp(22px, 4vw, 62px); }
+.sa-title { align-items: center; margin-bottom: 28px; }
+.sa-title h1 { margin: 7px 0 5px; color: #173b32; font-size: clamp(28px, 3vw, 36px) !important; line-height: 1.15; }
+.sa-title > div > p { margin: 0; color: #75867d; font-size: 14px; }
+.sa-refresh { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; border-color: #cbded2; color: #15513e; background: #fff; box-shadow: 0 2px 5px rgba(16,63,52,.04); }
+.sa-refresh:hover:not(:disabled) { border-color: #92c3a7; background: #f6faf7; }
+.sa-refresh:disabled { cursor: wait; opacity: .7; }
+.sa-card-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+.sa-stat { min-height: 112px; align-content: space-between; padding: 19px 20px; border-radius: 15px; box-shadow: 0 4px 14px rgba(20,57,43,.035); }
+.sa-stat > span { color: #708279; font-size: 12px; font-weight: 600; }
+.sa-stat strong { color: #123f33; font-size: 30px; }
+.sa-panel { padding: 22px; border-radius: 15px; box-shadow: 0 4px 14px rgba(20,57,43,.035); }
+.sa-panel h2 { color: #244b3d; }
+.sa-note { padding: 12px 15px; border: 1px solid #e9dfbd; border-radius: 10px; color: #78683e; background: #fffaf0; }
+.sa-table th { background: #f6f9f7; }
+.sa-error { margin: 24px; }
+
+.sa-support-layout { display: grid; grid-template-columns: minmax(260px, .8fr) minmax(0, 1.6fr); align-items: start; gap: 16px; }
+.sa-support-layout.is-ticket-closed { grid-template-columns: minmax(0, 1fr); }
+.sa-ticket-list, .sa-ticket-detail { min-width: 0; }
+.sa-ticket-list h2 { margin-bottom: 12px; }
+.sa-ticket-select { width: 100%; display: grid; gap: 7px; padding: 12px; border: 1px solid #e7ede7; border-radius: 11px; color: #536b60; background: #fff; text-align: left; cursor: pointer; }
+.sa-ticket-select + .sa-ticket-select { margin-top: 8px; }
+.sa-ticket-select:hover, .sa-ticket-select.is-active { border-color: #bcdac7; background: #f3f8f4; }
+.sa-ticket-select > span:last-child { color: #84928a; font-size: 11px; }
+.sa-ticket-select-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.sa-ticket-select-top strong { color: #294a3c; font-size: 13px; }
+.sa-ticket-status { padding: 4px 7px; border-radius: 99px; color: #66746c; background: #eff2ee; font-size: 10px; font-style: normal; white-space: nowrap; }
+.sa-ticket-status.is-open { color: #08704f; background: #e5f4ea; }
+.sa-ticket-status.is-in_progress { color: #7a5a19; background: #fff4d8; }
+.sa-ticket-detail-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid #e9eee8; }
+.sa-ticket-detail-heading h2 { margin: 0 0 5px; overflow-wrap: anywhere; }
+.sa-ticket-detail-heading p { margin: 0; color: #75867d; font-size: 12px; overflow-wrap: anywhere; }
+.sa-ticket-detail-heading select { max-width: 160px; padding: 8px 10px; border: 1px solid #dce6e1; border-radius: 9px; color: #36584b; background: white; }
+.sa-ticket-heading-actions { display: flex; align-items: center; gap: 8px; }
+.sa-ticket-close { padding: 8px 11px; border: 1px solid #cde4d4; border-radius: 9px; color: #126347; background: #eff8f0; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.sa-ticket-close:hover:not(:disabled) { background: #e2f2e6; }
+.sa-ticket-close:disabled { opacity: .6; cursor: wait; }
+.sa-ticket-messages { display: grid; gap: 10px; max-height: 55vh; overflow-y: auto; padding: 14px 0; }
+.sa-ticket-message { padding: 12px; border-radius: 11px; background: #f3f6f2; }
+.sa-ticket-message.is-admin { background: #eaf4ed; }
+.sa-ticket-message > div { display: flex; justify-content: space-between; gap: 10px; color: #456254; font-size: 12px; }
+.sa-ticket-message time { color: #89978f; font-size: 10px; white-space: nowrap; }
+.sa-ticket-message p { margin: 7px 0 0; color: #506359; font-size: 13px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+.sa-ticket-reply { display: grid; justify-items: start; gap: 10px; padding-top: 12px; border-top: 1px solid #e9eee8; }
+.sa-ticket-reply textarea { width: 100%; resize: vertical; }
+.sa-ticket-reply button { min-height: 40px; padding: 9px 13px; border: 0; border-radius: 9px; color: #fff; background: #137a59; font-weight: 700; cursor: pointer; }
+.sa-ticket-reply button:disabled { cursor: wait; opacity: .65; }
+.sa-notification-dot { width: 9px; height: 9px; flex: 0 0 9px; margin-left: auto; border: 2px solid #fff; border-radius: 50%; background: #e53935; box-shadow: 0 0 0 2px rgba(229,57,53,.16); }
+
+@media (max-width: 850px) {
+  .sa-layout { grid-template-columns: 1fr; }
+  .sa-sidebar { position: static; height: auto; padding: 15px 18px; }
+  .sa-sidebar nav { gap: 6px; }
+  .sa-sidebar nav button { min-height: 42px; }
+  .sa-sidebar-help { display: none; }
+  .sa-support-layout { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 560px) {
+  .sa-header { height: 64px; padding: 0 14px; }
+  .sa-brand-section, .sa-account-name { display: none; }
+  .sa-account { gap: 9px; }
+  .sa-layout { min-height: calc(100vh - 64px); }
+  .sa-sidebar nav button { gap: 7px; padding: 8px; font-size: 12px; }
+  .sa-nav-icon { width: 23px; height: 23px; flex-basis: 23px; font-size: 12px; }
+  .sa-content { padding: 24px 15px; }
+  .sa-title { align-items: flex-start; }
+  .sa-title > div > p { max-width: 235px; font-size: 12px; }
+  .sa-refresh { min-height: 38px; padding: 8px; font-size: 11px; }
+  .sa-ticket-detail-heading { flex-direction: column; }
+  .sa-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .sa-stat { min-height: 96px; padding: 15px; }
+}
+.sa-header .sa-brand > span { margin: 0; padding: 0; border: 0; }
+.sa-header .sa-brand-section { margin-left: 8px; padding-left: 17px; border-left: 1px solid rgba(255,255,255,.25); }

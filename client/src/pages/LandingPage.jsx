@@ -1,4 +1,5 @@
 ﻿import { Link } from 'react-router-dom';
+import BrandLogo from '../components/Logo';
 import './LadingPage.css';
 
 const features = [
@@ -38,9 +39,8 @@ const features = [
 
 function Logo() {
   return (
-    <Link className="nc-brand" to="/" aria-label="NutriControl, inicio">
-      <span className="nc-brand-icon">✳</span>
-      <span>NutriControl</span>
+    <Link className="nc-brand" to="/" aria-label="Nutria, inicio">
+      <BrandLogo size={42} />
     </Link>
   );
 }
@@ -50,7 +50,7 @@ function DashboardPreview() {
     <div className="nc-preview">
       <div className="nc-preview-main">
         <div className="nc-preview-header">
-          <span>✳ &nbsp; NutriControl</span>
+          <BrandLogo />
           <span>● &nbsp; Mi consulta</span>
         </div>
 
@@ -61,17 +61,17 @@ function DashboardPreview() {
 
           <div className="nc-stats">
             <div>
-              <span>♧</span>
+              <span>→</span>
               <strong>Pacientes</strong>
               <b>Activos</b>
             </div>
             <div>
-              <span>▦</span>
+              <span>→</span>
               <strong>Consultas</strong>
               <b>Organizadas</b>
             </div>
             <div>
-              <span>↗</span>
+              <span>→</span>
               <strong>Progreso</strong>
               <b>Historial</b>
             </div>
@@ -110,10 +110,6 @@ export default function LandingPage() {
       <header className="nc-navbar nc-container">
         <Logo />
 
-        <nav className="nc-nav-links">
-          <Link to="#privacidad">Privacidad</Link>
-        </nav>
-
         <div className="nc-nav-actions">
           <Link className="nc-login" to="/login">
             Iniciar sesión
@@ -142,9 +138,9 @@ export default function LandingPage() {
           <div className="nc-hero-actions">
             <Link
               className="nc-button nc-button-yellow nc-button-large"
-              to="#funciones"
+              to="/planes"
             >
-              Conocer NutriControl <span>→</span>
+              Conocer los Planes de Nutria <span>→</span>
             </Link>
 
             <Link className="nc-text-link" to="/login">
@@ -153,7 +149,7 @@ export default function LandingPage() {
           </div>
 
           <div className="nc-trust-note">
-            <span>✓</span>
+            <span>→</span>
             Diseñado para acompañar tu consulta nutricional
           </div>
         </div>
@@ -171,7 +167,7 @@ export default function LandingPage() {
         </div>
 
         <div>
-          <span className="nc-benefit-icon">↗</span>
+          <span className="nc-benefit-icon">♧</span>
           <div>
             <strong>Seguimiento claro</strong>
             <p>Visualiza su evolución.</p>
@@ -179,7 +175,7 @@ export default function LandingPage() {
         </div>
 
         <div>
-          <span className="nc-benefit-icon">✳</span>
+          <span className="nc-benefit-icon">♧</span>
           <div>
             <strong>Planes personalizados</strong>
             <p>Adaptados a cada paciente.</p>
@@ -248,16 +244,17 @@ export default function LandingPage() {
         <div>
           <h2>La confianza también importa.</h2>
           <p>
-            La información de tus pacientes merece un manejo responsable.
-            NutriControl se diseña pensando en la privacidad y el acceso
-            controlado.
+            La información de tus pacientes merece un manejo responsable. Nutria
+            se diseña pensando en la privacidad y el acceso controlado.
           </p>
         </div>
       </section>
 
       <section className="nc-cta nc-container">
         <div>
-          <span className="nc-cta-mark">✳</span>
+          <span className="nc-cta-mark" aria-hidden="true">
+            <BrandLogo size={42} showName={false} />
+          </span>
           <div>
             <h2>Más orden para ti. Mejor seguimiento para tus pacientes.</h2>
             <p>Descubre una nueva forma de organizar tu consulta.</p>
@@ -270,11 +267,12 @@ export default function LandingPage() {
       </section>
 
       <footer className="nc-footer nc-container">
-        <Logo />
-
         <p>Una herramienta para acompañar tu práctica profesional.</p>
-
-        <span>© {new Date().getFullYear()} NutriControl</span>
+        <div className="nc-footer-legal">
+          <Link to="/aviso-de-privacidad">Aviso de privacidad</Link>
+          <Link to="/terminos-de-uso">Términos de uso</Link>
+          <span>© {new Date().getFullYear()} Nutria</span>
+        </div>
       </footer>
     </main>
   );

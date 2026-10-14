@@ -1,0 +1,39 @@
+.client-app { min-height: 100vh; background: #f4f7f5; color: #173b32; }
+.client-header { position: sticky; top: 0; z-index: 50; display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 1rem; padding: 0 clamp(16px, 4vw, 64px); border: 0 !important; background: #103f34 !important; color: #fff !important; box-shadow: 0 5px 20px rgba(16,63,52,.12) !important; }
+.client-header .client-brand { display: inline-flex; align-items: center; gap: 11px; color: #fff !important; font-size: 15px !important; font-weight: 750 !important; text-decoration: none; white-space: nowrap; }
+.client-header .client-brand::before { display: none !important; content: none !important; }
+.client-brand-mark { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 11px; color: #fff; background: #14805f; font-size: 20px; }
+.client-account { display: flex; min-height: 0 !important; align-items: center; gap: 12px; margin-left: auto; }
+.client-avatar { display: grid; width: 34px; height: 34px; flex: 0 0 34px; place-items: center; border-radius: 50%; color: #164535; background: #d8eee2; font-size: 13px; font-weight: 800; }
+.client-user-name { color: #fff; font-size: 13px; }
+.client-header .client-logout { min-height: 38px; padding: 8px 13px !important; border: 1px solid rgba(255,255,255,.27) !important; border-radius: 9px !important; color: #fff !important; background: rgba(255,255,255,.1) !important; font-size: 13px; font-weight: 650; cursor: pointer; }
+.client-header .client-logout:hover { background: rgba(255,255,255,.18) !important; }
+.client-layout { display: grid; min-height: calc(100vh - 72px); grid-template-columns: 250px minmax(0, 1fr); }
+.client-sidebar { position: sticky; top: 72px; height: calc(100vh - 72px); padding: 30px 18px 22px; border-right: 1px solid #e2e9e4; background: #fff; }
+.client-sidebar-eyebrow { margin: 0; color: #198265; font-size: 10px; font-weight: 800; letter-spacing: .13em; }
+.client-sidebar-nav { display: grid; gap: 5px; margin-top: 16px; }
+.client-nav-link { display: flex; min-height: 46px; align-items: center; gap: 12px; padding: 8px 12px; border: 1px solid transparent; border-radius: 10px; color: #536b60 !important; font-size: 14px !important; font-weight: 650 !important; text-decoration: none; transition: background .16s, color .16s, border-color .16s; }
+.client-nav-link:hover { background: #f4f8f5; }
+.client-nav-link.is-active { border-color: #dcebe1; outline: 2px solid #79d9ad; outline-offset: 1px; color: #0e7254 !important; background: #eaf4ed; font-weight: 750 !important; }
+.client-nav-icon { display: grid; width: 27px; height: 27px; flex: 0 0 27px; place-items: center; border-radius: 8px; color: #638176; background: #f1f5f1; font-size: 15px; }
+.client-nav-link.is-active .client-nav-icon { color: #fff; background: #13805e; }
+.client-sidebar-help { margin-top: 34px; padding: 15px; border: 1px solid #e4ebe5; border-radius: 12px; background: #f8faf8; }
+.client-sidebar-help strong { color: #285042; font-size: 12px; }
+.client-sidebar-help p { margin: 7px 0 0; color: #73857b; font-size: 11px; line-height: 1.55; }
+main.client-content { width: 100%; max-width: none !important; min-width: 0; box-sizing: border-box; margin: 0 !important; padding: clamp(24px, 4vw, 54px) clamp(18px, 4vw, 62px) !important; }
+@media (max-width: 850px) {
+  .client-layout { grid-template-columns: minmax(0, 1fr); }
+  .client-sidebar { position: static; height: auto; padding: 14px 18px; border-right: 0; border-bottom: 1px solid #e2e9e4; }
+  .client-sidebar-nav { display: flex; gap: 6px; overflow-x: auto; margin-top: 10px; }
+  .client-nav-link { min-height: 42px; flex: 0 0 auto; gap: 8px; padding: 7px 10px; }
+  .client-sidebar-help { display: none; }
+  main.client-content { padding: 24px 20px !important; }
+}
+@media (max-width: 520px) {
+  .client-header { min-height: 64px; padding-inline: 14px; }
+  .client-layout { min-height: calc(100vh - 64px); }
+  .client-sidebar { top: 64px; }
+  .client-user-name { display: none; }
+  .client-account { gap: 9px; }
+  main.client-content { padding: 20px 14px !important; }
+}

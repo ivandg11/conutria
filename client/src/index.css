@@ -9,7 +9,6 @@ main { max-width: 1160px !important; padding: 2rem 1.5rem !important; }
 header { background: rgba(255,255,255,.92) !important; color: #173b32 !important; border-bottom: 1px solid #e4ece8; box-shadow: 0 2px 12px rgba(21,55,45,.04); }
 header > div { max-width: 1160px !important; min-height: 72px; }
 header a { font-size: 1.15rem !important; font-weight: 750 !important; letter-spacing: -.03em; }
-header a::before { content: "✳"; display: inline-grid; place-items: center; width: 34px; height: 34px; margin-right: 10px; border-radius: 11px; color: white; background: #14805f; vertical-align: middle; }
 header button { color: #35564b !important; background: #edf4f0 !important; border-radius: 10px !important; padding: .55rem .9rem !important; font-weight: 600; }
 header button:hover { background: #dcebe3 !important; }
 main h1, main h2 { color: #173b32; letter-spacing: -.035em; }
@@ -97,7 +96,7 @@ main:has(.patient-page) { max-width: 1160px !important; padding-top: 1.7rem !imp
 
 /* Navegación principal */
 .app-navbar { position: sticky; top: 0; z-index: 50; background: rgba(250,249,245,.94) !important; border-bottom: 1px solid #e8ebe4 !important; box-shadow: 0 3px 16px rgba(27,56,43,.035) !important; backdrop-filter: blur(14px); }
-.app-navbar-inner { min-height: 76px !important; display: flex; align-items: center; gap: 2rem; padding-inline: max(1.5rem, calc((100% - 1160px) / 2)) !important; }
+.app-navbar-inner { width: 100%; margin-inline: auto; box-sizing: border-box; min-height: 76px !important; display: flex; align-items: center; gap: 2rem; padding-inline: max(1.5rem, calc((100% - 1160px) / 2)) !important; }
 .app-brand { display: inline-flex; align-items: center; gap: .7rem; color: #1c382f !important; text-decoration: none; font-size: 1.2rem !important; font-weight: 750 !important; letter-spacing: -.035em !important; white-space: nowrap; }
 .app-brand::before { content: none !important; }
 .app-brand-mark { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 11px; color: #fff; background: #0d805f; font-size: 1.15rem; }
@@ -107,11 +106,89 @@ main:has(.patient-page) { max-width: 1160px !important; padding-top: 1.7rem !imp
 .app-nav-link:hover, .app-nav-link.is-active { color: #0d805f !important; }
 .app-nav-link.is-active::after { position: absolute; right: .9rem; bottom: 0; left: .9rem; height: 3px; border-radius: 3px 3px 0 0; background: #0d805f; content: ""; }
 .app-nav-link > span { font-size: 1.2rem; }
-.app-navbar-account { display: flex; align-items: center; gap: .85rem; }
+.app-navbar-account { display: flex; align-items: center; gap: .85rem; margin-left: auto; flex: 0 0 auto; }
 .app-user-name { color: #456055; font-size: .9rem; }
 .app-logout { min-height: 42px; padding: .55rem 1rem !important; border: 1px solid transparent !important; border-radius: 999px !important; color: #314a40 !important; background: #eaf0e9 !important; font-size: .88rem; font-weight: 650 !important; cursor: pointer; transition: background .15s, border-color .15s; }
 .app-logout:hover { border-color: #d6e2d7 !important; background: #e0eade !important; }
+/* Cuenta del cliente */
+.account-page { max-width: 940px; margin: 0 auto; color: #213b31; }
+.account-heading { display: flex; justify-content: space-between; align-items: end; margin: .4rem 0 1.5rem; }
+.account-heading h1 { margin: .25rem 0 .4rem; font-size: 2rem !important; }
+.account-heading p:not(.account-eyebrow) { margin: 0; color: #71847a; }
+.account-eyebrow { margin: 0; color: #14805f; font-size: .72rem; font-weight: 800; letter-spacing: .14em; }
+.account-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.account-card { min-width: 0; padding: 1.35rem; border: 1px solid #e2e9df; border-radius: 18px; background: #fff; box-shadow: 0 7px 24px rgba(23,59,50,.045); }
+.account-card-heading { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.15rem; }
+.account-icon { width: 40px; height: 40px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 13px; color: #0d805f; background: #eaf4ed; font-size: 1.25rem; }
+.account-card-heading h2 { margin: 0 0 .2rem; font-size: 1.06rem !important; }
+.account-card-heading p { margin: 0; color: #84938b; font-size: .82rem; }
+.account-details { display: grid; gap: .85rem; margin: 0; }
+.account-details > div { display: grid; gap: .25rem; }
+.account-details dt { color: #87958e; font-size: .77rem; }
+.account-details dd { overflow-wrap: anywhere; margin: 0; color: #294438; font-size: .91rem; font-weight: 650; }
+.account-plan-line { display: flex; align-items: center; justify-content: space-between; gap: .7rem; }
+.account-plan-line > strong { font-size: 1.2rem; }
+.account-status { padding: .32rem .65rem; border-radius: 999px; color: #66736d; background: #eef1ed; font-size: .75rem; font-weight: 700; }
+.account-status.is-active { color: #08704f; background: #e5f4ea; }
+.account-price { margin: .75rem 0 1.2rem; color: #173b32; font-size: 1.7rem; font-weight: 750; letter-spacing: -.04em; }
+.account-price span { color: #87958e; font-size: .86rem; font-weight: 500; letter-spacing: 0; }
+.account-sub-details { grid-template-columns: 1fr 1fr; padding-top: 1rem; border-top: 1px solid #edf1ec; }
+.account-cancel { margin-top: 1.15rem; padding: .62rem .85rem; border: 1px solid #f0d4cf; border-radius: 10px; color: #a33e34; background: #fff8f6; font-size: .83rem; font-weight: 650; cursor: pointer; }
+.account-cancel:hover { background: #fff0ed; }
+.account-no-plan { padding: .8rem 0; }
+.account-no-plan p, .account-muted { color: #7d8b83; font-size: .87rem; line-height: 1.55; }
+.account-payments { grid-column: 1 / -1; }
+.account-table-wrap { overflow-x: auto; }
+.account-table { width: 100%; border-collapse: collapse; font-size: .84rem; text-align: left; }
+.account-table th { padding: .7rem .6rem; color: #839188; border-bottom: 1px solid #e9eee8; font-size: .7rem; text-transform: uppercase; letter-spacing: .07em; white-space: nowrap; }
+.account-table td { padding: .8rem .6rem; border-bottom: 1px solid #f0f3ef; color: #435c50; white-space: nowrap; }
+.account-table tr:last-child td { border-bottom: 0; }
+.account-help { grid-column: 1 / -1; display: flex; align-items: flex-start; gap: .8rem; padding: 1rem 1.1rem; border: 1px solid #dce9df; border-radius: 15px; color: #385b4c; background: #f0f7f1; }
+.account-help > span { width: 24px; height: 24px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; color: #fff; background: #348566; font-size: .8rem; font-weight: 700; }
+.account-help strong { font-size: .88rem; }
+.account-help p { margin: .25rem 0 0; color: #71877b; font-size: .82rem; }
+.account-support { grid-column: 1 / -1; }
+.support-page { max-width: 1250px; }
+.support-heading { box-sizing: border-box; min-height: 145px; align-items: center; margin: 0 0 1.5rem; padding: 1.6rem 2rem; border: 1px solid #e0e9df; border-radius: 22px; background: linear-gradient(115deg, #eef6ee 0%, #fbfcf9 66%, #fff 100%) !important; box-shadow: 0 8px 24px rgba(23,59,50,.045) !important; }
+.support-heading h1 { font-size: clamp(2rem, 3.3vw, 2.55rem) !important; }
+.account-page-heading { box-sizing: border-box; min-height: 145px; align-items: center; margin: 0 0 1.5rem; padding: 1.6rem 2rem; border: 1px solid #e0e9df; border-radius: 22px; background: linear-gradient(115deg, #eef6ee 0%, #fbfcf9 66%, #fff 100%) !important; box-shadow: 0 8px 24px rgba(23,59,50,.045) !important; }
+.account-page-heading h1 { font-size: clamp(2rem, 3.3vw, 2.55rem) !important; }
+.support-layout { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: start; gap: 1rem; }
+.support-compose { gap: 1rem; padding: 1.5rem; }
+.support-tickets { min-width: 0; gap: .8rem; margin: 0; padding: 1.25rem; }
+.support-list-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: .9rem; border-bottom: 1px solid #edf1ed; }
+.support-list-heading h2 { margin: .3rem 0 0; color: #214236; font-size: 1.2rem !important; }
+.account-ticket-form { display: grid; gap: .8rem; }
+.account-ticket-form label { display: grid; gap: .4rem; color: #435d50; font-size: .82rem; font-weight: 650; }
+.account-ticket-form input, .account-ticket-form textarea, .account-ticket-reply textarea { width: 100%; box-sizing: border-box; resize: vertical; }
+.account-ticket-submit, .account-ticket-reply button { justify-self: start; padding: .65rem .95rem; border: 0; border-radius: 10px; color: #fff; background: #147a5b; font-size: .84rem; font-weight: 700; cursor: pointer; }
+.account-ticket-submit:disabled, .account-ticket-reply button:disabled { cursor: wait; opacity: .65; }
+.account-ticket-list { display: grid; gap: .8rem; margin-top: 1.6rem; }
+.account-card.support-tickets { margin-top: 0; }
+.account-ticket-list h3 { margin: 0; color: #29483b; font-size: 1rem; }
+.account-ticket { min-width: 0; padding: 0 1rem; border: 1px solid #e7ede6; border-radius: 13px; background: #fcfdfb; }
+.account-ticket-title { min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: .75rem; cursor: pointer; list-style: none; }
+.account-ticket-title::-webkit-details-marker { display: none; }
+.account-ticket-title::marker { content: ''; }
+.account-ticket-title > strong { min-width: 0; overflow-wrap: anywhere; }
+.support-ticket-chevron { flex: 0 0 auto; color: #70877a; font-size: 1.2rem; transition: transform .15s; }
+.account-ticket[open] .support-ticket-chevron { transform: rotate(180deg); }
+.account-ticket-title > strong { color: #29483b; font-size: .9rem; }
+.account-ticket-closed { margin: .8rem 0 0; padding: .7rem .8rem; border: 1px solid #cde4d4; border-radius: 10px; color: #126347; background: #eff8f0; font-size: .82rem; line-height: 1.5; }
+.account-ticket-messages { display: grid; gap: .6rem; margin-top: .85rem; }
+.account-ticket-message { padding: .75rem; border-radius: 10px; background: #f1f5f0; }
+.account-ticket-message.is-admin { background: #eaf4ed; }
+.account-ticket-message > div { display: flex; justify-content: space-between; gap: .7rem; color: #466154; font-size: .75rem; }
+.account-ticket-message time { color: #89978f; font-size: .7rem; }
+.account-ticket-message p { margin: .4rem 0 0; color: #4e6257; font-size: .84rem; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.account-ticket-reply { display: flex; align-items: end; gap: .65rem; margin-top: .8rem; }
+.account-ticket-reply textarea { min-width: 0; }
+.account-ticket-reply button { flex: 0 0 auto; }
+.account-error { padding: .8rem 1rem; border: 1px solid #f0d0ca; border-radius: 12px; color: #9a382f; background: #fff5f3; }
+@media (max-width: 680px) { .account-grid { grid-template-columns: 1fr; } .account-payments, .account-help, .account-support { grid-column: auto; } .account-heading h1 { font-size: 1.7rem !important; } .account-card { padding: 1.1rem; } .account-sub-details { gap: .65rem; } .account-ticket-reply { align-items: stretch; flex-direction: column; } }
 @media (max-width: 560px) { .app-navbar-inner { min-height: 66px !important; gap: .65rem; padding-inline: 1rem !important; } .app-brand { gap: .45rem; font-size: 1rem !important; } .app-brand-mark { width: 32px; height: 32px; } .app-nav-link { min-height: 66px; gap: .35rem; padding-inline: .55rem; font-size: .83rem !important; } .app-nav-link.is-active::after { right: .55rem; left: .55rem; } .app-user-name { display: none; } .app-navbar-account { margin-left: auto; } .app-logout { min-height: 38px; padding: .45rem .8rem !important; } }
+@media (max-width: 850px) { .support-layout { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 680px) { .support-heading, .account-page-heading { min-height: 125px; padding: 1.3rem; border-radius: 20px; } .support-tickets, .support-compose { padding: 1.1rem; } .account-ticket-title { gap: .5rem; } .account-ticket-title > strong { font-size: .84rem; } }
 
 /* Clasificación Heath-Carter */
 .somato-category-result { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .45rem; padding: .85rem 1rem; border: 1px solid #cfe8db; border-radius: 14px; background: #f0f8f3; }

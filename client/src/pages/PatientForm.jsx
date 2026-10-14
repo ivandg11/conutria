@@ -55,7 +55,7 @@ export default function PatientForm() {
     try {
       if (id) await api.put(`/patients/${id}`, payload);
       else await api.post('/patients', payload);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       const details = err.response?.data?.details;
       setError(
@@ -182,7 +182,7 @@ export default function PatientForm() {
         </button>
         <button
           type="button"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/dashboard')}
           className="rounded border px-4 py-2"
         >
           Cancelar

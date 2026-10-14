@@ -1,6 +1,7 @@
 ﻿import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
+import Logo from '../components/Logo';
 
 export default function Login() {
   const { user, login } = useAuth();
@@ -10,15 +11,15 @@ export default function Login() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  if (user) return <Navigate to="/dashboard" replace />;
+  if (user) return <Navigate to={user.role === 'SUPERADMIN' ? '/admin' : '/dashboard'} replace />;
 
   async function handleSubmit(event) {
     event.preventDefault();
     setError('');
     setSubmitting(true);
     try {
-      await login(name.trim(), password);
-      navigate('/dashboard');
+      const signedInUser = await login(name.trim(), password);
+      navigate(signedInUser.role === 'SUPERADMIN' ? '/admin' : '/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'No se pudo iniciar sesión');
     } finally {
@@ -31,8 +32,7 @@ export default function Login() {
       <section className="login-intro">
         <div className="login-intro-header">
           <div className="login-brand">
-            <span className="login-brand-mark" aria-hidden="true">✳</span>
-            <span>NutriControl</span>
+            <Logo size={38} />
           </div>
         </div>
         <div className="login-intro-copy">
@@ -50,10 +50,7 @@ export default function Login() {
       <section className="login-form-side">
         <form onSubmit={handleSubmit} className="login-form">
           <div className="login-mobile-brand">
-            <span className="login-brand-mark" aria-hidden="true">
-              ✳
-            </span>
-            <span>NutriControl</span>
+            <Logo size={38} />
           </div>
           <span className="login-eyebrow">Bienvenida de nuevo</span>
           <h2>Inicia sesión</h2>

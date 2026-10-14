@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: nutria-api
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm ci --include=dev && npx prisma generate
+    startCommand: npx prisma migrate deploy && npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: CLIENT_URL
+        sync: false
+      - key: PUBLIC_API_URL
+        sync: false
+      - key: SUPERADMIN_EMAIL
+        sync: false
+      - key: MP_ACCESS_TOKEN
+        sync: false
+      - key: MP_WEBHOOK_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: MAIL_FROM
+        sync: false

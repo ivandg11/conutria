@@ -553,6 +553,7 @@
   margin: 0 0 8px;
   font-size: 21px;
   letter-spacing: -0.4px;
+  color: white !important;
 }
 
 .nc-cta p {
@@ -590,6 +591,9 @@
   color: var(--nc-muted);
   font-size: 12px;
 }
+.nc-footer-legal { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 18px; }
+.nc-footer-legal a { color: #54736a; text-decoration: none; font-size: 13px; }
+.nc-footer-legal a:hover { color: #087e60; }
 
 @media (max-width: 1000px) {
   .nc-nav-links {
@@ -757,6 +761,7 @@
   .nc-footer p {
     margin: 0;
   }
+  .nc-footer-legal { justify-content: flex-start; gap: 12px; }
 }
 
 @media (max-width: 390px) {
@@ -785,17 +790,51 @@
   .nc-floating-card {
     max-width: 230px;
   }
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 /* Ajustes frente a los estilos globales de la aplicación */
-#root > main.nc-landing { width: 100%; max-width: none !important; margin: 0; padding: 0 !important; }
-.nc-landing > .nc-navbar { max-width: 1200px !important; background: transparent !important; border: 0 !important; box-shadow: none !important; }
-
+#root > main.nc-landing {
+  width: 100%;
+  max-width: none !important;
+  margin: 0;
+  padding: 0 !important;
+}
+.nc-landing > .nc-navbar {
+  max-width: 1200px !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
 
 /* Evita que los estilos globales agreguen adornos a los enlaces de la portada */
-.nc-landing .nc-navbar a::before { content: none !important; display: none !important; }
-.nc-landing .nc-navbar a { font-size: 14px !important; }
-.nc-landing .nc-navbar .nc-brand { font-size: 23px !important; }
-.nc-landing h1 { font-size: clamp(36px, 4.2vw, 58px) !important; }
-@media (max-width: 720px) { .nc-landing .nc-navbar a { font-size: 12px !important; } .nc-landing .nc-navbar .nc-brand { font-size: 19px !important; } .nc-landing h1 { font-size: clamp(36px, 9vw, 49px) !important; } }
-
+.nc-landing .nc-navbar a::before {
+  content: none !important;
+  display: none !important;
+}
+.nc-landing .nc-footer a::before {
+  content: none !important;
+  display: none !important;
+}
+.nc-landing .nc-navbar a {
+  font-size: 14px !important;
+}
+.nc-landing .nc-navbar .nc-brand {
+  font-size: 23px !important;
+}
+.nc-landing h1 {
+  font-size: clamp(36px, 4.2vw, 58px) !important;
+}
+@media (max-width: 720px) {
+  .nc-landing .nc-navbar a {
+    font-size: 12px !important;
+  }
+  .nc-landing .nc-navbar .nc-brand {
+    font-size: 19px !important;
+  }
+  .nc-landing h1 {
+    font-size: clamp(36px, 9vw, 49px) !important;
+  }
+}

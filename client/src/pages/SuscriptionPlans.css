@@ -1,0 +1,312 @@
+﻿.nc-pricing {
+  padding: 85px 24px;
+  background: #fbfaf6;
+  color: #193d35;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.nc-pricing-heading {
+  max-width: 660px;
+  margin: 0 auto 45px;
+  text-align: center;
+}
+
+.nc-pricing-eyebrow {
+  color: #0e8060;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.nc-pricing-heading h2 {
+  margin: 13px 0;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 900;
+  letter-spacing: -1px;
+  line-height: 1.15;
+}
+
+.nc-pricing-heading > p {
+  color: #6b827b;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.nc-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 410px));
+  justify-content: center;
+  align-items: stretch;
+  gap: 24px;
+}
+
+.nc-plan-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 32px;
+  border: 1px solid #e0e7de;
+  border-radius: 22px;
+  background: white;
+  box-shadow: 0 12px 35px #103f3408;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.nc-plan-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 42px #103f3412;
+}
+
+.nc-plan-featured {
+  border: 2px solid #0e8060;
+  background: #103f34;
+  color: white;
+}
+
+.nc-plan-badge {
+  position: absolute;
+  top: 17px;
+  right: 18px;
+  padding: 8px 11px;
+  border-radius: 30px;
+  background: #f8cb59;
+  color: #103f34;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+}
+
+.nc-plan-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 21px;
+  border-radius: 15px;
+  background: #e2f1e8;
+  color: #0e8060;
+  font-size: 25px;
+}
+
+.nc-plan-featured .nc-plan-icon {
+  background: #24594a;
+  color: #f8cb59;
+}
+
+.nc-plan-card h3 {
+  margin: 0 0 8px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 23px;
+  font-weight: 900;
+}
+
+.nc-plan-description {
+  min-height: 42px;
+  margin: 0;
+  color: #6b827b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.nc-plan-featured .nc-plan-description {
+  color: #d0e1d8;
+}
+
+.nc-plan-price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 25px;
+}
+
+.nc-plan-price strong {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 43px;
+  font-weight: 900;
+  letter-spacing: -1.7px;
+}
+
+.nc-plan-price > span {
+  color: #71857d;
+  font-size: 13px;
+}
+
+.nc-plan-featured .nc-plan-price > span {
+  color: #d0e1d8;
+}
+
+.nc-plan-equivalent {
+  margin: 4px 0 0;
+  color: #d0e1d8;
+  font-size: 12px;
+}
+
+.nc-plan-savings {
+  align-self: flex-start;
+  margin-top: 14px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: #24594a;
+  color: #f8cb59;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+}
+
+.nc-plan-divider {
+  height: 1px;
+  margin: 27px 0 20px;
+  background: #e7ebe5;
+}
+
+.nc-plan-featured .nc-plan-divider {
+  background: #42675d;
+}
+
+.nc-plan-includes {
+  margin: 0 0 17px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.nc-plan-features {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  margin: 0 0 30px;
+  padding: 0;
+  list-style: none;
+}
+
+.nc-plan-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.nc-plan-check {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #e2f1e8;
+  color: #0e8060;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.nc-plan-featured .nc-plan-check {
+  background: #24594a;
+  color: #f8cb59;
+}
+
+.nc-plan-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding: 15px 18px;
+  border: 1px solid #0e8060;
+  border-radius: 12px;
+  color: #0e8060;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  width: 100%;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.nc-plan-button:hover {
+  background: #e2f1e8;
+}
+
+.nc-plan-button-featured {
+  border-color: #f8cb59;
+  background: #f8cb59;
+  color: #103f34;
+}
+
+.nc-plan-button-featured:hover {
+  background: #ffda79;
+}
+
+.nc-plan-footnote {
+  margin: 14px 0 0;
+  color: #71857d;
+  font-size: 10px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.nc-plan-featured .nc-plan-footnote {
+  color: #d0e1d8;
+}
+
+.nc-pricing-note {
+  max-width: 650px;
+  margin: 28px auto 0;
+  color: #71857d;
+  font-size: 11px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .nc-pricing {
+    padding: 60px 18px;
+  }
+
+  .nc-pricing-grid {
+    grid-template-columns: minmax(0, 440px);
+    gap: 20px;
+  }
+
+  .nc-plan-card {
+    padding: 26px;
+  }
+}
+
+@media (max-width: 400px) {
+  .nc-plan-card {
+    padding: 22px;
+  }
+
+  .nc-plan-price strong {
+    font-size: 37px;
+  }
+
+  .nc-plan-badge {
+    top: 12px;
+    right: 12px;
+    font-size: 9px;
+  }
+}
+
+.nc-back-home {
+  display: block;
+  width: max-content;
+  margin: 18px auto 0;
+  color: #0e8060;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.nc-back-home:hover {
+  color: #103f34;
+  text-decoration: underline;
+}

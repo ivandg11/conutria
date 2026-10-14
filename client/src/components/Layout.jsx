@@ -1,5 +1,6 @@
 ﻿import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
+import Logo from './Logo';
 
 export default function Layout() {
   const { user, logout } = useAuth();
@@ -8,9 +9,8 @@ export default function Layout() {
     <div className="min-h-screen bg-slate-50">
       <header className="app-navbar">
         <div className="app-navbar-inner">
-          <Link to="/dashboard" className="app-brand" aria-label="NutriControl, dashboard">
-            <span className="app-brand-mark" aria-hidden="true">✳</span>
-            <span>NutriControl</span>
+          <Link to="/dashboard" className="app-brand" aria-label="Nutria, dashboard">
+            <Logo size={36} />
           </Link>
 
           <nav className="app-navbar-nav" aria-label="Navegación principal">
@@ -21,6 +21,13 @@ export default function Layout() {
             >
               <span aria-hidden="true">⌂</span>
               Dashboard
+            </NavLink>
+            <NavLink
+              to="/account"
+              className={({ isActive }) => `app-nav-link ${isActive ? 'is-active' : ''}`}
+            >
+              <span aria-hidden="true">◉</span>
+              Cuenta
             </NavLink>
           </nav>
 
