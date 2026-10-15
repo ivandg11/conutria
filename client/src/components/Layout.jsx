@@ -9,7 +9,11 @@ export default function Layout() {
     <div className="min-h-screen bg-slate-50">
       <header className="app-navbar">
         <div className="app-navbar-inner">
-          <Link to="/dashboard" className="app-brand" aria-label="Nutria, dashboard">
+          <Link
+            to="/dashboard"
+            className="app-brand"
+            aria-label="Conutria, dashboard"
+          >
             <Logo size={36} />
           </Link>
 
@@ -17,14 +21,18 @@ export default function Layout() {
             <NavLink
               to="/dashboard"
               end
-              className={({ isActive }) => `app-nav-link ${isActive ? 'is-active' : ''}`}
+              className={({ isActive }) =>
+                `app-nav-link ${isActive ? 'is-active' : ''}`
+              }
             >
               <span aria-hidden="true">⌂</span>
               Dashboard
             </NavLink>
             <NavLink
               to="/account"
-              className={({ isActive }) => `app-nav-link ${isActive ? 'is-active' : ''}`}
+              className={({ isActive }) =>
+                `app-nav-link ${isActive ? 'is-active' : ''}`
+              }
             >
               <span aria-hidden="true">◉</span>
               Cuenta
@@ -45,4 +53,3 @@ export default function Layout() {
     </div>
   );
 }
-

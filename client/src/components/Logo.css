@@ -1,3 +1,16 @@
-.nutria-logo { display: inline-flex; align-items: center; gap: .7rem; color: inherit; font: inherit; }
-.nutria-logo svg { display: block; flex: 0 0 auto; }
-.nutria-logo-name { color: inherit; font: inherit; letter-spacing: inherit; }
+.Conutria-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: inherit;
+  font: inherit;
+}
+.Conutria-logo svg {
+  display: block;
+  flex: 0 0 auto;
+}
+.Conutria-logo-name {
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}

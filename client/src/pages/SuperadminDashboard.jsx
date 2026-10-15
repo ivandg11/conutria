@@ -201,7 +201,7 @@ export default function SuperadminDashboard() {
         <Link
           to="/admin"
           className="sa-brand"
-          aria-label="Nutria, panel de administración"
+          aria-label="Conutria, panel de administración"
         >
           <Logo size={36} />
           <span className="sa-brand-section">Superadmin</span>
@@ -244,8 +244,7 @@ export default function SuperadminDashboard() {
           <div className="sa-sidebar-help">
             <strong>Centro de control</strong>
             <p>
-              Revisa la actividad y el estado de Nutria desde un solo
-              lugar.
+              Revisa la actividad y el estado de Conutria desde un solo lugar.
             </p>
           </div>
         </aside>
@@ -377,7 +376,7 @@ export default function SuperadminDashboard() {
                   cells: [
                     u.name,
                     u.email,
-                    u.plan === 'LIFETIME' ? 'De por vida' : u.plan ?? '—',
+                    u.plan === 'LIFETIME' ? 'De por vida' : (u.plan ?? '—'),
                     statusText[u.status] ?? u.status,
                     date(u.createdAt),
                     date(u.lastLoginAt),
@@ -395,7 +394,9 @@ export default function SuperadminDashboard() {
                   {ticketError}
                 </p>
               )}
-              <div className={`sa-support-layout ${activeTicket?.status === 'CLOSED' ? 'is-ticket-closed' : ''}`}>
+              <div
+                className={`sa-support-layout ${activeTicket?.status === 'CLOSED' ? 'is-ticket-closed' : ''}`}
+              >
                 <div className="sa-panel sa-ticket-list">
                   <h2>Solicitudes</h2>
                   {supportTickets.length === 0 ? (
@@ -429,82 +430,95 @@ export default function SuperadminDashboard() {
                     ))
                   )}
                 </div>
-                {activeTicket?.status !== 'CLOSED' && <div className="sa-panel sa-ticket-detail">
-                  {!activeTicket ? (
-                    <p className="sa-empty">
-                      Selecciona una solicitud para ver la conversación.
-                    </p>
-                  ) : (
-                    <>
-                      <div className="sa-ticket-detail-heading">
-                        <div>
-                          <h2>{activeTicket.subject}</h2>
-                          <p>
-                            {activeTicket.user.name} · {activeTicket.user.email}
-                          </p>
-                        </div>
-                        {activeTicket.status !== 'CLOSED' && <div className="sa-ticket-heading-actions">
-                          <select
-                            aria-label="Estado del ticket"
-                            value={activeTicket.status}
-                            disabled={ticketBusy}
-                            onChange={(event) =>
-                              updateTicketStatus(event.target.value)
-                            }
-                          >
-                            <option value="OPEN">Abierto</option>
-                            <option value="IN_PROGRESS">En seguimiento</option>
-                            <option value="CLOSED">Cerrado</option>
-                          </select>
-                          <button
-                            type="button"
-                            className="sa-ticket-close"
-                            disabled={ticketBusy}
-                            onClick={() => updateTicketStatus('CLOSED')}
-                          >
-                            Cerrar ticket
-                          </button>
-                        </div>}
-                      </div>
-                      {activeTicket.status !== 'CLOSED' && <div className="sa-ticket-messages">
-                        {activeTicket.messages.map((message) => (
-                          <article
-                            className={`sa-ticket-message ${message.authorRole === 'ADMIN' ? 'is-admin' : ''}`}
-                            key={message.id}
-                          >
-                            <div>
-                              <strong>
-                                {message.authorRole === 'ADMIN'
-                                  ? message.author?.name || 'Administración'
-                                  : activeTicket.user.name}
-                              </strong>
-                              <time>{date(message.createdAt)}</time>
+                {activeTicket?.status !== 'CLOSED' && (
+                  <div className="sa-panel sa-ticket-detail">
+                    {!activeTicket ? (
+                      <p className="sa-empty">
+                        Selecciona una solicitud para ver la conversación.
+                      </p>
+                    ) : (
+                      <>
+                        <div className="sa-ticket-detail-heading">
+                          <div>
+                            <h2>{activeTicket.subject}</h2>
+                            <p>
+                              {activeTicket.user.name} ·{' '}
+                              {activeTicket.user.email}
+                            </p>
+                          </div>
+                          {activeTicket.status !== 'CLOSED' && (
+                            <div className="sa-ticket-heading-actions">
+                              <select
+                                aria-label="Estado del ticket"
+                                value={activeTicket.status}
+                                disabled={ticketBusy}
+                                onChange={(event) =>
+                                  updateTicketStatus(event.target.value)
+                                }
+                              >
+                                <option value="OPEN">Abierto</option>
+                                <option value="IN_PROGRESS">
+                                  En seguimiento
+                                </option>
+                                <option value="CLOSED">Cerrado</option>
+                              </select>
+                              <button
+                                type="button"
+                                className="sa-ticket-close"
+                                disabled={ticketBusy}
+                                onClick={() => updateTicketStatus('CLOSED')}
+                              >
+                                Cerrar ticket
+                              </button>
                             </div>
-                            <p>{message.content}</p>
-                          </article>
-                        ))}
-                      </div>}
-                      {activeTicket.status !== 'CLOSED' && <form
-                        className="sa-ticket-reply"
-                        onSubmit={sendTicketReply}
-                      >
-                        <textarea
-                          rows={3}
-                          maxLength={5000}
-                          required
-                          value={ticketReply}
-                          onChange={(event) =>
-                            setTicketReply(event.target.value)
-                          }
-                          placeholder="Escribe una respuesta para el cliente…"
-                        />
-                        <button type="submit" disabled={ticketBusy}>
-                          {ticketBusy ? 'Enviando…' : 'Responder al cliente'}
-                        </button>
-                      </form>}
-                    </>
-                  )}
-                </div>}
+                          )}
+                        </div>
+                        {activeTicket.status !== 'CLOSED' && (
+                          <div className="sa-ticket-messages">
+                            {activeTicket.messages.map((message) => (
+                              <article
+                                className={`sa-ticket-message ${message.authorRole === 'ADMIN' ? 'is-admin' : ''}`}
+                                key={message.id}
+                              >
+                                <div>
+                                  <strong>
+                                    {message.authorRole === 'ADMIN'
+                                      ? message.author?.name || 'Administración'
+                                      : activeTicket.user.name}
+                                  </strong>
+                                  <time>{date(message.createdAt)}</time>
+                                </div>
+                                <p>{message.content}</p>
+                              </article>
+                            ))}
+                          </div>
+                        )}
+                        {activeTicket.status !== 'CLOSED' && (
+                          <form
+                            className="sa-ticket-reply"
+                            onSubmit={sendTicketReply}
+                          >
+                            <textarea
+                              rows={3}
+                              maxLength={5000}
+                              required
+                              value={ticketReply}
+                              onChange={(event) =>
+                                setTicketReply(event.target.value)
+                              }
+                              placeholder="Escribe una respuesta para el cliente…"
+                            />
+                            <button type="submit" disabled={ticketBusy}>
+                              {ticketBusy
+                                ? 'Enviando…'
+                                : 'Responder al cliente'}
+                            </button>
+                          </form>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             </>
           )}
