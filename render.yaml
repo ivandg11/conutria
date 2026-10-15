@@ -5,7 +5,7 @@ services:
     plan: free
     rootDir: server
     buildCommand: npm ci --include=dev && npx prisma generate
-    startCommand: npx prisma migrate deploy && npm start
+    startCommand: node src/write-db-ca.js && npx prisma migrate deploy && npm start
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
@@ -13,6 +13,8 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_CA_CERT_BASE64
         sync: false
       - key: CLIENT_URL
         sync: false

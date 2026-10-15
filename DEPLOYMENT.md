@@ -12,7 +12,12 @@ Sube el proyecto a GitHub. Mantén el repositorio privado si contiene configurac
 
 1. Crea un servicio MySQL y una base de datos para Conutria.
 2. Descarga el certificado CA de Aiven y guárdalo en `server/prisma/ca.pem`.
-3. Prepara `DATABASE_URL` con el host, puerto, base, usuario y contraseña de Aiven:
+3. Prepara `DATABASE_URL` con el host, puerto, base, usuario y contraseña de Aiven.
+4. Configura `DATABASE_CA_CERT_BASE64` en Render con el certificado CA codificado en Base64. Desde PowerShell, en la raíz del proyecto, genera el valor con:
+
+   ```powershell
+   [Convert]::ToBase64String([IO.File]::ReadAllBytes("server/prisma/ca.pem"))
+   ```
 
    `mysql://USUARIO:CONTRASEÑA_CODIFICADA@HOST:PUERTO/BASE?sslcert=ca.pem&sslaccept=strict&connection_limit=5`
 
@@ -23,6 +28,7 @@ Sube el proyecto a GitHub. Mantén el repositorio privado si contiene configurac
 1. En Render selecciona **New → Blueprint**, conecta el repositorio y confirma el servicio descrito en `render.yaml`.
 2. Completa las variables secretas solicitadas:
    - `DATABASE_URL`: URL TLS de Aiven.
+   - `DATABASE_CA_CERT_BASE64`: certificado CA de Aiven codificado en Base64; Render lo escribe en `server/prisma/ca.pem` antes de ejecutar las migraciones.
    - `CLIENT_URL`: origen final del cliente, por ejemplo `https://www.tudominio.com` (sin `/` al final).
    - `PUBLIC_API_URL`: URL pública de la API, por ejemplo `https://api.tudominio.com` (sin `/` al final).
    - `SUPERADMIN_EMAIL`: correo de tu cuenta administradora.
