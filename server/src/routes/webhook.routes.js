@@ -133,12 +133,19 @@ async function sendSetupEmail(user, rawToken) {
 router.post('/mercadopago', async (req, res) => {
   const queryDataId = req.query['data.id'];
   const dataId = queryDataId ?? req.body?.data?.id;
-  if (!validSignature(req, queryDataId))
-    return res.status(401).json({ error: 'Firma de webhook invÃ¡lida.' });
+  // A notification without a resource ID cannot be processed as a payment.
+  // Acknowledge it so non-payment probes do not create misleading retries.
   if (!dataId) {
-    console.warn('Webhook de Mercado Pago ignorado: no contiene data.id en query ni en body.');
+    console.warn('Webhook de Mercado Pago ignorado: no contiene data.id.', {
+      queryKeys: Object.keys(req.query),
+      bodyType: req.body?.type ?? null,
+      bodyAction: req.body?.action ?? null,
+      bodyHasData: Boolean(req.body?.data),
+    });
     return res.sendStatus(200);
   }
+  if (!validSignature(req, queryDataId))
+    return res.status(401).json({ error: 'Firma de webhook invÃ¡lida.' });
   if (!process.env.MP_ACCESS_TOKEN)
     return res.status(503).json({ error: 'Webhook no configurado.' });
   try {
