@@ -14,7 +14,7 @@ const plans = {
   ANNUAL: { price: 1990, months: 12 },
 };
 
-function validSignature(req, dataId) {
+function validSignature(req, queryDataId) {
   const signature = req.get('x-signature');
   const requestId = req.get('x-request-id');
   const secret = process.env.MP_WEBHOOK_SECRET;
@@ -22,7 +22,6 @@ function validSignature(req, dataId) {
     !signature && 'x-signature',
     !requestId && 'x-request-id',
     !secret && 'MP_WEBHOOK_SECRET',
-    !dataId && 'data.id',
   ].filter(Boolean);
   if (missing.length) {
     console.error('Webhook de Mercado Pago rechazado; faltan datos:', missing.join(', '));
@@ -35,7 +34,8 @@ function validSignature(req, dataId) {
     console.error('Webhook de Mercado Pago rechazado: formato de firma incompleto.');
     return false;
   }
-  const manifest = `id:${String(dataId).toLowerCase()};request-id:${requestId};ts:${fields.ts};`;
+  // Mercado Pago signs data.id from the query string, not the JSON body.
+  const manifest = `${queryDataId ? `id:${String(queryDataId).toLowerCase()};` : ''}request-id:${requestId};ts:${fields.ts};`;
   const expected = createHmac('sha256', secret).update(manifest).digest();
   let received;
   try {
@@ -117,9 +117,14 @@ async function sendSetupEmail(user, rawToken) {
 }
 
 router.post('/mercadopago', async (req, res) => {
-  const dataId = req.query['data.id'] ?? req.body?.data?.id;
-  if (!validSignature(req, dataId))
+  const queryDataId = req.query['data.id'];
+  const dataId = queryDataId ?? req.body?.data?.id;
+  if (!validSignature(req, queryDataId))
     return res.status(401).json({ error: 'Firma de webhook invÃ¡lida.' });
+  if (!dataId) {
+    console.warn('Webhook de Mercado Pago ignorado: no contiene data.id en query ni en body.');
+    return res.sendStatus(200);
+  }
   if (!process.env.MP_ACCESS_TOKEN)
     return res.status(503).json({ error: 'Webhook no configurado.' });
   try {
