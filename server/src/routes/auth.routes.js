@@ -2,9 +2,10 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
-import { createHash } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
+import { sendPasswordResetEmail as sendPasswordResetMessage } from '../lib/email.js';
 import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
@@ -42,7 +43,7 @@ function setSession(res, userId) {
   res.cookie('token', token, cookieOptions);
 }
 
-async function sendPasswordResetEmail(user, rawToken) {
+async function sendPasswordResetEmailLegacy(user, rawToken) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.MAIL_FROM;
   const clientUrl = process.env.CLIENT_URL?.replace(/\/$/, '');
@@ -131,7 +132,7 @@ router.post('/forgot-password', passwordRecoveryLimiter, async (req, res) => {
       },
     });
     try {
-      await sendPasswordResetEmail(user, rawToken);
+      await sendPasswordResetMessage(user, rawToken);
     } catch (emailError) {
       await prisma.passwordSetupToken.deleteMany({ where: { tokenHash } });
       console.error('No se pudo enviar el correo de recuperación:', emailError.message);

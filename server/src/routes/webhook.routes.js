@@ -6,6 +6,7 @@ import {
   createHash,
 } from 'node:crypto';
 import { prisma } from '../lib/prisma.js';
+import { sendWelcomeEmail as sendWelcomeMessage } from '../lib/email.js';
 
 const router = Router();
 const plans = {
@@ -291,7 +292,7 @@ router.post('/mercadopago', async (req, res) => {
       });
     }
     try {
-      await sendSetupEmail(user, rawToken);
+      await sendWelcomeMessage(user, rawToken);
       await prisma.pendingSignup.update({
         where: { id: pending.id },
         data: {
