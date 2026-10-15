@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /recuperar-contrasena
+Disallow: /restablecer-contrasena
+Disallow: /crear-contrasena
+Disallow: /dashboard
+Disallow: /account
+Disallow: /support
+Disallow: /agenda
+Disallow: /patients
+Disallow: /consultations
+Disallow: /admin
+Disallow: /pago/resultado
+
+Sitemap: https://www.conutria.com/sitemap.xml
