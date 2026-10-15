@@ -222,6 +222,8 @@ body:has(.login-shell) { background: #f5f6f0; }
 .login-field { display: grid; gap: .5rem; color: #344e42; font-size: .88rem; font-weight: 650; }
 .login-field input { min-height: 52px; padding: .85rem 1rem !important; border: 1px solid #dce6df !important; border-radius: 12px !important; background: #fcfdfb !important; }
 .login-field input:focus { border-color: #45a984 !important; box-shadow: 0 0 0 3px rgba(69,169,132,.13) !important; }
+.login-recovery-link { justify-self: end; margin-top: -.55rem; color: #147a5b; font-size: .82rem; font-weight: 650; text-decoration: none; }
+.login-recovery-link:hover { text-decoration: underline; }
 .login-password-toggle { justify-self: start; padding: 0; border: 0; background: transparent; color: #347b60; font: inherit; font-size: .8rem; cursor: pointer; }
 .login-password-toggle:hover { text-decoration: underline; }
 .login-submit { min-height: 52px; display: flex; align-items: center; justify-content: space-between; margin-top: .25rem; padding: .8rem 1.1rem; border: 0; border-radius: 12px; color: #fff; background: #0d805f; font-weight: 700; cursor: pointer; transition: background .15s, transform .15s; }

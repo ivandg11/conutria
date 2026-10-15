@@ -6,6 +6,8 @@ import Layout from './components/ClientLayout';
 import LandingPage from './pages/LandingPage';
 import SubscriptionPlans from './pages/SuscriptionPlans';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Patients from './pages/Patients';
 import PatientForm from './pages/PatientForm';
 import PatientDetail from './pages/PatientDetail';
@@ -33,6 +35,8 @@ export default function App() {
 
           {/* Inicio de sesión */}
           <Route path="/login" element={<Login />} />
+          <Route path="/recuperar-contrasena" element={<ForgotPassword />} />
+          <Route path="/restablecer-contrasena" element={<ResetPassword />} />
           <Route
             path="/admin"
             element={

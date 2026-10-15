@@ -20,6 +20,12 @@ const createAuthLimiter = () => rateLimit({
 
 const loginLimiter = createAuthLimiter();
 const passwordSetupLimiter = createAuthLimiter();
+const passwordRecoveryLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const cookieOptions = {
   httpOnly: true,
@@ -34,6 +40,36 @@ function setSession(res, userId) {
     expiresIn: '7d',
   });
   res.cookie('token', token, cookieOptions);
+}
+
+async function sendPasswordResetEmail(user, rawToken) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.MAIL_FROM;
+  const clientUrl = process.env.CLIENT_URL?.replace(/\/$/, '');
+  if (!apiKey || !from || !clientUrl) {
+    throw new Error('Falta configurar el servicio de correo.');
+  }
+  const url = `${clientUrl}/restablecer-contrasena?token=${encodeURIComponent(rawToken)}`;
+  const safeName = String(user.name ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  })[char]);
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from,
+      to: [user.email],
+      subject: 'Restablece tu contraseña de Conutria',
+      text: `Hola ${user.name}, solicita una contraseña nueva desde este enlace: ${url}\n\nEl enlace vence en 30 minutos y solo se puede usar una vez. Si no pediste este cambio, ignora este correo.`,
+      html: `<!doctype html><html lang="es"><body style="margin:0;padding:32px;background:#f4f7f3;font-family:Arial,sans-serif;color:#193d35"><main style="max-width:520px;margin:auto;padding:32px;background:#fff;border:1px solid #e0e7de;border-radius:18px"><p style="color:#0e8060;font-weight:bold">Conutria</p><h1 style="font-size:24px">Restablece tu contraseña</h1><p>Hola ${safeName}, recibimos una solicitud para cambiar la contraseña de tu cuenta.</p><p style="margin:28px 0"><a href="${url}" style="padding:14px 22px;border-radius:10px;background:#f8cb59;color:#103f34;font-weight:bold;text-decoration:none">Crear contraseña nueva</a></p><p style="color:#71847c;font-size:13px">El enlace vence en 30 minutos y solo se puede usar una vez. Si no solicitaste el cambio, ignora este mensaje; tu contraseña seguirá igual.</p><p style="color:#71847c;font-size:12px;word-break:break-all">${url}</p></main></body></html>`,
+    }),
+  });
+  if (!response.ok) {
+    throw new Error(`Resend rechazó el correo (${response.status}).`);
+  }
 }
 
 router.post('/register', async (_req, res) => {
@@ -73,6 +109,76 @@ router.post('/setup-password', passwordSetupLimiter, async (req, res) => {
   if (!updated) return res.status(400).json({ error: 'El enlace no es válido o ya venció.' });
   setSession(res, updated.id);
   res.json({ id: updated.id, name: updated.name, email: updated.email, role: updated.role });
+});
+
+router.post('/forgot-password', passwordRecoveryLimiter, async (req, res) => {
+  const startedAt = Date.now();
+  const { email } = z.object({ email: z.string().trim().email().max(254) }).parse(req.body);
+  const normalizedEmail = email.toLowerCase();
+  const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+
+  if (user?.passwordHash) {
+    const rawToken = randomBytes(32).toString('base64url');
+    const tokenHash = createHash('sha256').update(rawToken).digest('hex');
+    await prisma.passwordSetupToken.deleteMany({
+      where: { userId: user.id, usedAt: null },
+    });
+    await prisma.passwordSetupToken.create({
+      data: {
+        userId: user.id,
+        tokenHash,
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+      },
+    });
+    try {
+      await sendPasswordResetEmail(user, rawToken);
+    } catch (emailError) {
+      await prisma.passwordSetupToken.deleteMany({ where: { tokenHash } });
+      console.error('No se pudo enviar el correo de recuperación:', emailError.message);
+    }
+  }
+
+  const delay = 700 - (Date.now() - startedAt);
+  if (delay > 0) await new Promise((resolve) => setTimeout(resolve, delay));
+  res.json({
+    message: 'Si existe una cuenta con ese correo, enviaremos un enlace para restablecer la contraseña.',
+  });
+});
+
+router.post('/reset-password', passwordSetupLimiter, async (req, res) => {
+  const { token, password } = z.object({
+    token: z.string().min(32),
+    password: z.string().min(8),
+  }).parse(req.body);
+  const tokenHash = createHash('sha256').update(token).digest('hex');
+  const reset = await prisma.passwordSetupToken.findUnique({
+    where: { tokenHash },
+  });
+  if (!reset || reset.usedAt || reset.expiresAt <= new Date()) {
+    return res.status(400).json({ error: 'El enlace no es válido o ya venció.' });
+  }
+
+  const passwordHash = await bcrypt.hash(password, 12);
+  const now = new Date();
+  const updated = await prisma.$transaction(async (tx) => {
+    const claimed = await tx.passwordSetupToken.updateMany({
+      where: { id: reset.id, usedAt: null, expiresAt: { gt: now } },
+      data: { usedAt: now },
+    });
+    if (claimed.count !== 1) return false;
+    await tx.user.update({
+      where: { id: reset.userId },
+      data: { passwordHash },
+    });
+    await tx.auditLog.create({
+      data: { actorId: reset.userId, action: 'Restableció contraseña', details: 'Recuperación por correo' },
+    });
+    return true;
+  });
+  if (!updated) {
+    return res.status(400).json({ error: 'El enlace no es válido o ya venció.' });
+  }
+  res.json({ ok: true });
 });
 
 router.post('/login', loginLimiter, async (req, res) => {

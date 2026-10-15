@@ -57,17 +57,17 @@ async function sendSetupEmail(user, rawToken) {
   const html = `<!doctype html>
 <html lang="es">
   <body style="margin:0;padding:0;background:#f4f7f3;font-family:Arial,Helvetica,sans-serif;color:#193d35;">
-    <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Tu pago fue confirmado. Crea tu contraseña para activar Conutria.</div>
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Te damos la bienvenida a Conutria. Tu suscripción está confirmada; activa tu cuenta.</div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f7f3;padding:36px 16px;">
       <tr><td align="center">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#ffffff;border:1px solid #e0e7de;border-radius:20px;overflow:hidden;">
           <tr><td style="padding:28px 32px;background:#103f34;color:#ffffff;text-align:center;">
             <div style="font-size:12px;font-weight:700;letter-spacing:3px;color:#9de0c2;">Conutria</div>
-            <div style="margin-top:12px;font-size:24px;font-weight:700;line-height:1.3;">Tu cuenta está casi lista</div>
+            <div style="margin-top:12px;font-size:24px;font-weight:700;line-height:1.3;">¡Te damos la bienvenida!</div>
           </td></tr>
           <tr><td style="padding:32px;color:#193d35;">
             <p style="margin:0 0 14px;font-size:16px;line-height:1.6;">Hola ${safeName},</p>
-            <p style="margin:0 0 24px;color:#627970;font-size:15px;line-height:1.7;">Confirmamos tu pago. Crea una contraseña para activar tu cuenta y comenzar a organizar tu consulta nutricional.</p>
+            <p style="margin:0 0 24px;color:#627970;font-size:15px;line-height:1.7;">Confirmamos tu suscripción. Crea una contraseña para activar tu cuenta y comenzar a organizar tu consulta nutricional.</p>
             <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto 22px;"><tr><td align="center" style="border-radius:10px;background:#f8cb59;">
               <a href="${url}" style="display:inline-block;padding:15px 28px;color:#103f34;font-size:15px;font-weight:700;text-decoration:none;">Crear mi contraseña</a>
             </td></tr></table>
@@ -80,7 +80,7 @@ async function sendSetupEmail(user, rawToken) {
     </table>
   </body>
 </html>`;
-  const text = `Hola ${user.name},\n\nConfirmamos tu pago. Crea una contraseña para activar tu cuenta de Conutria: ${url}\n\nEl enlace es de un solo uso y vence en 36 horas.`;
+  const text = `Hola ${user.name},\n\nTe damos la bienvenida a Conutria. Confirmamos tu suscripción. Crea una contraseña para activar tu cuenta: ${url}\n\nEl enlace es de un solo uso y vence en 36 horas.`;
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -90,7 +90,7 @@ async function sendSetupEmail(user, rawToken) {
     body: JSON.stringify({
       from,
       to: [user.email],
-      subject: 'Activa tu cuenta de Conutria',
+      subject: 'Te damos la bienvenida a Conutria',
       html,
       text,
     }),

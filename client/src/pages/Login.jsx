@@ -78,6 +78,7 @@ export default function Login() {
               {showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
             </button>
           </label>
+          <Link to="/recuperar-contrasena" className="login-recovery-link">¿Olvidaste tu contraseña?</Link>
           <button type="submit" className="login-submit" disabled={submitting}>
             {submitting ? 'Entrando…' : 'Entrar'}
             {!submitting && <span aria-hidden="true">→</span>}
