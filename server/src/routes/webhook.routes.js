@@ -17,10 +17,18 @@ const plans = {
 function validSignature(req, queryDataId) {
   const signature = req.get('x-signature')?.trim();
   const requestId = req.get('x-request-id')?.trim();
-  const secret = process.env.MP_WEBHOOK_SECRET;
+  const liveMode = req.body?.live_mode;
+  const secretVariable = liveMode === true
+    ? 'MP_WEBHOOK_SECRET_PROD'
+    : liveMode === false
+      ? 'MP_WEBHOOK_SECRET_TEST'
+      : 'MP_WEBHOOK_SECRET';
+  const secret = (process.env[secretVariable] || (
+    liveMode === true || liveMode === false ? '' : process.env.MP_WEBHOOK_SECRET
+  ))?.trim();
   const missing = [
     !signature && 'x-signature',
-    !secret && 'MP_WEBHOOK_SECRET',
+    !secret && secretVariable,
   ].filter(Boolean);
   if (missing.length) {
     console.error('Webhook de Mercado Pago rechazado; faltan datos:', missing.join(', '));
@@ -69,6 +77,7 @@ function validSignature(req, queryDataId) {
       queryAndBodyDataIdMatch: bodyId ? bodyId === id : null,
       requestIdPresent: Boolean(requestId),
       secretConfigured: Boolean(secret),
+      secretMode: liveMode === true ? 'production' : liveMode === false ? 'test' : 'unspecified',
       signatureTimestampPresent: Boolean(fields.ts),
       signatureHashPresent: Boolean(fields.v1),
       signatureMatchesWithoutRequestId: Boolean(requestId) && matchesCandidate(withoutRequestId),
@@ -146,6 +155,15 @@ async function sendSetupEmail(user, rawToken) {
 }
 
 router.post('/mercadopago', async (req, res) => {
+  // This endpoint provisions signups only from approved payment notifications.
+  // Merchant-order events are unrelated to that flow and must not be fetched as payments.
+  if (req.body?.type && req.body.type !== 'payment') {
+    console.info('Webhook de Mercado Pago ignorado: tipo no procesado.', {
+      eventType: req.body.type,
+      eventAction: req.body.action ?? null,
+    });
+    return res.sendStatus(200);
+  }
   const queryDataId = req.query['data.id'];
   const dataId = queryDataId ?? req.body?.data?.id;
   // A notification without a resource ID cannot be processed as a payment.
