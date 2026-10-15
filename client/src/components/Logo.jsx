@@ -2,13 +2,13 @@ import './Logo.css';
 
 export default function Logo({ size = 36, bg = '#1f8a6f', showName = true }) {
   return (
-    <span className="Conutria-logo">
+    <span className="Conutri-logo">
       <svg
         width={size}
         height={size}
         viewBox="0 0 40 40"
         role="img"
-        aria-label="Conutria"
+        aria-label="Conutri"
       >
         <rect width="40" height="40" rx="10" fill={bg} />
         <path
@@ -23,7 +23,7 @@ export default function Logo({ size = 36, bg = '#1f8a6f', showName = true }) {
           fill="none"
         />
       </svg>
-      {showName && <span className="Conutria-logo-name">Conutria</span>}
+      {showName && <span className="Conutri-logo-name">Conutri</span>}
     </span>
   );
 }

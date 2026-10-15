@@ -1,4 +1,4 @@
-# Despliegue de Conutria con servicios gratuitos
+# Despliegue de Conutri con servicios gratuitos
 
 La arquitectura preparada es: cliente React en Cloudflare Pages, API Node/Express en Render y MySQL en Aiven. Usa un dominio propio con dos subdominios bajo el mismo dominio registrable, por ejemplo `www.tudominio.com` para la app y `api.tudominio.com` para la API. Así las cookies de sesión seguras funcionan entre ambos servicios.
 
@@ -10,7 +10,7 @@ Sube el proyecto a GitHub. Mantén el repositorio privado si contiene configurac
 
 ## 2. Crea MySQL en Aiven
 
-1. Crea un servicio MySQL y una base de datos para Conutria.
+1. Crea un servicio MySQL y una base de datos para Conutri.
 2. Descarga el certificado CA de Aiven y guárdalo en `server/prisma/ca.pem`.
 3. Prepara `DATABASE_URL` con el host, puerto, base, usuario y contraseña de Aiven.
 4. Configura `DATABASE_CA_CERT_BASE64` en Render con el certificado CA codificado en Base64. Desde PowerShell, en la raíz del proyecto, genera el valor con:
@@ -44,7 +44,7 @@ Usa Cloudflare como DNS gratuito para el dominio. Añádelo a Cloudflare y sigue
 
 ### API en Render
 
-En el servicio de Render abre **Settings → Custom Domains**, añade `api.tudominio.com` y sigue sus instrucciones DNS. Para el registro CNAME de `api`, apunta a `Conutria-api.onrender.com`; durante la validación TLS déjalo como **DNS only** (nube gris) y elimina cualquier registro AAAA conflictivo. Espera a que Render indique que el certificado TLS está listo.
+En el servicio de Render abre **Settings → Custom Domains**, añade `api.tudominio.com` y sigue sus instrucciones DNS. Para el registro CNAME de `api`, apunta a `Conutri-api.onrender.com`; durante la validación TLS déjalo como **DNS only** (nube gris) y elimina cualquier registro AAAA conflictivo. Espera a que Render indique que el certificado TLS está listo.
 
 ### Cliente en Cloudflare Pages
 
@@ -74,7 +74,7 @@ En Mercado Pago configura el webhook con:
 
 `https://api.tudominio.com/api/webhooks/mercadopago`
 
-Guarda las credenciales de producción y `PUBLIC_API_URL` en Render. Verifica también el dominio remitente en Resend antes de usar `MAIL_FROM`. Si aún no tienes dominio, Render puede ofrecer temporalmente `https://Conutria-api.onrender.com`, pero actualiza `PUBLIC_API_URL`, `CLIENT_URL` y `VITE_API_URL` a los subdominios propios antes de habilitar el acceso de clientes.
+Guarda las credenciales de producción y `PUBLIC_API_URL` en Render. Verifica también el dominio remitente en Resend antes de usar `MAIL_FROM`. Si aún no tienes dominio, Render puede ofrecer temporalmente `https://Conutri-api.onrender.com`, pero actualiza `PUBLIC_API_URL`, `CLIENT_URL` y `VITE_API_URL` a los subdominios propios antes de habilitar el acceso de clientes.
 
 ## Límites del presupuesto de $0
 

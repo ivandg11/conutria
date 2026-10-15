@@ -7,12 +7,12 @@ const router = Router();
 const limiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 8 });
 const plans = {
   monthly: {
-    title: 'Conutria mensual',
+    title: 'Conutri mensual',
     code: 'MONTHLY',
     amount: 199,
     months: 1,
   },
-  annual: { title: 'Conutria anual', code: 'ANNUAL', amount: 1990, months: 12 },
+  annual: { title: 'Conutri anual', code: 'ANNUAL', amount: 1990, months: 12 },
 };
 
 router.post('/start', limiter, async (req, res) => {
@@ -31,12 +31,10 @@ router.post('/start', limiter, async (req, res) => {
       select: { id: true },
     })
   ) {
-    return res
-      .status(409)
-      .json({
-        error:
-          'Ya existe una cuenta con ese correo. Inicia sesión o contacta soporte.',
-      });
+    return res.status(409).json({
+      error:
+        'Ya existe una cuenta con ese correo. Inicia sesión o contacta soporte.',
+    });
   }
   if (
     await prisma.pendingSignup.findFirst({
@@ -116,11 +114,9 @@ router.post('/start', limiter, async (req, res) => {
       'No se pudo crear la preferencia de Mercado Pago:',
       error.message,
     );
-    res
-      .status(502)
-      .json({
-        error: 'No se pudo iniciar el pago. Inténtalo de nuevo más tarde.',
-      });
+    res.status(502).json({
+      error: 'No se pudo iniciar el pago. Inténtalo de nuevo más tarde.',
+    });
   }
 });
 

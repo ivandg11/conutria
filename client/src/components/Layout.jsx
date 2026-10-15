@@ -12,7 +12,7 @@ export default function Layout() {
           <Link
             to="/dashboard"
             className="app-brand"
-            aria-label="Conutria, dashboard"
+            aria-label="Conutri, dashboard"
           >
             <Logo size={36} />
           </Link>

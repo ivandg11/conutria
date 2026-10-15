@@ -9,7 +9,7 @@ function DraftNotice() {
     <aside className="legal-draft-notice">
       <strong>Borrador por completar</strong>
       <p>
-        Antes de publicar Conutria para clientes, reemplaza los campos entre
+        Antes de publicar Conutri para clientes, reemplaza los campos entre
         corchetes y pide una revisión legal. No uses datos reales de pacientes
         mientras estos documentos sigan incompletos.
       </p>
@@ -22,14 +22,12 @@ function PrivacyNotice() {
     <>
       <p className="legal-lead">
         Este aviso explica qué información se trata al crear una cuenta y usar
-        Conutria, para qué se utiliza y cómo puedes ejercer tus derechos.
+        Conutri, para qué se utiliza y cómo puedes ejercer tus derechos.
       </p>
       <h2>1. Responsable y contacto</h2>
       <p>
-        El responsable de los datos de cuenta y facturación de Conutria es{' '}
-        <strong>
-          [NOMBRE LEGAL O NOMBRE COMPLETO DE QUIEN OPERA Conutria]
-        </strong>
+        El responsable de los datos de cuenta y facturación de Conutri es{' '}
+        <strong>[NOMBRE LEGAL O NOMBRE COMPLETO DE QUIEN OPERA Conutri]</strong>
         , con domicilio en <strong>[DOMICILIO COMPLETO]</strong>. Para dudas o
         solicitudes de privacidad, escribe a{' '}
         <strong>[CORREO DE PRIVACIDAD]</strong>.
@@ -54,8 +52,8 @@ function PrivacyNotice() {
           salud y se considera sensible.
         </li>
         <li>
-          <strong>Pago:</strong> Conutria recibe la confirmación y referencias
-          de la transacción. El pago se procesa en Mercado Pago; Conutria no
+          <strong>Pago:</strong> Conutri recibe la confirmación y referencias de
+          la transacción. El pago se procesa en Mercado Pago; Conutri no
           solicita en esta aplicación el número completo de tarjeta ni el código
           de seguridad.
         </li>
@@ -65,11 +63,11 @@ function PrivacyNotice() {
         Usamos los datos de cuenta para crear y proteger el acceso, prestar las
         funciones contratadas, administrar pagos y suscripciones, responder a
         soporte, prevenir fraude y atender obligaciones legales. Los datos de
-        pacientes se alojan para que el profesional que contrató Conutria
+        pacientes se alojan para que el profesional que contrató Conutri
         gestione su consulta, expedientes, citas y seguimiento.
       </p>
       <p>
-        Conutria proporciona herramientas de organización; no sustituye el
+        Conutri proporciona herramientas de organización; no sustituye el
         criterio clínico ni presta atención nutricional a los pacientes del
         profesional. El profesional que incorpora los datos de sus pacientes
         debe determinar y documentar la base legal, informarles sobre el
@@ -78,11 +76,11 @@ function PrivacyNotice() {
       </p>
       <h2>4. Roles respecto de los expedientes</h2>
       <p>
-        Respecto de la cuenta del profesional, quien opera Conutria actúa como
+        Respecto de la cuenta del profesional, quien opera Conutri actúa como
         responsable de los datos necesarios para ofrecer la plataforma. Respecto
         de los expedientes de pacientes, la intención del servicio es que el
         profesional cliente determine las finalidades y opere como responsable,
-        y que Conutria trate esos datos por cuenta e instrucciones del
+        y que Conutri trate esos datos por cuenta e instrucciones del
         profesional para alojar y mostrar la información. Esta asignación deberá
         reflejarse en el contrato y en las instrucciones reales del servicio.
       </p>
@@ -91,8 +89,8 @@ function PrivacyNotice() {
         Los expedientes pueden incluir datos sensibles de salud. El profesional
         debe contar con las autorizaciones y avisos aplicables antes de
         incorporarlos. El reconocimiento de este aviso por la persona que
-        contrata Conutria no sustituye el consentimiento del paciente ni
-        autoriza por sí mismo el tratamiento de sus datos sensibles.
+        contrata Conutri no sustituye el consentimiento del paciente ni autoriza
+        por sí mismo el tratamiento de sus datos sensibles.
       </p>
       <h2>6. Proveedores y comunicaciones</h2>
       <p>
@@ -109,7 +107,7 @@ function PrivacyNotice() {
       </p>
       <p>
         No vendemos datos personales. Solo comunicaremos información cuando sea
-        necesario para prestar Conutria, exista una instrucción válida del
+        necesario para prestar Conutri, exista una instrucción válida del
         profesional cliente o lo requiera la ley.
       </p>
       <h2>7. Conservación, seguridad y eliminación</h2>
@@ -134,13 +132,13 @@ function PrivacyNotice() {
         Indica tu nombre, correo de cuenta, derecho que deseas ejercer y medios
         para responderte. Para expedientes de pacientes, el profesional
         responsable debe atender la solicitud del paciente y coordinar con
-        Conutria cuando sea necesario.
+        Conutri cuando sea necesario.
       </p>
       <h2>9. Cookies y sesión</h2>
       <p>
-        Conutria utiliza una cookie de sesión necesaria, protegida como
-        HTTP-only y, en producción, Secure, para mantener la sesión iniciada. No
-        usamos esa cookie para publicidad.{' '}
+        Conutri utiliza una cookie de sesión necesaria, protegida como HTTP-only
+        y, en producción, Secure, para mantener la sesión iniciada. No usamos
+        esa cookie para publicidad.{' '}
         <strong>
           [CONFIRMAR SI EL SITIO USA ANALÍTICA, PIXELES U OTRAS COOKIES]
         </strong>
@@ -160,20 +158,20 @@ function TermsOfUse() {
   return (
     <>
       <p className="legal-lead">
-        Estas condiciones regulan el uso de Conutria, una plataforma de
+        Estas condiciones regulan el uso de Conutri, una plataforma de
         organización para profesionales de nutrición. Al contratar, la persona
         usuaria acepta estas condiciones.
       </p>
       <h2>1. Quién presta el servicio</h2>
       <p>
-        Conutria es operada por{' '}
-        <strong>[NOMBRE LEGAL O NOMBRE COMPLETO]</strong>, con domicilio en{' '}
-        <strong>[DOMICILIO COMPLETO]</strong> y contacto Conutria2027@gmail.com.{' '}
+        Conutri es operada por <strong>[NOMBRE LEGAL O NOMBRE COMPLETO]</strong>
+        , con domicilio en <strong>[DOMICILIO COMPLETO]</strong> y contacto
+        Conutri2027@gmail.com.{' '}
         <strong>[AGREGAR RFC Y DATOS COMERCIALES QUE CORRESPONDAN]</strong>.
       </p>
       <h2>2. Servicio y cuenta</h2>
       <p>
-        Conutria ofrece herramientas para organizar pacientes, expedientes,
+        Conutri ofrece herramientas para organizar pacientes, expedientes,
         citas, consultas, mediciones, planes alimenticios y soporte. La persona
         titular de la cuenta es responsable de mantener sus credenciales
         seguras, usar información correcta y limitar el acceso a personal
@@ -217,18 +215,18 @@ function TermsOfUse() {
       <p>
         El profesional es responsable de contar con autorización para registrar
         información de sus pacientes, proporcionarles su aviso de privacidad,
-        obtener los consentimientos requeridos y usar Conutria conforme a sus
+        obtener los consentimientos requeridos y usar Conutri conforme a sus
         obligaciones profesionales. No registres datos de personas sin
         autorización ni información que no sea necesaria para la atención.
       </p>
       <p>
-        Conutria es una herramienta administrativa y no diagnostica, prescribe
-        ni sustituye la valoración profesional, la consulta clínica ni el juicio
+        Conutri es una herramienta administrativa y no diagnostica, prescribe ni
+        sustituye la valoración profesional, la consulta clínica ni el juicio
         del nutriólogo.
       </p>
       <h2>6. Uso permitido</h2>
       <p>
-        No uses Conutria para actividades ilícitas, acceder a cuentas ajenas,
+        No uses Conutri para actividades ilícitas, acceder a cuentas ajenas,
         intentar comprometer la plataforma, cargar código malicioso o infringir
         derechos de otras personas. Podemos limitar temporalmente una cuenta
         ante un riesgo de seguridad o incumplimiento grave, procurando informar
@@ -236,7 +234,7 @@ function TermsOfUse() {
       </p>
       <h2>7. Disponibilidad y soporte</h2>
       <p>
-        Trabajamos para mantener Conutria disponible y atender solicitudes de
+        Trabajamos para mantener Conutri disponible y atender solicitudes de
         soporte. Puede haber interrupciones por mantenimiento, fallas de
         proveedores o incidentes técnicos. El plan de infraestructura actual
         puede tener periodos de inactividad y no incluye un compromiso de
@@ -262,7 +260,7 @@ function TermsOfUse() {
       <p>
         Publicaremos cambios a estas condiciones en esta página e indicaremos la
         fecha de actualización. Para soporte o dudas contractuales escribe a{' '}
-        <a href="mailto:Conutria2027@gmail.com">Conutria2027@gmail.com</a>.
+        <a href="mailto:Conutri2027@gmail.com">Conutri2027@gmail.com</a>.
       </p>
       <h2>11. Legislación aplicable</h2>
       <p>
@@ -283,7 +281,7 @@ export default function LegalDocuments({ type }) {
   return (
     <main className="legal-page">
       <header className="legal-header">
-        <Link to="/" className="legal-brand" aria-label="Conutria, inicio">
+        <Link to="/" className="legal-brand" aria-label="Conutri, inicio">
           <Logo size={42} />
         </Link>
         <Link className="legal-home-button" to="/">
@@ -291,7 +289,7 @@ export default function LegalDocuments({ type }) {
         </Link>
       </header>
       <article className="legal-content">
-        <span className="legal-eyebrow">Conutria · DOCUMENTO INFORMATIVO</span>
+        <span className="legal-eyebrow">Conutri · DOCUMENTO INFORMATIVO</span>
         <h1>{isPrivacy ? 'Aviso de privacidad' : 'Términos de uso'}</h1>
         <p className="legal-date">
           Última revisión del borrador: {revisionDate}
