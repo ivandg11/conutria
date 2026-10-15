@@ -15,39 +15,53 @@ const plans = {
 };
 
 function validSignature(req, queryDataId) {
-  const signature = req.get('x-signature');
-  const requestId = req.get('x-request-id');
+  const signature = req.get('x-signature')?.trim();
+  const requestId = req.get('x-request-id')?.trim();
   const secret = process.env.MP_WEBHOOK_SECRET;
   const missing = [
     !signature && 'x-signature',
-    !requestId && 'x-request-id',
     !secret && 'MP_WEBHOOK_SECRET',
   ].filter(Boolean);
   if (missing.length) {
     console.error('Webhook de Mercado Pago rechazado; faltan datos:', missing.join(', '));
     return false;
   }
-  const fields = Object.fromEntries(
-    signature.split(',').map((part) => part.trim().split('=')),
-  );
+  const fields = {};
+  for (const part of signature.split(',')) {
+    const separator = part.indexOf('=');
+    if (separator < 0) continue;
+    const key = part.slice(0, separator).trim().toLowerCase();
+    const value = part.slice(separator + 1).trim();
+    if (key && value) fields[key] = value;
+  }
   if (!fields.ts || !fields.v1) {
     console.error('Webhook de Mercado Pago rechazado: formato de firma incompleto.');
     return false;
   }
-  // Mercado Pago signs data.id from the query string, not the JSON body.
-  const manifest = `${queryDataId ? `id:${String(queryDataId).toLowerCase()};` : ''}request-id:${requestId};ts:${fields.ts};`;
-  const expected = createHmac('sha256', secret).update(manifest).digest();
-  let received;
-  try {
-    received = Buffer.from(fields.v1, 'hex');
-  } catch {
+  // Follow Mercado Pago's current SDK: preserve data.id exactly as received,
+  // and omit optional manifest fields when the notification does not include them.
+  const manifestParts = [];
+  if (queryDataId !== undefined && queryDataId !== null && String(queryDataId).trim())
+    manifestParts.push(`id:${String(queryDataId).trim()}`);
+  if (requestId) manifestParts.push(`request-id:${requestId}`);
+  manifestParts.push(`ts:${fields.ts}`);
+  const manifest = `${manifestParts.join(';')};`;
+  if (!/^[a-f\d]{64}$/i.test(fields.v1)) {
+    console.error('Webhook de Mercado Pago rechazado: firma con formato inválido.');
     return false;
   }
-  const isValid = (
-    received.length === expected.length && timingSafeEqual(received, expected)
-  );
+  const expected = createHmac('sha256', secret).update(manifest).digest();
+  const received = Buffer.from(fields.v1, 'hex');
+  const isValid = received.length === expected.length && timingSafeEqual(received, expected);
   if (!isValid) {
-    console.error('Webhook de Mercado Pago rechazado: la firma no coincide.');
+    console.error('Webhook de Mercado Pago rechazado: la firma no coincide.', {
+      queryDataIdPresent: Boolean(queryDataId),
+      bodyDataIdPresent: Boolean(req.body?.data?.id),
+      requestIdPresent: Boolean(requestId),
+      secretConfigured: Boolean(secret),
+      signatureTimestampPresent: Boolean(fields.ts),
+      signatureHashPresent: Boolean(fields.v1),
+    });
   }
   return isValid;
 }
