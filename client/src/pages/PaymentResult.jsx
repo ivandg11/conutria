@@ -23,7 +23,7 @@ export default function PaymentResult() {
   return (
     <main className="nc-checkout-page">
       <section className="nc-checkout-panel nc-payment-result">
-        <span className="nc-pricing-eyebrow">Conutri</span>
+        <span className="nc-pricing-eyebrow">Conutria</span>
         <h1>{content[0]}</h1>
         <p>{content[1]}</p>
         <Link

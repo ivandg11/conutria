@@ -19,7 +19,7 @@ export default function ClientLayout() {
         <Link
           to="/dashboard"
           className="client-brand"
-          aria-label="Conutri, dashboard"
+          aria-label="Conutria, dashboard"
         >
           <Logo size={36} />
         </Link>

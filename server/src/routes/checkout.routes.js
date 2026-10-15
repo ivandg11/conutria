@@ -7,12 +7,12 @@ const router = Router();
 const limiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 8 });
 const plans = {
   monthly: {
-    title: 'Conutri mensual',
+    title: 'Conutria mensual',
     code: 'MONTHLY',
     amount: 199,
     months: 1,
   },
-  annual: { title: 'Conutri anual', code: 'ANNUAL', amount: 1990, months: 12 },
+  annual: { title: 'Conutria anual', code: 'ANNUAL', amount: 1990, months: 12 },
 };
 
 router.post('/start', limiter, async (req, res) => {

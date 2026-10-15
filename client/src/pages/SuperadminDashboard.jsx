@@ -201,7 +201,7 @@ export default function SuperadminDashboard() {
         <Link
           to="/admin"
           className="sa-brand"
-          aria-label="Conutri, panel de administración"
+          aria-label="Conutria, panel de administración"
         >
           <Logo size={36} />
           <span className="sa-brand-section">Superadmin</span>
@@ -244,7 +244,7 @@ export default function SuperadminDashboard() {
           <div className="sa-sidebar-help">
             <strong>Centro de control</strong>
             <p>
-              Revisa la actividad y el estado de Conutri desde un solo lugar.
+              Revisa la actividad y el estado de Conutria desde un solo lugar.
             </p>
           </div>
         </aside>

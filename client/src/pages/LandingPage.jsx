@@ -39,7 +39,7 @@ const features = [
 
 function Logo() {
   return (
-    <Link className="nc-brand" to="/" aria-label="Conutri, inicio">
+    <Link className="nc-brand" to="/" aria-label="Conutria, inicio">
       <BrandLogo size={42} />
     </Link>
   );
@@ -140,7 +140,7 @@ export default function LandingPage() {
               className="nc-button nc-button-yellow nc-button-large"
               to="/planes"
             >
-              Conocer los Planes de Conutri <span>→</span>
+              Conocer los Planes de Conutria <span>→</span>
             </Link>
 
             <Link className="nc-text-link" to="/login">
@@ -245,7 +245,7 @@ export default function LandingPage() {
           <h2>La confianza también importa.</h2>
           <p>
             La información de tus pacientes merece un manejo responsable.
-            Conutri se diseña pensando en la privacidad y el acceso controlado.
+            Conutria se diseña pensando en la privacidad y el acceso controlado.
           </p>
         </div>
       </section>
@@ -271,7 +271,7 @@ export default function LandingPage() {
         <div className="nc-footer-legal">
           <Link to="/aviso-de-privacidad">Aviso de privacidad</Link>
           <Link to="/terminos-de-uso">Términos de uso</Link>
-          <span>© {new Date().getFullYear()} Conutri</span>
+          <span>© {new Date().getFullYear()} Conutria</span>
         </div>
       </footer>
     </main>

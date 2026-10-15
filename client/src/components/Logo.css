@@ -1,15 +1,15 @@
-.Conutri-logo {
+.Conutria-logo {
   display: inline-flex;
   align-items: center;
   gap: 0.7rem;
   color: inherit;
   font: inherit;
 }
-.Conutri-logo svg {
+.Conutria-logo svg {
   display: block;
   flex: 0 0 auto;
 }
-.Conutri-logo-name {
+.Conutria-logo-name {
   color: inherit;
   font: inherit;
   letter-spacing: inherit;

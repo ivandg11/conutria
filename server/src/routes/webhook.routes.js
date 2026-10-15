@@ -57,12 +57,12 @@ async function sendSetupEmail(user, rawToken) {
   const html = `<!doctype html>
 <html lang="es">
   <body style="margin:0;padding:0;background:#f4f7f3;font-family:Arial,Helvetica,sans-serif;color:#193d35;">
-    <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Tu pago fue confirmado. Crea tu contraseña para activar Conutri.</div>
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Tu pago fue confirmado. Crea tu contraseña para activar Conutria.</div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f7f3;padding:36px 16px;">
       <tr><td align="center">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#ffffff;border:1px solid #e0e7de;border-radius:20px;overflow:hidden;">
           <tr><td style="padding:28px 32px;background:#103f34;color:#ffffff;text-align:center;">
-            <div style="font-size:12px;font-weight:700;letter-spacing:3px;color:#9de0c2;">Conutri</div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:3px;color:#9de0c2;">Conutria</div>
             <div style="margin-top:12px;font-size:24px;font-weight:700;line-height:1.3;">Tu cuenta está casi lista</div>
           </td></tr>
           <tr><td style="padding:32px;color:#193d35;">
@@ -74,13 +74,13 @@ async function sendSetupEmail(user, rawToken) {
             <p style="margin:0;color:#71847c;font-size:13px;line-height:1.6;text-align:center;">Este enlace es de un solo uso y vence en 36 horas.</p>
             <p style="margin:22px 0 0;color:#71847c;font-size:12px;line-height:1.6;">Si el botón no funciona, copia este enlace en tu navegador:<br><a href="${url}" style="color:#0e8060;word-break:break-all;">${url}</a></p>
           </td></tr>
-          <tr><td style="padding:18px 32px;border-top:1px solid #edf1ec;color:#87978f;font-size:12px;line-height:1.6;text-align:center;">Conutri · Herramientas para una consulta más organizada</td></tr>
+          <tr><td style="padding:18px 32px;border-top:1px solid #edf1ec;color:#87978f;font-size:12px;line-height:1.6;text-align:center;">Conutria · Herramientas para una consulta más organizada</td></tr>
         </table>
       </td></tr>
     </table>
   </body>
 </html>`;
-  const text = `Hola ${user.name},\n\nConfirmamos tu pago. Crea una contraseña para activar tu cuenta de Conutri: ${url}\n\nEl enlace es de un solo uso y vence en 36 horas.`;
+  const text = `Hola ${user.name},\n\nConfirmamos tu pago. Crea una contraseña para activar tu cuenta de Conutria: ${url}\n\nEl enlace es de un solo uso y vence en 36 horas.`;
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -90,7 +90,7 @@ async function sendSetupEmail(user, rawToken) {
     body: JSON.stringify({
       from,
       to: [user.email],
-      subject: 'Activa tu cuenta de Conutri',
+      subject: 'Activa tu cuenta de Conutria',
       html,
       text,
     }),

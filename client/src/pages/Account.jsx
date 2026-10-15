@@ -108,7 +108,7 @@ export default function Account() {
               <span className="account-icon">◎</span>
               <div>
                 <h2>Perfil</h2>
-                <p>Datos de acceso a Conutri</p>
+                <p>Datos de acceso a Conutria</p>
               </div>
             </div>
             <dl className="account-details">
