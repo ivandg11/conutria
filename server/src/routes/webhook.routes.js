@@ -18,11 +18,23 @@ function validSignature(req, dataId) {
   const signature = req.get('x-signature');
   const requestId = req.get('x-request-id');
   const secret = process.env.MP_WEBHOOK_SECRET;
-  if (!signature || !requestId || !secret || !dataId) return false;
+  const missing = [
+    !signature && 'x-signature',
+    !requestId && 'x-request-id',
+    !secret && 'MP_WEBHOOK_SECRET',
+    !dataId && 'data.id',
+  ].filter(Boolean);
+  if (missing.length) {
+    console.error('Webhook de Mercado Pago rechazado; faltan datos:', missing.join(', '));
+    return false;
+  }
   const fields = Object.fromEntries(
     signature.split(',').map((part) => part.trim().split('=')),
   );
-  if (!fields.ts || !fields.v1) return false;
+  if (!fields.ts || !fields.v1) {
+    console.error('Webhook de Mercado Pago rechazado: formato de firma incompleto.');
+    return false;
+  }
   const manifest = `id:${String(dataId).toLowerCase()};request-id:${requestId};ts:${fields.ts};`;
   const expected = createHmac('sha256', secret).update(manifest).digest();
   let received;
@@ -31,9 +43,13 @@ function validSignature(req, dataId) {
   } catch {
     return false;
   }
-  return (
+  const isValid = (
     received.length === expected.length && timingSafeEqual(received, expected)
   );
+  if (!isValid) {
+    console.error('Webhook de Mercado Pago rechazado: la firma no coincide.');
+  }
+  return isValid;
 }
 
 async function sendSetupEmail(user, rawToken) {
