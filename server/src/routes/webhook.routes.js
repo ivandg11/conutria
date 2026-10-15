@@ -136,7 +136,10 @@ router.post('/mercadopago', async (req, res) => {
   // A notification without a resource ID cannot be processed as a payment.
   // Acknowledge it so non-payment probes do not create misleading retries.
   if (!dataId) {
-    console.warn('Webhook de Mercado Pago ignorado: no contiene data.id.', {
+    const isLegacyIpn = req.query.id != null || req.query.topic != null;
+    console.warn(isLegacyIpn
+      ? 'Notificación IPN antigua de Mercado Pago ignorada; se espera Webhook con data.id.'
+      : 'Webhook de Mercado Pago ignorado: no contiene data.id.', {
       queryKeys: Object.keys(req.query),
       bodyType: req.body?.type ?? null,
       bodyAction: req.body?.action ?? null,
