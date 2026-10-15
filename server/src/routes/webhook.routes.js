@@ -54,13 +54,28 @@ function validSignature(req, queryDataId) {
   const received = Buffer.from(fields.v1, 'hex');
   const isValid = received.length === expected.length && timingSafeEqual(received, expected);
   if (!isValid) {
+    const matchesCandidate = (candidate) => {
+      const digest = createHmac('sha256', secret).update(candidate).digest();
+      return received.length === digest.length && timingSafeEqual(received, digest);
+    };
+    const id = String(queryDataId ?? '').trim();
+    const tsPart = `ts:${fields.ts};`;
+    const withoutRequestId = `${id ? `id:${id};` : ''}${tsPart}`;
+    const bodyId = String(req.body?.data?.id ?? '').trim();
+    const withBodyId = `${bodyId ? `id:${bodyId};` : ''}${requestId ? `request-id:${requestId};` : ''}${tsPart}`;
     console.error('Webhook de Mercado Pago rechazado: la firma no coincide.', {
       queryDataIdPresent: Boolean(queryDataId),
       bodyDataIdPresent: Boolean(req.body?.data?.id),
+      queryAndBodyDataIdMatch: bodyId ? bodyId === id : null,
       requestIdPresent: Boolean(requestId),
       secretConfigured: Boolean(secret),
       signatureTimestampPresent: Boolean(fields.ts),
       signatureHashPresent: Boolean(fields.v1),
+      signatureMatchesWithoutRequestId: Boolean(requestId) && matchesCandidate(withoutRequestId),
+      signatureMatchesBodyDataId: Boolean(bodyId) && bodyId !== id && matchesCandidate(withBodyId),
+      eventType: req.body?.type ?? null,
+      eventAction: req.body?.action ?? null,
+      liveMode: typeof req.body?.live_mode === 'boolean' ? req.body.live_mode : null,
     });
   }
   return isValid;
