@@ -71,6 +71,10 @@ function validSignature(req, queryDataId) {
     const withoutRequestId = `${id ? `id:${id};` : ''}${tsPart}`;
     const bodyId = String(req.body?.data?.id ?? '').trim();
     const withBodyId = `${bodyId ? `id:${bodyId};` : ''}${requestId ? `request-id:${requestId};` : ''}${tsPart}`;
+    const tokenApplicationId = process.env.MP_ACCESS_TOKEN?.match(/^(?:APP_USR|TEST)-(\d+)-/)?.[1];
+    const eventApplicationId = req.body?.application_id == null
+      ? null
+      : String(req.body.application_id);
     console.error('Webhook de Mercado Pago rechazado: la firma no coincide.', {
       queryDataIdPresent: Boolean(queryDataId),
       bodyDataIdPresent: Boolean(req.body?.data?.id),
@@ -85,6 +89,9 @@ function validSignature(req, queryDataId) {
       eventType: req.body?.type ?? null,
       eventAction: req.body?.action ?? null,
       liveMode: typeof req.body?.live_mode === 'boolean' ? req.body.live_mode : null,
+      applicationIdMatchesAccessToken: tokenApplicationId && eventApplicationId
+        ? tokenApplicationId === eventApplicationId
+        : null,
     });
   }
   return isValid;
