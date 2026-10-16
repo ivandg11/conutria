@@ -101,6 +101,7 @@ function validSignature(req, queryDataId) {
       bodyDataIdPresent: Boolean(req.body?.data?.id),
       queryAndBodyDataIdMatch: bodyId ? bodyId === id : null,
       requestIdPresent: Boolean(requestId),
+      requestId: requestId ?? null,
       secretConfigured: Boolean(secret),
       secretHasEdgeWhitespace: Boolean(secret && secret !== secret.trim()),
       secretVariableUsed: configuredSecretVariable,
@@ -111,6 +112,8 @@ function validSignature(req, queryDataId) {
             ? 'test'
             : 'unspecified',
       signatureTimestampPresent: Boolean(fields.ts),
+      signatureTimestamp: fields.ts,
+      signatureManifest: manifest,
       signatureHashPresent: Boolean(fields.v1),
       dataIdHadUppercase: Boolean(id && id !== id.toLowerCase()),
       signatureMatchesWithoutRequestId:
