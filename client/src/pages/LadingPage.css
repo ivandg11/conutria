@@ -838,3 +838,9 @@
     font-size: clamp(36px, 9vw, 49px) !important;
   }
 }
+
+
+.nc-feature-icon svg {
+  width: 23px;
+  height: 23px;
+}

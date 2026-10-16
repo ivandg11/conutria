@@ -1,42 +1,58 @@
-﻿import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import BrandLogo from '../components/Logo';
 import './LadingPage.css';
 
 const features = [
   {
-    icon: '♧',
+    icon: 'patients',
     title: 'Gestiona tus pacientes',
     description:
       'Organiza expedientes, objetivos y datos importantes en un solo lugar.',
   },
   {
-    icon: '↗',
+    icon: 'progress',
     title: 'Registra su evolución',
     description:
       'Consulta mediciones e historial para dar seguimiento a cada paciente.',
   },
   {
-    icon: '✳',
+    icon: 'plans',
     title: 'Planes de alimentación',
     description: 'Organiza comidas, porciones e indicaciones personalizadas.',
   },
   {
-    icon: '▦',
+    icon: 'calendar',
     title: 'Administra tus consultas',
     description: 'Mantén tus consultas y próximos seguimientos organizados.',
   },
   {
-    icon: '▤',
+    icon: 'documents',
     title: 'Genera documentos',
     description: 'Prepara planes de alimentación con un formato profesional.',
   },
   {
-    icon: '♡',
+    icon: 'care',
     title: 'Da seguimiento cercano',
     description: 'Mantén visible el progreso y los objetivos de cada paciente.',
   },
 ];
 
+function FeatureIcon({ name }) {
+  const icon = {
+    patients: <><circle cx="9" cy="8" r="3" /><path d="M3.5 19v-1.5a5.5 5.5 0 0 1 11 0V19M16 5.5a3 3 0 0 1 0 5.8M17 13a4.5 4.5 0 0 1 3.5 4.4V19" /></>,
+    progress: <><path d="M4 17 10 11l4 4 6-8" /><path d="M14 7h6v6" /></>,
+    plans: <><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" /><path d="M12 17c-2-2-2.4-4.4-.5-6.5M12 15c.3-2.2 1.4-3.5 3-4" /></>,
+    calendar: <><rect x="4" y="5.5" width="16" height="15" rx="2" /><path d="M8 3.5v4M16 3.5v4M4 10h16M8 14h2m3 0h2m-7 3h2m3 0h2" /></>,
+    documents: <><path d="M6 3.5h8l4 4V20H6z" /><path d="M14 3.5V8h4M9 12h6m-6 3h6m-6 3h4" /></>,
+    care: <><path d="M20 9c0 5-8 10-8 10S4 14 4 9a4 4 0 0 1 8-1 4 4 0 0 1 8 1Z" /><path d="M12 10v5m-2.5-2.5h5" /></>,
+  }[name];
+
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      {icon}
+    </svg>
+  );
+}
 function Logo() {
   return (
     <Link className="nc-brand" to="/" aria-label="Conutria, inicio">
@@ -196,7 +212,7 @@ export default function LandingPage() {
         <div className="nc-feature-grid">
           {features.map((feature) => (
             <article className="nc-feature-card" key={feature.title}>
-              <span className="nc-feature-icon">{feature.icon}</span>
+              <span className="nc-feature-icon"><FeatureIcon name={feature.icon} /></span>
               <div>
                 <h3>{feature.title}</h3>
                 <p>{feature.description}</p>
