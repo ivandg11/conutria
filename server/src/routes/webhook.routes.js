@@ -65,7 +65,7 @@ function validSignature(req, queryDataId) {
     queryDataId !== null &&
     String(queryDataId).trim()
   )
-    manifestParts.push(`id:${String(queryDataId).trim().toLowerCase()}`);
+    manifestParts.push(`id:${String(queryDataId).trim()}`);
   if (requestId) manifestParts.push(`request-id:${requestId}`);
   manifestParts.push(`ts:${fields.ts}`);
   const manifest = `${manifestParts.join(';')};`;
@@ -111,6 +111,7 @@ function validSignature(req, queryDataId) {
             : 'unspecified',
       signatureTimestampPresent: Boolean(fields.ts),
       signatureHashPresent: Boolean(fields.v1),
+      dataIdHadUppercase: Boolean(id && id !== id.toLowerCase()),
       signatureMatchesWithoutRequestId:
         Boolean(requestId) && matchesCandidate(withoutRequestId),
       signatureMatchesBodyDataId:
