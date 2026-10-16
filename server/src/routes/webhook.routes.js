@@ -18,20 +18,27 @@ function validSignature(req, queryDataId) {
   const signature = req.get('x-signature')?.trim();
   const requestId = req.get('x-request-id')?.trim();
   const liveMode = req.body?.live_mode;
-  const secretVariable = liveMode === true
-    ? 'MP_WEBHOOK_SECRET_PROD'
-    : liveMode === false
-      ? 'MP_WEBHOOK_SECRET_TEST'
-      : 'MP_WEBHOOK_SECRET';
-  const secret = (process.env[secretVariable] || (
-    liveMode === true || liveMode === false ? '' : process.env.MP_WEBHOOK_SECRET
-  ))?.trim();
+  const secretVariable =
+    liveMode === true
+      ? 'MP_WEBHOOK_SECRET_PROD'
+      : liveMode === false
+        ? 'MP_WEBHOOK_SECRET_TEST'
+        : 'MP_WEBHOOK_SECRET';
+  const secret = (
+    process.env[secretVariable] ||
+    (liveMode === true || liveMode === false
+      ? ''
+      : process.env.MP_WEBHOOK_SECRET)
+  )?.trim();
   const missing = [
     !signature && 'x-signature',
     !secret && secretVariable,
   ].filter(Boolean);
   if (missing.length) {
-    console.error('Webhook de Mercado Pago rechazado; faltan datos:', missing.join(', '));
+    console.error(
+      'Webhook de Mercado Pago rechazado; faltan datos:',
+      missing.join(', '),
+    );
     return false;
   }
   const fields = {};
@@ -43,55 +50,76 @@ function validSignature(req, queryDataId) {
     if (key && value) fields[key] = value;
   }
   if (!fields.ts || !fields.v1) {
-    console.error('Webhook de Mercado Pago rechazado: formato de firma incompleto.');
+    console.error(
+      'Webhook de Mercado Pago rechazado: formato de firma incompleto.',
+    );
     return false;
   }
   // Follow Mercado Pago's current SDK: preserve data.id exactly as received,
   // and omit optional manifest fields when the notification does not include them.
   const manifestParts = [];
-  if (queryDataId !== undefined && queryDataId !== null && String(queryDataId).trim())
+  if (
+    queryDataId !== undefined &&
+    queryDataId !== null &&
+    String(queryDataId).trim()
+  )
     manifestParts.push(`id:${String(queryDataId).trim()}`);
   if (requestId) manifestParts.push(`request-id:${requestId}`);
   manifestParts.push(`ts:${fields.ts}`);
   const manifest = `${manifestParts.join(';')};`;
   if (!/^[a-f\d]{64}$/i.test(fields.v1)) {
-    console.error('Webhook de Mercado Pago rechazado: firma con formato inválido.');
+    console.error(
+      'Webhook de Mercado Pago rechazado: firma con formato inválido.',
+    );
     return false;
   }
   const expected = createHmac('sha256', secret).update(manifest).digest();
   const received = Buffer.from(fields.v1, 'hex');
-  const isValid = received.length === expected.length && timingSafeEqual(received, expected);
+  const isValid =
+    received.length === expected.length && timingSafeEqual(received, expected);
   if (!isValid) {
     const matchesCandidate = (candidate) => {
       const digest = createHmac('sha256', secret).update(candidate).digest();
-      return received.length === digest.length && timingSafeEqual(received, digest);
+      return (
+        received.length === digest.length && timingSafeEqual(received, digest)
+      );
     };
     const id = String(queryDataId ?? '').trim();
     const tsPart = `ts:${fields.ts};`;
     const withoutRequestId = `${id ? `id:${id};` : ''}${tsPart}`;
     const bodyId = String(req.body?.data?.id ?? '').trim();
     const withBodyId = `${bodyId ? `id:${bodyId};` : ''}${requestId ? `request-id:${requestId};` : ''}${tsPart}`;
-    const tokenApplicationId = process.env.MP_ACCESS_TOKEN?.match(/^(?:APP_USR|TEST)-(\d+)-/)?.[1];
-    const eventApplicationId = req.body?.application_id == null
-      ? null
-      : String(req.body.application_id);
+    const tokenApplicationId = process.env.MP_ACCESS_TOKEN?.match(
+      /^(?:APP_USR|TEST)-(\d+)-/,
+    )?.[1];
+    const eventApplicationId =
+      req.body?.application_id == null ? null : String(req.body.application_id);
     console.error('Webhook de Mercado Pago rechazado: la firma no coincide.', {
       queryDataIdPresent: Boolean(queryDataId),
       bodyDataIdPresent: Boolean(req.body?.data?.id),
       queryAndBodyDataIdMatch: bodyId ? bodyId === id : null,
       requestIdPresent: Boolean(requestId),
       secretConfigured: Boolean(secret),
-      secretMode: liveMode === true ? 'production' : liveMode === false ? 'test' : 'unspecified',
+      secretMode:
+        liveMode === true
+          ? 'production'
+          : liveMode === false
+            ? 'test'
+            : 'unspecified',
       signatureTimestampPresent: Boolean(fields.ts),
       signatureHashPresent: Boolean(fields.v1),
-      signatureMatchesWithoutRequestId: Boolean(requestId) && matchesCandidate(withoutRequestId),
-      signatureMatchesBodyDataId: Boolean(bodyId) && bodyId !== id && matchesCandidate(withBodyId),
+      signatureMatchesWithoutRequestId:
+        Boolean(requestId) && matchesCandidate(withoutRequestId),
+      signatureMatchesBodyDataId:
+        Boolean(bodyId) && bodyId !== id && matchesCandidate(withBodyId),
       eventType: req.body?.type ?? null,
       eventAction: req.body?.action ?? null,
-      liveMode: typeof req.body?.live_mode === 'boolean' ? req.body.live_mode : null,
-      applicationIdMatchesAccessToken: tokenApplicationId && eventApplicationId
-        ? tokenApplicationId === eventApplicationId
-        : null,
+      liveMode:
+        typeof req.body?.live_mode === 'boolean' ? req.body.live_mode : null,
+      applicationIdMatchesAccessToken:
+        tokenApplicationId && eventApplicationId
+          ? tokenApplicationId === eventApplicationId
+          : null,
     });
   }
   return isValid;
@@ -177,14 +205,17 @@ router.post('/mercadopago', async (req, res) => {
   // Acknowledge it so non-payment probes do not create misleading retries.
   if (!dataId) {
     const isLegacyIpn = req.query.id != null || req.query.topic != null;
-    console.warn(isLegacyIpn
-      ? 'Notificación IPN antigua de Mercado Pago ignorada; se espera Webhook con data.id.'
-      : 'Webhook de Mercado Pago ignorado: no contiene data.id.', {
-      queryKeys: Object.keys(req.query),
-      bodyType: req.body?.type ?? null,
-      bodyAction: req.body?.action ?? null,
-      bodyHasData: Boolean(req.body?.data),
-    });
+    console.warn(
+      isLegacyIpn
+        ? 'Notificación IPN antigua de Mercado Pago ignorada; se espera Webhook con data.id.'
+        : 'Webhook de Mercado Pago ignorado: no contiene data.id.',
+      {
+        queryKeys: Object.keys(req.query),
+        bodyType: req.body?.type ?? null,
+        bodyAction: req.body?.action ?? null,
+        bodyHasData: Boolean(req.body?.data),
+      },
+    );
     return res.sendStatus(200);
   }
   if (!validSignature(req, queryDataId))
