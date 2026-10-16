@@ -55,15 +55,15 @@ function validSignature(req, queryDataId) {
     );
     return false;
   }
-  // Follow Mercado Pago's current SDK: preserve data.id exactly as received,
-  // and omit optional manifest fields when the notification does not include them.
+  // Mercado Pago requires data.id in lowercase when building the signature manifest.
+  // Keep the original ID elsewhere for the payment API request.
   const manifestParts = [];
   if (
     queryDataId !== undefined &&
     queryDataId !== null &&
     String(queryDataId).trim()
   )
-    manifestParts.push(`id:${String(queryDataId).trim()}`);
+    manifestParts.push(`id:${String(queryDataId).trim().toLowerCase()}`);
   if (requestId) manifestParts.push(`request-id:${requestId}`);
   manifestParts.push(`ts:${fields.ts}`);
   const manifest = `${manifestParts.join(';')};`;
