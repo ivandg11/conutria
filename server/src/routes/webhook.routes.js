@@ -86,6 +86,12 @@ function validSignature(req, queryDataId) {
         received.length === digest.length && timingSafeEqual(received, digest)
       );
     };
+    const matchesCandidateWithSecret = (candidateSecret) => {
+      const digest = createHmac('sha256', candidateSecret)
+        .update(manifest)
+        .digest();
+      return received.length === digest.length && timingSafeEqual(received, digest);
+    };
     const id = String(queryDataId ?? '').trim();
     const tsPart = `ts:${fields.ts};`;
     const withoutRequestId = `${id ? `id:${id};` : ''}${tsPart}`;
@@ -115,11 +121,22 @@ function validSignature(req, queryDataId) {
       signatureTimestamp: fields.ts,
       signatureManifest: manifest,
       signatureHashPresent: Boolean(fields.v1),
+      productionAndTestSecretsMatch:
+        Boolean(process.env.MP_WEBHOOK_SECRET_PROD && process.env.MP_WEBHOOK_SECRET_TEST) &&
+        process.env.MP_WEBHOOK_SECRET_PROD === process.env.MP_WEBHOOK_SECRET_TEST,
+      signatureMatchesProductionSecret:
+        Boolean(process.env.MP_WEBHOOK_SECRET_PROD) &&
+        matchesCandidateWithSecret(process.env.MP_WEBHOOK_SECRET_PROD),
+      signatureMatchesTestSecret:
+        Boolean(process.env.MP_WEBHOOK_SECRET_TEST) &&
+        matchesCandidateWithSecret(process.env.MP_WEBHOOK_SECRET_TEST),
+      signatureMatchesGenericSecret:
+        Boolean(process.env.MP_WEBHOOK_SECRET) &&
+        matchesCandidateWithSecret(process.env.MP_WEBHOOK_SECRET),
       dataIdHadUppercase: Boolean(id && id !== id.toLowerCase()),
       signatureMatchesWithoutRequestId:
         Boolean(requestId) && matchesCandidate(withoutRequestId),
-      signatureMatchesBodyDataId:
-        Boolean(bodyId) && bodyId !== id && matchesCandidate(withBodyId),
+      signatureMatchesBodyDataId: Boolean(bodyId) && matchesCandidate(withBodyId),
       eventType: req.body?.type ?? null,
       eventAction: req.body?.action ?? null,
       liveMode:
