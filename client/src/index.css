@@ -279,3 +279,14 @@ body:has(.login-shell) { background: #f5f6f0; }
 .history-detail:focus { border-color: #45a984; outline: 0; box-shadow: 0 0 0 3px rgba(69,169,132,.12); }
 .history-legacy { grid-column: 1 / -1; margin: 0; padding: 12px 14px; border: 1px solid #f0dfb7; border-radius: 12px; color: #725d2c; background: #fffbef; font-size: .85rem; }
 @media (max-width: 720px) { .history-grid { grid-template-columns: 1fr; } .history-panel { padding: 14px; } }
+
+
+.login-decor-leaf svg {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+}
+
+@media (max-width: 760px) {
+  .login-decor-leaf { display: none; }
+}

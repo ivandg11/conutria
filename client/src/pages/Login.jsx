@@ -37,7 +37,7 @@ export default function Login() {
           <h1>Un espacio claro para acompañar cada progreso.</h1>
           <p>Organiza pacientes, consultas y su evolución desde un solo lugar.</p>
         </div>
-        <div className="login-decor" aria-hidden="true"><span className="login-decor-leaf">✳</span></div>
+        <div className="login-decor" aria-hidden="true"><span className="login-decor-leaf"><svg viewBox="0 0 40 40" fill="none"><path d="M10 29C10 17 17 10 30 10c0 13-7 20-20 19Z" fill="currentColor"/><path d="m11 29 12-12" stroke="#103f34" stroke-width="1.8" stroke-linecap="round"/></svg></span></div>
       </section>
       <section className="login-form-side">
         <form onSubmit={handleSubmit} className="login-form">
