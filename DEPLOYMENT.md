@@ -30,9 +30,8 @@ Sube el proyecto a GitHub. Mantén el repositorio privado si contiene configurac
    - `DATABASE_URL`: URL TLS de Aiven.
    - `DATABASE_CA_CERT_BASE64`: certificado CA de Aiven codificado en Base64; Render lo escribe en `server/prisma/ca.pem` antes de ejecutar las migraciones.
    - `CLIENT_URL`: origen final del cliente, por ejemplo `https://www.tudominio.com` (sin `/` al final).
-   - `PUBLIC_API_URL`: URL pública de la API, por ejemplo `https://api.tudominio.com` (sin `/` al final).
    - `SUPERADMIN_EMAIL`: correo de tu cuenta administradora.
-   - `MP_ACCESS_TOKEN` y `MP_WEBHOOK_SECRET`: credenciales de producción de Mercado Pago.
+   - `STRIPE_SECRET_KEY` y `STRIPE_WEBHOOK_SECRET`: credenciales de producción de Stripe.
    - `RESEND_API_KEY` y `MAIL_FROM`: configuración de envío de correo.
 3. Render genera `JWT_SECRET`. Cuando el dominio de la API esté conectado, valida `https://api.tudominio.com/api/health`; debe responder `{"ok":true}`.
 
@@ -68,13 +67,16 @@ Remove-Item Env:DOTENV_CONFIG_PATH
 
 El script solicitará nombre, correo y contraseña.
 
-## 6. Activa pagos y correo
+## 6. Configura Stripe Billing y correo
 
-En Mercado Pago configura el webhook con:
+1. Activa tu cuenta de Stripe para cobrar en Mexico.
+2. En Render configura STRIPE_SECRET_KEY con la clave privada del modo que vayas a usar (sk_test para pruebas o sk_live para produccion).
+3. En Stripe agrega un endpoint webhook: https://api.tudominio.com/api/webhooks/stripe. Selecciona invoice.paid, invoice.payment_failed, customer.subscription.updated y customer.subscription.deleted.
+4. Copia el secreto de firma whsec que Stripe muestra para ese endpoint a STRIPE_WEBHOOK_SECRET en Render y redepliega la API. No uses la clave privada como secreto del webhook.
+5. Para desarrollo local, ejecuta Stripe CLI con stripe listen --forward-to localhost:4000/api/webhooks/stripe; usa la clave whsec que imprime la CLI en tu .env local.
+6. Verifica el dominio remitente en Resend antes de usar MAIL_FROM.
 
-`https://api.tudominio.com/api/webhooks/mercadopago`
-
-Guarda las credenciales de producción y `PUBLIC_API_URL` en Render. Verifica también el dominio remitente en Resend antes de usar `MAIL_FROM`. Si aún no tienes dominio, Render puede ofrecer temporalmente `https://Conutria-api.onrender.com`, pero actualiza `PUBLIC_API_URL`, `CLIENT_URL` y `VITE_API_URL` a los subdominios propios antes de habilitar el acceso de clientes.
+El checkout crea suscripciones mensuales de $199 MXN y anuales de $1,990 MXN. Stripe aloja el formulario; Conutria no recibe ni almacena los datos de la tarjeta. Usa claves y tarjetas de prueba antes de habilitar las claves de produccion.
 
 ## Límites del presupuesto de $0
 

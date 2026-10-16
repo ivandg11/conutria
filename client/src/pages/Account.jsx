@@ -142,7 +142,7 @@ export default function Account() {
                   <span
                     className={`account-status ${subscription.status === 'ACTIVE' ? 'is-active' : ''}`}
                   >
-                    {statusName(subscription.status)}
+                    {subscription.cancelAtPeriodEnd ? 'Cancelacion programada' : statusName(subscription.status)}
                   </span>
                 </div>
                 <p className="account-price">
@@ -166,9 +166,11 @@ export default function Account() {
                     <dt>
                       {isLifetime
                         ? 'Vigencia'
-                        : subscription.status === 'CANCELED'
-                          ? 'Cancelada el'
-                          : 'Próxima renovación'}
+                        : subscription.cancelAtPeriodEnd
+                          ? 'Acceso hasta'
+                          : subscription.status === 'CANCELED'
+                            ? 'Cancelada el'
+                            : 'Próxima renovación'}
                     </dt>
                     <dd>
                       {isLifetime
@@ -181,7 +183,7 @@ export default function Account() {
                     </dd>
                   </div>
                 </dl>
-                {subscription.status === 'ACTIVE' && !isLifetime && (
+                {subscription.status === 'ACTIVE' && !subscription.cancelAtPeriodEnd && !isLifetime && (
                   <button
                     className="account-cancel"
                     type="button"

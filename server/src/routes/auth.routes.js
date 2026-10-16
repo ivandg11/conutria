@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { sendPasswordResetEmail as sendPasswordResetMessage } from '../lib/email.js';
 import { requireAuth } from '../middleware/auth.js';
+import { getStripe } from '../lib/stripe.js';
 
 const router = Router();
 
@@ -236,6 +237,7 @@ router.get('/account', requireAuth, async (req, res) => {
       startedAt: current.startedAt,
       renewsAt: current.renewsAt,
       canceledAt: current.canceledAt,
+      cancelAtPeriodEnd: current.cancelAtPeriodEnd,
     } : null,
     payments: subscriptions.flatMap((subscription) => subscription.payments.map((payment) => ({
       id: payment.id,
@@ -254,25 +256,43 @@ router.post('/account/cancel-subscription', requireAuth, async (req, res) => {
     orderBy: { createdAt: 'desc' },
   });
   if (!latest || latest.status !== 'ACTIVE') {
-    return res.status(409).json({ error: 'No tienes una suscripción activa para cancelar.' });
+    return res.status(409).json({ error: 'No tienes una suscripcion activa para cancelar.' });
   }
   if (latest.plan === 'LIFETIME') {
-    return res.status(409).json({ error: 'La membresía de por vida no se puede cancelar desde la cuenta.' });
+    return res.status(409).json({ error: 'La membresia de por vida no se puede cancelar desde la cuenta.' });
+  }
+  if (latest.cancelAtPeriodEnd) {
+    return res.status(409).json({ error: 'La renovacion ya esta cancelada.' });
   }
 
-  const canceledAt = new Date();
-  const result = await prisma.subscription.updateMany({
-    where: { id: latest.id, userId: req.userId, status: 'ACTIVE' },
-    data: { status: 'CANCELED', canceledAt },
-  });
-  if (!result.count) return res.status(409).json({ error: 'La suscripción ya fue modificada.' });
+  let canceledAt = new Date();
+  let cancelAtPeriodEnd = false;
+  if (latest.stripeSubscriptionId) {
+    const stripe = getStripe();
+    const remote = await stripe.subscriptions.retrieve(latest.stripeSubscriptionId);
+    if (remote.status !== 'canceled') {
+      const updated = await stripe.subscriptions.update(latest.stripeSubscriptionId, {
+        cancel_at_period_end: true,
+      });
+      cancelAtPeriodEnd = Boolean(updated.cancel_at_period_end);
+    }
+  }
 
+  await prisma.subscription.update({
+    where: { id: latest.id },
+    data: cancelAtPeriodEnd
+      ? { cancelAtPeriodEnd: true }
+      : { status: 'CANCELED', canceledAt },
+  });
   await prisma.auditLog.create({
-    data: { actorId: req.userId, action: 'Canceló su suscripción', details: `Suscripción ${latest.id}` },
+    data: {
+      actorId: req.userId,
+      action: 'Cancelo su suscripcion',
+      details: 'Suscripcion ' + latest.id,
+    },
   });
-  res.json({ ok: true, canceledAt });
+  return res.json({ ok: true, canceledAt, cancelAtPeriodEnd });
 });
-
 router.get('/support-tickets', requireAuth, async (req, res) => {
   const tickets = await prisma.supportTicket.findMany({
     where: { userId: req.userId },

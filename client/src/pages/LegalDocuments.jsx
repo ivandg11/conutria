@@ -55,7 +55,7 @@ function PrivacyNotice() {
         </li>
         <li>
           <strong>Pago:</strong> Conutria recibe la confirmación y referencias
-          de la transacción. El pago se procesa en Mercado Pago; Conutria no
+          de la transacción. El pago se procesa en Stripe; Conutria no
           solicita en esta aplicación el número completo de tarjeta ni el código
           de seguridad.
         </li>
@@ -98,7 +98,7 @@ function PrivacyNotice() {
       <p>
         Para operar el servicio podemos apoyarnos en proveedores de alojamiento
         y base de datos (Render, Aiven y Cloudflare), procesamiento de pagos
-        (Mercado Pago) y envío de correo (Resend). Estos proveedores pueden
+        (Stripe) y envío de correo (Resend). Estos proveedores pueden
         procesar información desde la ubicación de sus centros de datos conforme
         a sus servicios y contratos.{' '}
         <strong>
@@ -184,7 +184,7 @@ function TermsOfUse() {
         Los precios se muestran en pesos mexicanos antes de iniciar el pago:
         plan mensual por <strong>$199 MXN por periodo mensual</strong> y plan
         anual por <strong>$1,990 MXN por periodo anual</strong>. El pago se
-        realiza mediante Mercado Pago. El importe y las condiciones se muestran
+        realiza mediante Stripe. El importe y las condiciones se muestran
         antes de confirmar el pago.{' '}
         <strong>
           [CONFIRMAR IMPUESTOS, COMPROBANTES/FACTURACIÓN Y SI LOS PRECIOS LOS
@@ -193,11 +193,7 @@ function TermsOfUse() {
         .
       </p>
       <p>
-        El flujo actual cobra por adelantado un periodo a la vez; no inicia un
-        cargo recurrente automático. Para continuar después del periodo
-        contratado, la persona usuaria debe realizar una nueva compra. El acceso
-        se otorga después de la confirmación del pago y dura el periodo
-        indicado, sujeto a la disponibilidad técnica del servicio.
+        La suscripcion se cobra automaticamente al inicio de cada periodo. La renovacion continua hasta que la persona usuaria la cancele desde Cuenta. Al cancelar, se detienen los cargos futuros y se conserva el acceso hasta que termine el periodo ya pagado.
       </p>
       <h2>4. Cancelación y reembolsos</h2>
       <p>

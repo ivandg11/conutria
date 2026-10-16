@@ -8,12 +8,12 @@ export default function PaymentResult() {
     status === 'success'
       ? [
           'Estamos confirmando tu pago',
-          'Mercado Pago nos notificará el resultado. Cuando se confirme, recibirás un correo para crear tu contraseña.',
+          'Stripe nos notificará el resultado. Cuando se confirme, recibirás un correo para crear tu contraseña.',
         ]
       : status === 'pending'
         ? [
             'Tu pago está pendiente',
-            'Te enviaremos el acceso cuando Mercado Pago confirme el pago.',
+            'Te enviaremos el acceso cuando Stripe confirme el pago.',
           ]
         : [
             'No se completó el pago',

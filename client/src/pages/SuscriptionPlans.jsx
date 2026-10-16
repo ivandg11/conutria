@@ -151,7 +151,7 @@ export default function SubscriptionPlans() {
               <label>Correo electrónico<input type="email" autoComplete="email" required value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} /></label>
               <label className="nc-legal-consent"><input type="checkbox" required checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} /><span>Leí y acepto los <Link to="/terminos-de-uso" target="_blank" rel="noreferrer">Términos de uso</Link>. He leído el <Link to="/aviso-de-privacidad" target="_blank" rel="noreferrer">Aviso de privacidad</Link>.</span></label>
               {error && <p className="nc-checkout-error" role="alert">{error}</p>}
-              <button className="nc-checkout-submit" disabled={loading}>{loading ? 'Conectando con Mercado Pago…' : `Continuar al pago · ${selectedPlan.price} MXN`}</button>
+              <button className="nc-checkout-submit" disabled={loading}>{loading ? 'Conectando con Stripe…' : `Continuar al pago · ${selectedPlan.price} MXN`}</button>
             </form>
           </section>
         </div>

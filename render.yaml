@@ -18,13 +18,11 @@ services:
         sync: false
       - key: CLIENT_URL
         sync: false
-      - key: PUBLIC_API_URL
-        sync: false
       - key: SUPERADMIN_EMAIL
         sync: false
-      - key: MP_ACCESS_TOKEN
+      - key: STRIPE_SECRET_KEY
         sync: false
-      - key: MP_WEBHOOK_SECRET
+      - key: STRIPE_WEBHOOK_SECRET
         sync: false
       - key: RESEND_API_KEY
         sync: false
