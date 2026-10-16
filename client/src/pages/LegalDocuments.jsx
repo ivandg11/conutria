@@ -182,7 +182,7 @@ function TermsOfUse() {
       <h2>3. Planes y pagos</h2>
       <p>
         Los precios se muestran en pesos mexicanos antes de iniciar el pago:
-        plan mensual por <strong>$199 MXN por periodo mensual</strong> y plan
+        plan mensual por <strong>$1 MXN por periodo mensual</strong> y plan
         anual por <strong>$1,990 MXN por periodo anual</strong>. El pago se
         realiza mediante Mercado Pago. El importe y las condiciones se muestran
         antes de confirmar el pago.{' '}

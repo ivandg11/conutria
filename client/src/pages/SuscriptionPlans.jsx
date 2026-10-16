@@ -9,7 +9,7 @@ const plans = [
     id: 'monthly',
     name: 'Plan mensual',
     description: 'Flexibilidad para tu consulta.',
-    price: '$199',
+    price: '$1',
     period: '/ mes',
     features: [
       'Gestión de pacientes',
@@ -27,12 +27,11 @@ const plans = [
     price: '$1,990',
     period: '/ año',
     equivalent: '$165.83 MXN al mes',
-    savings: 'AHORRA $398 AL AÑO',
     features: [
       'Todo lo incluido en el plan mensual',
       'Un año completo de acceso',
       'Mismas funciones y condiciones',
-      'Ahorro frente al pago mensual',
+      'Un solo pago por el año',
       'Ideal para una práctica continua',
     ],
     button: 'Elegir plan anual',

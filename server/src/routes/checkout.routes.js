@@ -9,7 +9,7 @@ const plans = {
   monthly: {
     title: 'Conutria mensual',
     code: 'MONTHLY',
-    amount: 199,
+    amount: 1,
     months: 1,
   },
   annual: { title: 'Conutria anual', code: 'ANNUAL', amount: 1990, months: 12 },
