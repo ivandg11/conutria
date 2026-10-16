@@ -125,3 +125,6 @@ main.sa-shell {
 }
 .sa-header .sa-brand > span { margin: 0; padding: 0; border: 0; }
 .sa-header .sa-brand-section { margin-left: 8px; padding-left: 17px; border-left: 1px solid rgba(255,255,255,.25); }
+
+.sa-subscription-cancel { padding: 7px 10px; border: 1px solid #e8c2bc; border-radius: 8px; color: #9a352b; background: #fff6f4; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.sa-subscription-cancel:hover { background: #ffebe7; }

@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useAuth } from '../context/useAuth';
 import Logo from '../components/Logo';
+import ConfirmDialog from '../components/ConfirmDialog';
 import './SuperadminDashboard.css';
 
 const sections = [
   'Resumen',
   'Planes',
+  'Suscripciones',
   'Cobros',
   'Usuarios',
   'Soporte',
@@ -17,6 +19,7 @@ const sections = [
 const sectionIcons = {
   Resumen: '⌂',
   Planes: '▤',
+  Suscripciones: '↻',
   Cobros: '$',
   Usuarios: '♧',
   Soporte: '✉',
@@ -26,6 +29,7 @@ const sectionIcons = {
 const sectionDescriptions = {
   Resumen: 'Indicadores generales de suscripciones e ingresos.',
   Planes: 'Distribución de planes e ingresos estimados.',
+  Suscripciones: 'Consulta y cancela suscripciones administradas por Stripe.',
   Cobros: 'Pagos recientes y próximas renovaciones.',
   Usuarios: 'Cuentas, actividad y pacientes registrados.',
   Soporte: 'Solicitudes de clientes y seguimiento de conversaciones.',
@@ -45,6 +49,12 @@ const currency = (value) =>
     currency: 'MXN',
     maximumFractionDigits: 0,
   }).format(value ?? 0);
+const planText = {
+  MONTHLY: 'Mensual',
+  ANNUAL: 'Anual',
+  PRODUCTION_TEST: 'Prueba $10/mes',
+  LIFETIME: 'De por vida',
+};
 const statusText = {
   ACTIVE: 'Activa',
   TRIAL: 'En prueba',
@@ -93,6 +103,9 @@ export default function SuperadminDashboard() {
   const [ticketReply, setTicketReply] = useState('');
   const [ticketError, setTicketError] = useState('');
   const [ticketBusy, setTicketBusy] = useState(false);
+  const [subscriptionToCancel, setSubscriptionToCancel] = useState(null);
+  const [subscriptionBusy, setSubscriptionBusy] = useState(false);
+  const [subscriptionError, setSubscriptionError] = useState('');
 
   const loadDashboard = useCallback(async () => {
     setRefreshing(true);
@@ -152,6 +165,21 @@ export default function SuperadminDashboard() {
     }
   }
 
+  async function cancelAdminSubscription() {
+    if (!subscriptionToCancel) return;
+    setSubscriptionBusy(true);
+    setSubscriptionError('');
+    try {
+      await api.post(`/admin/subscriptions/${subscriptionToCancel.id}/cancel`);
+      setSubscriptionToCancel(null);
+      await loadDashboard();
+    } catch (err) {
+      setSubscriptionError(err.response?.data?.error ?? 'No se pudo cancelar la suscripcion.');
+    } finally {
+      setSubscriptionBusy(false);
+    }
+  }
+
   async function updateTicketStatus(status) {
     if (!activeTicketId) return;
     setTicketBusy(true);
@@ -197,6 +225,16 @@ export default function SuperadminDashboard() {
 
   return (
     <main className="sa-shell">
+      {subscriptionToCancel && (
+        <ConfirmDialog
+          title="Cancelar suscripcion ahora"
+          message={`Se cancelara inmediatamente el plan ${planText[subscriptionToCancel.plan] ?? subscriptionToCancel.plan} de ${subscriptionToCancel.name}. Stripe detendra las renovaciones futuras. Esta accion no procesa reembolsos.`}
+          confirmLabel={subscriptionBusy ? 'Cancelando...' : 'Si, cancelar ahora'}
+          danger
+          onCancel={() => !subscriptionBusy && setSubscriptionToCancel(null)}
+          onConfirm={cancelAdminSubscription}
+        />
+      )}
       <header className="sa-header">
         <Link
           to="/admin"
@@ -277,6 +315,7 @@ export default function SuperadminDashboard() {
                   </article>
                 ))}
               </div>
+              <p className="sa-note">MRR significa ingreso mensual recurrente estimado: suma los planes recurrentes activos y prorratea los anuales. No representa necesariamente dinero ya cobrado; las membresias vitalicias se excluyen.</p>
               <div className="sa-panel">
                 <h2>Estado de la plataforma</h2>
                 <p>
@@ -299,6 +338,10 @@ export default function SuperadminDashboard() {
                   <strong>{data.plans.annual}</strong>
                 </article>
                 <article className="sa-stat">
+                  <span>Plan de prueba ($10/mes)</span>
+                  <strong>{data.plans.productionTest}</strong>
+                </article>
+                <article className="sa-stat">
                   <span>Ingreso del mes</span>
                   <strong>{currency(data.plans.monthlyRevenue)}</strong>
                 </article>
@@ -312,6 +355,30 @@ export default function SuperadminDashboard() {
                 garantizados.
               </p>
             </>
+          )}
+          {section === 'Suscripciones' && (
+            <div className="sa-panel">
+              {subscriptionError && <p className="sa-error" role="alert">{subscriptionError}</p>}
+              <p className="sa-note">Cancelar ahora detiene la renovacion en Stripe de inmediato. Las membresias vitalicias o manuales no se pueden cancelar desde aqui.</p>
+              <Table
+                headers={['Usuario', 'Correo', 'Plan', 'Estado', 'Importe', 'Renovacion', 'Accion']}
+                empty="No hay suscripciones registradas."
+                rows={data.subscriptions.map((subscription) => ({
+                  key: subscription.id,
+                  cells: [
+                    subscription.name,
+                    subscription.email,
+                    planText[subscription.plan] ?? subscription.plan,
+                    subscription.cancelAtPeriodEnd ? 'Cancelacion programada' : (statusText[subscription.status] ?? subscription.status),
+                    currency(subscription.price),
+                    date(subscription.renewsAt),
+                    subscription.stripeSubscriptionId && subscription.status !== 'CANCELED'
+                      ? <button type="button" className="sa-subscription-cancel" onClick={() => { setSubscriptionError(''); setSubscriptionToCancel(subscription); }}>Cancelar ahora</button>
+                      : subscription.plan === 'LIFETIME' ? 'Vitalicia' : 'No disponible',
+                  ],
+                }))}
+              />
+            </div>
           )}
           {section === 'Cobros' && (
             <>
@@ -376,7 +443,7 @@ export default function SuperadminDashboard() {
                   cells: [
                     u.name,
                     u.email,
-                    u.plan === 'LIFETIME' ? 'De por vida' : (u.plan ?? '—'),
+                    planText[u.plan] ?? (u.plan ?? '—'),
                     statusText[u.status] ?? u.status,
                     date(u.createdAt),
                     date(u.lastLoginAt),
@@ -588,7 +655,7 @@ function Renewals({ items }) {
           <span>
             <strong>{item.name}</strong>
             <small>
-              {item.plan === 'ANNUAL' ? 'Anual' : item.plan === 'PRODUCTION_TEST' ? 'Prueba $10/mes' : 'Mensual'} ·{' '}
+              {planText[item.plan] ?? item.plan} ·{' '}
               {date(item.renewsAt)}
             </small>
           </span>

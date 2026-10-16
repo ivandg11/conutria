@@ -3,6 +3,7 @@ import { prisma } from '../lib/prisma.js';
 import { requireAuth } from '../middleware/auth.js';
 import { requireSuperadmin } from '../middleware/requireSuperadmin.js';
 import { z } from 'zod';
+import { getStripe } from '../lib/stripe.js';
 
 const router = Router();
 router.use(requireAuth, requireSuperadmin);
@@ -49,6 +50,39 @@ router.patch('/support-tickets/:id', async (req, res) => {
   const updated = await prisma.supportTicket.update({ where: { id: ticketId }, data: { status } });
   await prisma.auditLog.create({ data: { actorId: req.userId, action: 'Actualizó ticket de soporte', details: `Ticket ${ticketId}: ${status}` } });
   res.json(updated);
+});
+
+router.post('/subscriptions/:id/cancel', async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: 'Suscripcion invalida.' });
+  const subscription = await prisma.subscription.findUnique({ where: { id } });
+  if (!subscription) return res.status(404).json({ error: 'No encontramos la suscripcion.' });
+  if (!subscription.stripeSubscriptionId) return res.status(409).json({ error: 'Esta suscripcion no se gestiona en Stripe.' });
+  if (subscription.status === 'CANCELED') return res.status(409).json({ error: 'La suscripcion ya esta cancelada.' });
+
+  try {
+    const stripe = getStripe();
+    const remote = await stripe.subscriptions.retrieve(subscription.stripeSubscriptionId);
+    const canceled = remote.status === 'canceled'
+      ? remote
+      : await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
+    const canceledAt = canceled.canceled_at ? new Date(canceled.canceled_at * 1000) : new Date();
+    const updated = await prisma.subscription.update({
+      where: { id },
+      data: { status: 'CANCELED', canceledAt, cancelAtPeriodEnd: false },
+    });
+    await prisma.auditLog.create({
+      data: {
+        actorId: req.userId,
+        action: 'Superadmin cancelo suscripcion en Stripe',
+        details: 'Suscripcion local ' + id + '; Stripe ' + subscription.stripeSubscriptionId,
+      },
+    });
+    return res.json({ id: updated.id, status: updated.status, canceledAt: updated.canceledAt });
+  } catch (error) {
+    console.error('Superadmin could not cancel Stripe subscription:', error.message);
+    return res.status(502).json({ error: 'No se pudo cancelar la suscripcion en Stripe.' });
+  }
 });
 
 router.get('/dashboard', async (req, res) => {
@@ -109,7 +143,8 @@ router.get('/dashboard', async (req, res) => {
   const currentSubs = [...latestByUser.values()];
   const countStatus = (status) => currentSubs.filter((s) => s.status === status).length;
   const activeSubs = currentSubs.filter((s) => s.status === 'ACTIVE');
-  const mrr = activeSubs.reduce((sum, s) => sum + money(s.price) / (s.plan === 'ANNUAL' ? 12 : 1), 0);
+  const recurringSubs = activeSubs.filter((s) => ['MONTHLY', 'ANNUAL', 'PRODUCTION_TEST'].includes(s.plan));
+  const mrr = recurringSubs.reduce((sum, s) => sum + money(s.price) / (s.plan === 'ANNUAL' ? 12 : 1), 0);
   const renewals = currentSubs.filter((s) => s.status === 'ACTIVE' && s.renewsAt && s.renewsAt >= now);
   const presentUserIds = new Set(currentSubs.filter((s) => s.status !== 'CANCELED').map((s) => s.userId));
 
@@ -123,8 +158,15 @@ router.get('/dashboard', async (req, res) => {
     plans: {
       monthly: activeSubs.filter((s) => s.plan === 'MONTHLY').length,
       annual: activeSubs.filter((s) => s.plan === 'ANNUAL').length,
+      productionTest: activeSubs.filter((s) => s.plan === 'PRODUCTION_TEST').length,
       monthlyRevenue: money(monthPayments._sum.amount), annualProjection: mrr * 12,
     },
+    subscriptions: subscriptions.map((s) => ({
+      id: s.id, userId: s.userId, name: s.user.name, email: s.user.email,
+      plan: s.plan, status: s.status, price: money(s.price), renewsAt: s.renewsAt,
+      cancelAtPeriodEnd: s.cancelAtPeriodEnd, stripeSubscriptionId: s.stripeSubscriptionId,
+      createdAt: s.createdAt,
+    })),
     users: users.map((user) => {
       const sub = user.subscriptions[0];
       return {
@@ -161,7 +203,7 @@ router.get('/dashboard', async (req, res) => {
       version: process.env.APP_VERSION ?? process.env.npm_package_version ?? 'No configurada',
       errors: recentErrors,
     },
-    dataNotice: 'Los cobros y suscripciones se muestran cuando estén registrados en la base de datos; no hay una pasarela de pago conectada.',
+    dataNotice: 'Las suscripciones y pagos se consultan desde la base de datos y se actualizan con los eventos de Stripe.',
   });
 });
 
