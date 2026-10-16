@@ -37,6 +37,20 @@ const plans = [
     button: 'Elegir plan anual',
     featured: true,
   },
+  {
+    id: 'production_test',
+    name: 'Plan de prueba en produccion',
+    description: 'Plan temporal para verificar un cobro real de Stripe.',
+    price: '$1',
+    period: '/ mes',
+    features: [
+      'Acceso completo a Conutria',
+      'Cobro recurrente de $1 MXN cada mes',
+      'Cancela desde Cuenta para detener renovaciones',
+    ],
+    button: 'Probar suscripcion por $1',
+    testOnly: true,
+  },
 ];
 
 function CheckIcon() {
@@ -91,6 +105,9 @@ export default function SubscriptionPlans() {
             {plan.featured && (
               <span className="nc-plan-badge">MEJOR AHORRO</span>
             )}
+            {plan.testOnly && (
+              <span className="nc-plan-badge">PRUEBA TEMPORAL</span>
+            )}
 
             <div className="nc-plan-icon" aria-hidden="true">
               {plan.id === 'monthly' ? '◷' : <Logo size={36} showName={false} />}
@@ -132,7 +149,9 @@ export default function SubscriptionPlans() {
             <p className="nc-plan-footnote">
               {plan.id === 'monthly'
                 ? 'Pago mensual. Consulta las condiciones antes de contratar.'
-                : 'Pago anual anticipado. Consulta las condiciones antes de contratar.'}
+                : plan.id === 'production_test'
+                  ? 'Cargo real de $1 MXN cada mes con renovacion automatica. Cancela desde Cuenta para detener futuros cargos.'
+                  : 'Pago anual anticipado. Consulta las condiciones antes de contratar.'}
             </p>
           </article>
         ))}

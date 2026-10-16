@@ -9,13 +9,14 @@ const limiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 8 });
 const plans = {
   monthly: { title: 'Conutria mensual', code: 'MONTHLY', amount: 199, interval: 'month' },
   annual: { title: 'Conutria anual', code: 'ANNUAL', amount: 1990, interval: 'year' },
+  production_test: { title: 'Conutria prueba de produccion', code: 'PRODUCTION_TEST', amount: 1, interval: 'month' },
 };
 
 router.post('/start', limiter, async (req, res) => {
   const { name, email, plan } = z.object({
     name: z.string().trim().min(2).max(100),
     email: z.string().trim().email().max(254),
-    plan: z.enum(['monthly', 'annual']),
+    plan: z.enum(['monthly', 'annual', 'production_test']),
   }).parse(req.body);
   const normalizedEmail = email.toLowerCase();
   const selectedPlan = plans[plan];

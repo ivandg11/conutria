@@ -183,7 +183,9 @@ function TermsOfUse() {
       <p>
         Los precios se muestran en pesos mexicanos antes de iniciar el pago:
         plan mensual por <strong>$199 MXN por periodo mensual</strong> y plan
-        anual por <strong>$1,990 MXN por periodo anual</strong>. El pago se
+        anual por <strong>$1,990 MXN por periodo anual</strong>. Tambien hay un
+        plan temporal de prueba por <strong>$1 MXN por periodo mensual</strong>,
+        con renovacion automatica hasta que se cancele desde Cuenta. El pago se
         realiza mediante Stripe. El importe y las condiciones se muestran
         antes de confirmar el pago.{' '}
         <strong>
