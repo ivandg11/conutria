@@ -1,0 +1,15 @@
+{
+    "name":  "Conutria",
+    "short_name":  "Conutria",
+    "icons":  [
+                  {
+                      "purpose":  "any",
+                      "type":  "image/svg+xml",
+                      "sizes":  "any",
+                      "src":  "/nutria-favicon.svg?v=3"
+                  }
+              ],
+    "theme_color":  "#103f34",
+    "background_color":  "#ffffff",
+    "display":  "standalone"
+}

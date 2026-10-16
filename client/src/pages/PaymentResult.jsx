@@ -17,7 +17,7 @@ export default function PaymentResult() {
           ]
         : [
             'No se completó el pago',
-            'Puedes volver a los planes e intentarlo otra vez.',
+            'Tu banco rechazó la transacción. Llama a tu banco y solicita habilitar compras en internet.',
           ];
 
   return (
