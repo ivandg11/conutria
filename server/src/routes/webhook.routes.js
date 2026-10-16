@@ -232,8 +232,13 @@ router.post('/mercadopago', async (req, res) => {
     if (!response.ok)
       throw new Error(`Mercado Pago respondiÃ³ ${response.status}.`);
     const payment = await response.json();
-    if (String(payment.id) !== String(dataId))
+    if (String(payment.id) !== String(dataId)) {
+      console.error('Webhook rechazado: el ID de pago consultado no coincide.', {
+        notificationDataId: String(dataId),
+        providerPaymentId: String(payment.id),
+      });
       return res.status(400).json({ error: 'Pago no coincide.' });
+    }
     if (payment.status !== 'approved') {
       if (payment.external_reference)
         await prisma.pendingSignup.updateMany({
@@ -266,6 +271,14 @@ router.post('/mercadopago', async (req, res) => {
       Number(payment.transaction_amount) !== plan.price ||
       Number(pending.amount) !== plan.price
     ) {
+      console.error('Webhook rechazado: los datos del pago no coinciden con el plan.', {
+        paymentId: String(payment.id),
+        plan: pending.plan,
+        paymentCurrency: payment.currency_id ?? null,
+        paymentAmount: payment.transaction_amount ?? null,
+        expectedAmount: plan?.price ?? null,
+        pendingAmount: pending.amount,
+      });
       return res
         .status(400)
         .json({ error: 'Los datos del pago no coinciden con el plan.' });
@@ -274,6 +287,12 @@ router.post('/mercadopago', async (req, res) => {
       pending.providerPreferenceId &&
       String(payment.preference_id) !== pending.providerPreferenceId
     ) {
+      console.error('Webhook rechazado: la preferencia del pago no coincide.', {
+        paymentId: String(payment.id),
+        pendingSignupId: pending.id,
+        paymentPreferenceId: payment.preference_id ?? null,
+        expectedPreferenceId: pending.providerPreferenceId,
+      });
       return res
         .status(400)
         .json({ error: 'La preferencia de pago no coincide con el registro.' });
