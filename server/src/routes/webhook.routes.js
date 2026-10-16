@@ -283,8 +283,11 @@ router.post('/mercadopago', async (req, res) => {
         .status(400)
         .json({ error: 'Los datos del pago no coinciden con el plan.' });
     }
+    // Mercado Pago may omit preference_id from a payment response. When present,
+    // still reject a preference that conflicts with the pending signup.
     if (
       pending.providerPreferenceId &&
+      payment.preference_id != null &&
       String(payment.preference_id) !== pending.providerPreferenceId
     ) {
       console.error('Webhook rechazado: la preferencia del pago no coincide.', {
