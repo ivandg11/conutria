@@ -29,9 +29,9 @@ function validSignature(req, queryDataId) {
     : process.env.MP_WEBHOOK_SECRET
       ? 'MP_WEBHOOK_SECRET'
       : null;
-  const secret = (
-    configuredSecretVariable ? process.env[configuredSecretVariable] : ''
-  )?.trim();
+  const secret = configuredSecretVariable
+    ? process.env[configuredSecretVariable]
+    : '';
   const missing = [
     !signature && 'x-signature',
     !secret && secretVariable,
@@ -102,6 +102,7 @@ function validSignature(req, queryDataId) {
       queryAndBodyDataIdMatch: bodyId ? bodyId === id : null,
       requestIdPresent: Boolean(requestId),
       secretConfigured: Boolean(secret),
+      secretHasEdgeWhitespace: Boolean(secret && secret !== secret.trim()),
       secretVariableUsed: configuredSecretVariable,
       secretMode:
         liveMode === true
