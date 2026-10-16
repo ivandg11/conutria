@@ -57,7 +57,7 @@ function validSignature(req, queryDataId) {
     );
     return false;
   }
-  // Mercado Pago requires data.id in lowercase when building the signature manifest.
+  // Preserve data.id exactly as received in the signature manifest.
   // Keep the original ID elsewhere for the payment API request.
   const manifestParts = [];
   if (
