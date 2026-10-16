@@ -10,7 +10,7 @@ import { sendWelcomeEmail as sendWelcomeMessage } from '../lib/email.js';
 
 const router = Router();
 const plans = {
-  MONTHLY: { price: 1, months: 1 },
+  MONTHLY: { price: 199, months: 1 },
   ANNUAL: { price: 1990, months: 12 },
 };
 
