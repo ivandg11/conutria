@@ -16,7 +16,7 @@ const money = (value) =>
     value ?? 0,
   );
 const planName = (plan) =>
-  ({ MONTHLY: 'Mensual', ANNUAL: 'Anual', PRODUCTION_TEST: 'Prueba temporal de produccion', LIFETIME: 'De por vida' })[plan] ??
+  ({ MONTHLY: 'Mensual', ANNUAL: 'Anual', PRODUCTION_TEST: 'Prueba temporal de produccion ($10)' , LIFETIME: 'De por vida' })[plan] ??
   plan ??
   'Sin plan';
 const statusName = (status) =>

@@ -41,14 +41,14 @@ const plans = [
     id: 'production_test',
     name: 'Plan de prueba en produccion',
     description: 'Plan temporal para verificar un cobro real de Stripe.',
-    price: '$1',
+    price: '$10',
     period: '/ mes',
     features: [
       'Acceso completo a Conutria',
-      'Cobro recurrente de $1 MXN cada mes',
+      'Cobro recurrente de $10 MXN cada mes',
       'Cancela desde Cuenta para detener renovaciones',
     ],
-    button: 'Probar suscripcion por $1',
+    button: 'Probar suscripcion por $10',
     testOnly: true,
   },
 ];
@@ -150,7 +150,7 @@ export default function SubscriptionPlans() {
               {plan.id === 'monthly'
                 ? 'Pago mensual. Consulta las condiciones antes de contratar.'
                 : plan.id === 'production_test'
-                  ? 'Cargo real de $1 MXN cada mes con renovacion automatica. Cancela desde Cuenta para detener futuros cargos.'
+                  ? 'Cargo real de $10 MXN cada mes con renovacion automatica. Cancela desde Cuenta para detener futuros cargos.'
                   : 'Pago anual anticipado. Consulta las condiciones antes de contratar.'}
             </p>
           </article>

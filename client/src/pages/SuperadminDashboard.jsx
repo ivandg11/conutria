@@ -588,7 +588,7 @@ function Renewals({ items }) {
           <span>
             <strong>{item.name}</strong>
             <small>
-              {item.plan === 'ANNUAL' ? 'Anual' : item.plan === 'PRODUCTION_TEST' ? 'Prueba temporal / mes' : 'Mensual'} ·{' '}
+              {item.plan === 'ANNUAL' ? 'Anual' : item.plan === 'PRODUCTION_TEST' ? 'Prueba $10/mes' : 'Mensual'} ·{' '}
               {date(item.renewsAt)}
             </small>
           </span>

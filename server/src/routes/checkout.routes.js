@@ -9,7 +9,7 @@ const limiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 8 });
 const plans = {
   monthly: { title: 'Conutria mensual', code: 'MONTHLY', amount: 199, interval: 'month' },
   annual: { title: 'Conutria anual', code: 'ANNUAL', amount: 1990, interval: 'year' },
-  production_test: { title: 'Conutria prueba de produccion', code: 'PRODUCTION_TEST', amount: 1, interval: 'month' },
+  production_test: { title: 'Conutria prueba de produccion', code: 'PRODUCTION_TEST', amount: 10, interval: 'month' },
 };
 
 router.post('/start', limiter, async (req, res) => {

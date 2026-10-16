@@ -5,7 +5,7 @@ import { sendWelcomeEmail } from '../lib/email.js';
 import { getStripe } from '../lib/stripe.js';
 
 const router = Router();
-const plans = { MONTHLY: { amount: 199 }, ANNUAL: { amount: 1990 }, PRODUCTION_TEST: { amount: 1 } };
+const plans = { MONTHLY: { amount: 199 }, ANNUAL: { amount: 1990 }, PRODUCTION_TEST: { amount: 10 } };
 const idOf = (value) => typeof value === 'string' ? value : value?.id ?? null;
 const unixDate = (value) => value ? new Date(value * 1000) : null;
 const invoiceSubId = (invoice) => idOf(invoice.subscription ?? invoice.parent?.subscription_details?.subscription);
