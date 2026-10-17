@@ -27,7 +27,11 @@ export default function Support() {
     }
   }, []);
 
-  useEffect(() => { loadTickets(); }, [loadTickets]);
+  useEffect(() => {
+    let active = true;
+    queueMicrotask(() => active && loadTickets());
+    return () => { active = false; };
+  }, [loadTickets]);
 
   useEffect(() => {
     const timer = setInterval(loadTickets, 30000);

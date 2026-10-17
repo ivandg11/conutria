@@ -22,6 +22,20 @@ model User {
   passwordSetupTokens PasswordSetupToken[]
   supportTickets SupportTicket[]
   supportMessages SupportMessage[]
+  sessions       Session[]
+}
+
+model Session {
+  id           String    @id @db.VarChar(64)
+  userId       Int
+  lastActivity DateTime  @default(now())
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  createdAt    DateTime  @default(now())
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
 }
 
 model Subscription {
@@ -153,10 +167,45 @@ model Patient {
   consults     Consultation[]
   mealPlans    MealPlan[]
   appointments Appointment[]
+  checkInInvitations CheckInInvitation[]
+  weeklyCheckIns WeeklyCheckIn[]
  medicalHistory Json?
   @@index([userId, lastName])
   status       String    @default("ACTIVE")
 dischargedAt DateTime?
+}
+
+model CheckInInvitation {
+  id        String         @id @default(cuid())
+  patientId Int
+  tokenHash String         @unique @db.VarChar(64)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime       @default(now())
+  patient   Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  response  WeeklyCheckIn?
+
+  @@index([patientId, createdAt])
+  @@index([expiresAt, usedAt])
+}
+
+model WeeklyCheckIn {
+  id            Int               @id @default(autoincrement())
+  patientId     Int
+  invitationId  String            @unique
+  adherence     Int
+  energy        Int
+  hunger        Int
+  challenges    String?           @db.VarChar(500)
+  submittedAt   DateTime          @default(now())
+  consentAcceptedAt DateTime
+  reviewedAt    DateTime?
+  reviewNotes   String?           @db.VarChar(1000)
+  patient       Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  invitation    CheckInInvitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  @@index([patientId, submittedAt])
+  @@index([patientId, reviewedAt])
 }
 
 model Consultation {

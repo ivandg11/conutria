@@ -19,6 +19,7 @@ import Account from './pages/Account';
 import Support from './pages/Support';
 import Agenda from './pages/Agenda';
 import LegalDocuments from './pages/LegalDocuments';
+import WeeklyCheckin from './pages/WeeklyCheckin';
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/planes" element={<SubscriptionPlans />} />
           <Route path="/crear-contrasena" element={<SetupPassword />} />
           <Route path="/pago/resultado" element={<PaymentResult />} />
+          <Route path="/seguimiento-semanal" element={<WeeklyCheckin />} />
           <Route path="/aviso-de-privacidad" element={<LegalDocuments type="privacy" />} />
           <Route path="/terminos-de-uso" element={<LegalDocuments type="terms" />} />
 

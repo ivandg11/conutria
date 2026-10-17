@@ -51,7 +51,11 @@ export default function Agenda() {
     }
   }, [month]);
 
-  useEffect(() => { loadAppointments(); }, [loadAppointments]);
+  useEffect(() => {
+    let active = true;
+    queueMicrotask(() => active && loadAppointments());
+    return () => { active = false; };
+  }, [loadAppointments]);
 
   useEffect(() => {
     Promise.all([

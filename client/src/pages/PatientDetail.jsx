@@ -15,6 +15,7 @@ import { ALL_MEASURES, MEASURE_GROUPS } from '../lib/measures';
 import { HISTORY_FIELDS, FREQ_GROUPS, FREQ_OPTIONS, displayHistoryValue } from '../lib/clinical';
 import EnergyCalculator from '../components/EnergyCalculator';
 import SomatotypePanel from '../components/SomatotypePanel';
+import WeeklyCheckins from '../components/WeeklyCheckins';
 const fmtDate = (iso) =>
   new Date(iso).toLocaleDateString('es-MX', {
     timeZone: 'UTC',
@@ -180,6 +181,8 @@ export default function PatientDetail() {
           </p>
         )}
       </div>
+
+      <WeeklyCheckins patient={patient} />
 
       {hasHistory && (
         <details className="rounded bg-white p-4 shadow">

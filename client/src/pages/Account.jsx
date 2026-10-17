@@ -52,7 +52,9 @@ export default function Account() {
   }, []);
 
   useEffect(() => {
-    loadAccount();
+    let active = true;
+    queueMicrotask(() => active && loadAccount());
+    return () => { active = false; };
   }, [loadAccount]);
 
   async function cancelSubscription() {

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import Logo from '../components/Logo';
 import './LegalDocuments.css';
 
-const revisionDate = '14 de octubre de 2026';
+const revisionDate = '17 de octubre de 2026';
 
 function DraftNotice() {
   return (
@@ -36,6 +36,13 @@ function PrivacyNotice() {
       </p>
       <h2>2. Datos que tratamos</h2>
       <ul>
+        <li>
+          <strong>Seguimiento semanal:</strong> cuando el paciente responde una
+          invitaciÃ³n, se guardan sus calificaciones de adherencia, energÃ­a y
+          hambre, las dificultades que decida compartir, la fecha de respuesta
+          y la aceptaciÃ³n para compartirla con su nutriÃ³logo. El profesional
+          puede agregar notas privadas de revisiÃ³n.
+        </li>
         <li>
           <strong>Cuenta:</strong> nombre, correo electrónico, contraseña
           protegida mediante hash, actividad de acceso y datos técnicos

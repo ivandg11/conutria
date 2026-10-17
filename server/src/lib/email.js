@@ -31,6 +31,16 @@ async function sendEmail({ to, subject, html, text }) {
   }
 }
 
+export async function sendWeeklyCheckInEmail(patient, nutritionistName, rawToken) {
+  const { url: baseUrl } = getEmailConfig('/seguimiento-semanal');
+  const url = `${baseUrl}?token=${encodeURIComponent(rawToken)}`;
+  const patientName = escapeHtml(patient.firstName);
+  const professional = escapeHtml(nutritionistName);
+  const html = `<!doctype html><html lang="es"><body style="margin:0;padding:32px;background:#f4f7f3;font-family:Arial,sans-serif;color:#193d35"><main style="max-width:560px;margin:auto;padding:32px;background:#fff;border:1px solid #e0e7de;border-radius:18px"><p style="color:#0e8060;font-weight:bold">Conutria</p><h1>Seguimiento de tu semana</h1><p>Hola ${patientName}, ${professional} te invita a compartir cómo te fue esta semana.</p><p>Responde unas preguntas breves sobre tu plan, energía y hambre. Tus respuestas estarán disponibles para que tu nutriólogo las revise antes de su próxima consulta.</p><p style="margin:28px 0"><a href="${url}" style="padding:14px 22px;border-radius:10px;background:#f8cb59;color:#103f34;font-weight:bold;text-decoration:none">Responder seguimiento semanal</a></p><p style="color:#71847c;font-size:13px">Este enlace es privado, se puede usar una sola vez y vence en 7 días.</p><p style="color:#71847c;font-size:12px;word-break:break-all">Si el botón no funciona, abre este enlace: ${url}</p></main></body></html>`;
+  const text = `Hola ${patient.firstName}, ${nutritionistName} te invita a compartir cómo te fue esta semana. Responde aquí: ${url}\n\nEl enlace es privado, se puede usar una sola vez y vence en 7 días.`;
+  await sendEmail({ to: patient.email, subject: 'Tu seguimiento semanal de Conutria', html, text });
+}
+
 export async function sendWelcomeEmail(user, rawToken) {
   const { url: baseUrl } = getEmailConfig('/crear-contrasena');
   const url = `${baseUrl}?token=${encodeURIComponent(rawToken)}`;

@@ -30,18 +30,30 @@ const passwordRecoveryLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-const SESSION_IDLE_MS = 10 * 60 * 1000;
+const SESSION_ABSOLUTE_MS = 30 * 24 * 60 * 60 * 1000;
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'lax',
-  maxAge: SESSION_IDLE_MS,
+  maxAge: SESSION_ABSOLUTE_MS,
 };
 
-function setSession(res, userId) {
-  const token = jwt.sign({}, process.env.JWT_SECRET, {
+async function setSession(res, userId) {
+  const now = new Date();
+  const id = randomBytes(32).toString('base64url');
+  const expiresAt = new Date(now.getTime() + SESSION_ABSOLUTE_MS);
+  await prisma.session.deleteMany({
+    where: {
+      OR: [
+        { expiresAt: { lte: now } },
+        { revokedAt: { lt: new Date(now.getTime() - SESSION_ABSOLUTE_MS) } },
+      ],
+    },
+  });
+  await prisma.session.create({ data: { id, userId, expiresAt } });
+  const token = jwt.sign({ sid: id }, process.env.JWT_SECRET, {
     subject: String(userId),
-    expiresIn: '10m',
+    expiresIn: '30d',
   });
   res.cookie('token', token, cookieOptions);
 }
@@ -105,6 +117,7 @@ router.post('/setup-password', passwordSetupLimiter, async (req, res) => {
       where: { id: setup.userId },
       data: { passwordHash },
     });
+    await tx.session.updateMany({ where: { userId: setup.userId, revokedAt: null }, data: { revokedAt: now } });
     await tx.auditLog.create({
       data: { actorId: user.id, action: 'Configuró contraseña', details: 'Activación de cuenta desde enlace de pago' },
     });
@@ -173,6 +186,7 @@ router.post('/reset-password', passwordSetupLimiter, async (req, res) => {
       where: { id: reset.userId },
       data: { passwordHash },
     });
+    await tx.session.updateMany({ where: { userId: reset.userId, revokedAt: null }, data: { revokedAt: now } });
     await tx.auditLog.create({
       data: { actorId: reset.userId, action: 'Restableció contraseña', details: 'Recuperación por correo' },
     });
@@ -197,17 +211,22 @@ router.post('/login', loginLimiter, async (req, res) => {
     where: { id: user.id },
     data: { lastLoginAt: new Date() },
   });
-  setSession(res, updatedUser.id);
+  await setSession(res, updatedUser.id);
   res.json({ id: updatedUser.id, name: updatedUser.name, email: updatedUser.email, role: updatedUser.role });
 });
 
 router.post('/logout', async (req, res) => {
+  try {
+    const payload = jwt.verify(req.cookies.token ?? '', process.env.JWT_SECRET, { ignoreExpiration: true });
+    if (typeof payload.sid === 'string') {
+      await prisma.session.updateMany({ where: { id: payload.sid, revokedAt: null }, data: { revokedAt: new Date() } });
+    }
+  } catch { /* Clear the cookie even if its token is invalid. */ }
   res.clearCookie('token', cookieOptions);
   res.json({ ok: true });
 });
 
 router.post('/session/refresh', requireAuth, async (req, res) => {
-  setSession(res, req.userId);
   res.json({ ok: true });
 });
 

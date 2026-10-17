@@ -125,7 +125,9 @@ export default function SuperadminDashboard() {
   }, []);
 
   useEffect(() => {
-    loadDashboard();
+    let active = true;
+    queueMicrotask(() => active && loadDashboard());
+    return () => { active = false; };
   }, [loadDashboard]);
 
   const loadSupportTickets = useCallback(async () => {
@@ -142,7 +144,9 @@ export default function SuperadminDashboard() {
   }, []);
 
   useEffect(() => {
-    loadSupportTickets();
+    let active = true;
+    queueMicrotask(() => active && loadSupportTickets());
+    return () => { active = false; };
   }, [loadSupportTickets]);
   useEffect(() => {
     const timer = setInterval(loadSupportTickets, 30000);
