@@ -66,11 +66,12 @@ async function createCheckout({ name, email, plan, renewalForUserId }, res) {
 
 router.post('/start', limiter, async (req, res) => {
   const values = z.object({
-    name: z.string().trim().min(2).max(100),
+    firstName: z.string().trim().min(2).max(50),
+    lastName: z.string().trim().min(2).max(50),
     email: z.string().trim().email().max(254),
     plan: z.enum(['weekly', 'monthly', 'annual']),
   }).parse(req.body);
-  return createCheckout(values, res);
+  return createCheckout({ ...values, name: `${values.firstName} ${values.lastName}` }, res);
 });
 
 router.post('/renew', requireAuth, limiter, async (req, res) => {

@@ -61,7 +61,7 @@ function CheckIcon() {
 export default function SubscriptionPlans() {
   const { user } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const [form, setForm] = useState({ name: '', email: '' });
+  const [form, setForm] = useState({ firstName: '', lastName: '', email: '' });
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -158,7 +158,8 @@ export default function SubscriptionPlans() {
             <p>{user ? 'Confirma la renovación de tu cuenta con Stripe.' : 'Te enviaremos el acceso a este correo después de confirmar tu pago.'}</p>
             <form onSubmit={startCheckout}>
               {!user && <>
-                <label>Nombre<input autoComplete="name" required minLength={2} maxLength={100} value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} /></label>
+                <label>Nombre<input autoComplete="given-name" required minLength={2} maxLength={50} value={form.firstName} onChange={(event) => setForm({ ...form, firstName: event.target.value })} /></label>
+                <label>Apellido<input autoComplete="family-name" required minLength={2} maxLength={50} value={form.lastName} onChange={(event) => setForm({ ...form, lastName: event.target.value })} /></label>
                 <label>Correo electrónico<input type="email" autoComplete="email" required value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} /></label>
               </>}
               <label className="nc-legal-consent"><input type="checkbox" required checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} /><span>Leí y acepto los <Link to="/terminos-de-uso" target="_blank" rel="noreferrer">Términos de uso</Link>. He leído el <Link to="/aviso-de-privacidad" target="_blank" rel="noreferrer">Aviso de privacidad</Link>.</span></label>

@@ -30,7 +30,7 @@
 .nc-payment-result { text-align: center; }
 
 .nc-checkout-overlay { position: fixed; z-index: 20; inset: 0; display: grid; place-items: center; padding: 20px; background: #102d26a8; }
-.nc-checkout-dialog { position: relative; width: min(100%, 470px); box-sizing: border-box; padding: 38px; border: 1px solid #e0e7de; border-radius: 22px; background: #fff; color: #193d35; box-shadow: 0 24px 70px #102d2640; }
+.nc-checkout-dialog { position: relative; width: min(100%, 470px); max-height: calc(100dvh - 40px); overflow-y: auto; box-sizing: border-box; padding: 38px; border: 1px solid #e0e7de; border-radius: 22px; background: #fff; color: #193d35; box-shadow: 0 24px 70px #102d2640; }
 .nc-checkout-dialog h2 { margin: 12px 0 8px; font-size: 27px; }
 .nc-checkout-dialog > p { margin: 0; color: #6b827b; font-size: 14px; line-height: 1.6; }
 .nc-checkout-dialog form { display: grid; gap: 16px; margin-top: 23px; }

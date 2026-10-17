@@ -11,15 +11,18 @@ function getEmailConfig(path) {
   if (!apiKey || !from || !clientUrl) {
     throw new Error('Falta configurar RESEND_API_KEY, MAIL_FROM o CLIENT_URL.');
   }
-  return { apiKey, from, url: `${clientUrl}${path}` };
+  return { apiKey, from, clientUrl, url: `${clientUrl}${path}` };
 }
 
 async function sendEmail({ to, subject, html, text }) {
-  const { apiKey, from } = getEmailConfig('');
+  const { apiKey, from, clientUrl } = getEmailConfig('');
+  const logoUrl = `${clientUrl}/apple-touch-icon.png`;
+  const brandHeader = `<div style="display:flex;align-items:center;gap:12px;margin-bottom:24px"><img src="${logoUrl}" width="48" height="48" alt="Conutria" style="display:block;border-radius:50%"><span style="color:#0e8060;font-size:18px;font-weight:bold">Conutria</span></div>`;
+  const brandedHtml = html.replace(/<p style="color:#0e8060;font-weight:bold">Conutria<\/p>/, brandHeader);
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from, to: [to], subject, html, text }),
+    body: JSON.stringify({ from, to: [to], subject, html: brandedHtml, text }),
   });
   if (!response.ok) {
     const details = await response.text().catch(() => '');
