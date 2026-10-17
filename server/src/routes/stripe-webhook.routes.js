@@ -5,7 +5,14 @@ import { sendWelcomeEmail } from '../lib/email.js';
 import { getStripe } from '../lib/stripe.js';
 
 const router = Router();
-const plans = { MONTHLY: { amount: 199 }, ANNUAL: { amount: 1990 }, PRODUCTION_TEST: { amount: 10 } };
+const plans = {
+  MONTHLY: { amount: 199, currency: 'MXN', unitAmount: 19900 },
+  ANNUAL: { amount: 1990, currency: 'MXN', unitAmount: 199000 },
+  PRODUCTION_TEST: { amount: 10, currency: 'MXN', unitAmount: 1000 },
+  WEEKLY_USD: { amount: 1.99, currency: 'USD', unitAmount: 199 },
+  MONTHLY_USD: { amount: 7.99, currency: 'USD', unitAmount: 799 },
+  ANNUAL_USD: { amount: 79.99, currency: 'USD', unitAmount: 7999 },
+};
 const idOf = (value) => typeof value === 'string' ? value : value?.id ?? null;
 const unixDate = (value) => value ? new Date(value * 1000) : null;
 const invoiceSubId = (invoice) => idOf(invoice.subscription ?? invoice.parent?.subscription_details?.subscription);
@@ -42,6 +49,27 @@ async function syncSubscription(sub) {
       canceledAt: sub.status === 'canceled' ? unixDate(sub.canceled_at) ?? new Date() : null,
       stripeCustomerId: idOf(sub.customer),
     },
+  });
+}
+
+async function cancelReplacedSubscription(pending, newStripeSubscriptionId, stripe) {
+  if (!pending?.renewalForUserId) return;
+  const previous = await prisma.subscription.findFirst({
+    where: {
+      userId: pending.renewalForUserId,
+      stripeSubscriptionId: { not: newStripeSubscriptionId },
+      status: { in: ['ACTIVE', 'TRIAL', 'PAST_DUE'] },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+  if (!previous) return;
+  if (previous.stripeSubscriptionId) {
+    const remote = await stripe.subscriptions.retrieve(previous.stripeSubscriptionId);
+    if (remote.status !== 'canceled') await stripe.subscriptions.cancel(previous.stripeSubscriptionId);
+  }
+  await prisma.subscription.update({
+    where: { id: previous.id },
+    data: { status: 'CANCELED', canceledAt: new Date(), cancelAtPeriodEnd: false },
   });
 }
 
@@ -90,8 +118,8 @@ async function processPaidInvoice(invoice, stripe, res) {
   const local = await prisma.subscription.findUnique({ where: { stripeSubscriptionId: subId } });
   const planCode = local?.plan ?? remote.metadata?.plan;
   const plan = plans[planCode];
-  const expected = plan ? plan.amount * 100 : null;
-  if (!plan || String(invoice.currency).toUpperCase() !== 'MXN' || Number(invoice.amount_paid) !== expected) {
+  const expected = plan?.unitAmount ?? null;
+  if (!plan || String(invoice.currency).toUpperCase() !== plan.currency || Number(invoice.amount_paid) !== expected) {
     console.error('Stripe invoice does not match configured plan.', { invoiceId: invoice.id, currency: invoice.currency, amountPaid: invoice.amount_paid, expected });
     return;
   }
@@ -107,6 +135,7 @@ async function processPaidInvoice(invoice, stripe, res) {
     const pendingId = remote.metadata?.pendingSignupId;
     if (pendingId) {
       const pending = await prisma.pendingSignup.findUnique({ where: { id: pendingId } });
+      await cancelReplacedSubscription(pending, subId, stripe);
       if (pending && pending.status !== 'COMPLETED') {
         await retrySetupEmail(pending, res);
         if (res.headersSent) return;
@@ -125,7 +154,7 @@ async function processPaidInvoice(invoice, stripe, res) {
     console.error('Stripe invoice refers to unknown signup.', { invoiceId: invoice.id, pendingSignupId: pendingId });
     return;
   }
-  if (pending.plan !== planCode || Number(pending.amount) !== plan.amount) {
+  if (pending.plan !== planCode || Number(pending.amount) !== plan.amount || pending.currency !== plan.currency) {
     console.error('Stripe invoice does not match pending signup.', { invoiceId: invoice.id, pendingSignupId: pendingId });
     return;
   }
@@ -151,8 +180,10 @@ async function processPaidInvoice(invoice, stripe, res) {
 
   const existing = pending.userId
     ? await prisma.user.findUnique({ where: { id: pending.userId } })
-    : await prisma.user.findUnique({ where: { email: pending.email } });
-  if (existing && !pending.userId) {
+    : pending.renewalForUserId
+      ? await prisma.user.findUnique({ where: { id: pending.renewalForUserId } })
+      : await prisma.user.findUnique({ where: { email: pending.email } });
+  if (existing && !pending.userId && !pending.renewalForUserId) {
     await prisma.pendingSignup.update({ where: { id: pending.id }, data: { status: 'EMAIL_CONFLICT', processingStartedAt: null } });
     return;
   }
@@ -168,23 +199,32 @@ async function processPaidInvoice(invoice, stripe, res) {
     const subscription = await tx.subscription.upsert({
       where: { stripeSubscriptionId: subId },
       create: {
-        userId: user.id, plan: pending.plan, status: 'ACTIVE', price: plan.amount,
+        userId: user.id, plan: pending.plan, status: 'ACTIVE', price: plan.amount, currency: plan.currency,
         startedAt: paidAt, renewsAt: end, stripeSubscriptionId: subId,
         stripeCustomerId: idOf(remote.customer),
       },
-      update: { status: 'ACTIVE', renewsAt: end, stripeCustomerId: idOf(remote.customer) },
+      update: { status: 'ACTIVE', renewsAt: end, stripeCustomerId: idOf(remote.customer), currency: plan.currency },
     });
     await upsertInvoicePayment(subscription, invoice, 'PAID', tx);
-    await tx.passwordSetupToken.deleteMany({ where: { userId: user.id, usedAt: null } });
-    await tx.passwordSetupToken.create({ data: { userId: user.id, tokenHash, expiresAt: new Date(Date.now() + 36 * 60 * 60 * 1000) } });
+    if (!user.passwordHash) {
+      await tx.passwordSetupToken.deleteMany({ where: { userId: user.id, usedAt: null } });
+      await tx.passwordSetupToken.create({ data: { userId: user.id, tokenHash, expiresAt: new Date(Date.now() + 36 * 60 * 60 * 1000) } });
+    }
     await tx.pendingSignup.update({
       where: { id: pending.id },
-      data: { status: 'PROCESSING', userId: user.id, paidAt, processingStartedAt: new Date() },
+      data: {
+        status: user.passwordHash ? 'COMPLETED' : 'PROCESSING',
+        ...(!pending.renewalForUserId ? { userId: user.id } : {}),
+        paidAt,
+        processingStartedAt: user.passwordHash ? null : new Date(),
+      },
     });
     if (!existing) await tx.auditLog.create({
       data: { actorId: user.id, action: 'Cuenta creada por suscripcion pagada', details: 'Plan ' + pending.plan + '; factura ' + invoice.id },
     });
   });
+  await cancelReplacedSubscription(pending, subId, stripe);
+  if (user.passwordHash) return;
   try {
     await sendWelcomeEmail(user, rawToken);
     await prisma.pendingSignup.update({ where: { id: pending.id }, data: { status: 'COMPLETED', emailSentAt: new Date(), processingStartedAt: null } });

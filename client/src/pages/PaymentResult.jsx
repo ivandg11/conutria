@@ -8,7 +8,7 @@ export default function PaymentResult() {
     status === 'success'
       ? [
           'Estamos confirmando tu pago',
-          'Stripe nos notificará el resultado. Cuando se confirme, recibirás un correo para crear tu contraseña.',
+          'Stripe nos notificará el resultado. Si es tu primer registro, recibirás un correo para crear tu contraseña. Si estás renovando, inicia sesión cuando el pago quede confirmado.',
         ]
       : status === 'pending'
         ? [

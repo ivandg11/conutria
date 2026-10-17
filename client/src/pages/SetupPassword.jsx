@@ -1,17 +1,16 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../lib/api';
-import { useAuth } from '../context/useAuth';
 import './CheckoutPages.css';
 
 export default function SetupPassword() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const { setUser } = useAuth();
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [complete, setComplete] = useState(false);
 
   async function submit(event) {
     event.preventDefault();
@@ -19,9 +18,9 @@ export default function SetupPassword() {
     if (password !== confirm) return setError('Las contraseñas no coinciden.');
     setLoading(true);
     try {
-      const { data } = await api.post('/auth/setup-password', { token: params.get('token'), password });
-      setUser(data);
-      navigate('/dashboard', { replace: true });
+      await api.post('/auth/setup-password', { token: params.get('token'), password });
+      setComplete(true);
+      window.setTimeout(() => navigate('/login?registered=1', { replace: true }), 2200);
     } catch (requestError) {
       setError(requestError.response?.data?.error || 'No se pudo crear la contraseña.');
       setLoading(false);
@@ -31,16 +30,24 @@ export default function SetupPassword() {
   return (
     <main className="nc-checkout-page">
       <section className="nc-checkout-panel">
-        <span className="nc-pricing-eyebrow">ACTIVA TU CUENTA</span>
-        <h1>Crea tu contraseña</h1>
-        <p>Usa al menos 8 caracteres. El enlace solo se puede utilizar una vez.</p>
-        <form onSubmit={submit}>
-          <label>Contraseña<input type="password" autoComplete="new-password" minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} /></label>
-          <label>Confirmar contraseña<input type="password" autoComplete="new-password" minLength={8} required value={confirm} onChange={(event) => setConfirm(event.target.value)} /></label>
-          {error && <p className="nc-checkout-error" role="alert">{error}</p>}
-          <button className="nc-checkout-submit" disabled={loading}>{loading ? 'Guardando…' : 'Crear contraseña y entrar'}</button>
-        </form>
-        <Link className="nc-checkout-link" to="/">Volver al inicio</Link>
+        {complete ? <div className="nc-setup-success" role="status">
+          <span className="nc-setup-success-icon" aria-hidden="true">✓</span>
+          <span className="nc-pricing-eyebrow">CUENTA ACTIVADA</span>
+          <h1>Tu cuenta se registró correctamente</h1>
+          <p>Tu contraseña quedó guardada. Te enviaremos al inicio de sesión para que ingreses.</p>
+          <button type="button" className="nc-checkout-submit" onClick={() => navigate('/login?registered=1', { replace: true })}>Ir al inicio de sesión</button>
+        </div> : <>
+          <span className="nc-pricing-eyebrow">ACTIVA TU CUENTA</span>
+          <h1>Crea tu contraseña</h1>
+          <p>Usa al menos 8 caracteres. El enlace solo se puede utilizar una vez.</p>
+          <form onSubmit={submit}>
+            <label>Contraseña<input type="password" autoComplete="new-password" minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} /></label>
+            <label>Confirmar contraseña<input type="password" autoComplete="new-password" minLength={8} required value={confirm} onChange={(event) => setConfirm(event.target.value)} /></label>
+            {error && <p className="nc-checkout-error" role="alert">{error}</p>}
+            <button className="nc-checkout-submit" disabled={loading}>{loading ? 'Guardando…' : 'Guardar contraseña'}</button>
+          </form>
+          <Link className="nc-checkout-link" to="/">Volver al inicio</Link>
+        </>}
       </section>
     </main>
   );

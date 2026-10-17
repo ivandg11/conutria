@@ -290,3 +290,54 @@ body:has(.login-shell) { background: #f5f6f0; }
 @media (max-width: 760px) {
   .login-decor-leaf { display: none; }
 }
+
+.login-success, .login-session-notice { margin: .75rem 0; padding: .8rem 1rem; border: 1px solid #cfe5d5; border-radius: 12px; color: #176344; background: #eef8f0; font-size: .9rem; line-height: 1.45; }
+.login-session-notice { border-color: #eadcb4; color: #735b1d; background: #fff9e9; }
+.nc-setup-success { display: grid; justify-items: center; gap: .7rem; text-align: center; }
+.nc-setup-success h1, .nc-setup-success p { margin: 0; }
+.nc-setup-success-icon { display: grid; width: 52px; height: 52px; place-items: center; border-radius: 50%; color: #fff; background: #147a5b; font-size: 1.7rem; font-weight: 700; }
+.nc-setup-success .nc-checkout-submit { margin-top: .5rem; }
+.account-renewal-alert { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 0 0 1rem; padding: 1rem 1.1rem; border: 1px solid #edcf8a; border-radius: 15px; color: #6e5519; background: #fff8e6; }
+.account-renewal-alert p { margin: .25rem 0 0; color: #806d3d; font-size: .85rem; }
+.account-renewal-alert a, .subscription-renew-link { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: .65rem 1rem; border-radius: 10px; color: white; background: #147a5b; font-size: .88rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.subscription-locked-page { display: grid; justify-items: center; align-content: center; min-height: calc(100vh - 72px); max-width: 620px !important; margin: auto !important; text-align: center; }
+.subscription-locked-icon { display: grid; width: 52px; height: 52px; place-items: center; border-radius: 50%; color: #8a5c0d; background: #fff1cf; font-size: 1.5rem; font-weight: 800; }
+.subscription-locked-page h1 { margin: .4rem 0; }
+.subscription-locked-page > p:not(.account-eyebrow) { color: #687a70; line-height: 1.6; }
+.subscription-locked-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .7rem; margin-top: .75rem; }
+.subscription-account-link, .subscription-locked-actions button { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: .65rem 1rem; border: 1px solid #d6e1d9; border-radius: 10px; color: #36584b; background: #fff; font-size: .88rem; font-weight: 650; text-decoration: none; cursor: pointer; }
+
+/* Keep dense application views usable on narrow touch screens. */
+*, *::before, *::after { box-sizing: border-box; }
+img, svg, video, canvas { max-width: 100%; }
+@media (max-width: 640px) {
+  html { -webkit-text-size-adjust: 100%; }
+  main:not(.client-content):not(.login-shell):not(.nc-checkout-page):not(.sa-shell) { width: 100%; }
+  .patient-hero { align-items: flex-start; flex-direction: column; }
+  .patient-hero-action { width: 100%; }
+  .patient-card-actions { flex-wrap: wrap; }
+  .patient-card-actions > * { flex: 1 1 auto; }
+  .account-heading, .support-heading, .agenda-heading { align-items: stretch; flex-direction: column; gap: .8rem; }
+  .account-sub-details { grid-template-columns: 1fr; }
+  .sa-header { gap: .5rem; }
+  .sa-sidebar nav { scrollbar-width: thin; }
+  .sa-content, .client-content { min-width: 0; }
+  .sa-table-wrap, .account-table-wrap { max-width: 100%; -webkit-overflow-scrolling: touch; }
+  .sa-title { flex-wrap: wrap; }
+  .sa-title > div { min-width: 0; }
+  .sa-refresh { flex: 0 0 auto; }
+  .sa-panel { min-width: 0; }
+  .sa-ticket-heading-actions { max-width: 100%; flex-wrap: wrap; }
+  .sa-ticket-detail-heading select { max-width: 100%; }
+  .confirm-actions { flex-wrap: wrap; }
+  .account-renewal-alert { align-items: stretch; flex-direction: column; }
+  .account-renewal-alert a { width: 100%; }
+}
+
+@media (max-width: 380px) {
+  main.client-content { padding-inline: 10px !important; }
+  .patient-card { padding: 1rem; }
+  .sa-header { padding-inline: 10px; }
+  .sa-content { padding-inline: 10px; }
+  .sa-card-grid { grid-template-columns: 1fr; }
+}

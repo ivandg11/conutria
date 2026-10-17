@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import Logo from '../components/Logo';
 
 export default function Login() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -45,6 +46,8 @@ export default function Login() {
           <span className="login-eyebrow">Bienvenida de nuevo</span>
           <h2>Inicia sesión</h2>
           <p className="login-form-description">Ingresa tus datos para continuar con tu consulta.</p>
+          {searchParams.get('registered') === '1' && <p className="login-success" role="status">Tu cuenta se registró correctamente. Inicia sesión para continuar.</p>}
+          {searchParams.get('expired') === '1' && <p className="login-session-notice" role="status">Tu sesión se cerró después de 10 minutos sin actividad. Inicia sesión de nuevo.</p>}
           {error && <p className="login-error" role="alert">{error}</p>}
           <label className="login-field">
             <span>Correo electrónico</span>

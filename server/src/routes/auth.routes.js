@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { sendPasswordResetEmail as sendPasswordResetMessage } from '../lib/email.js';
 import { requireAuth } from '../middleware/auth.js';
+import { getSubscriptionAccess } from '../middleware/requireActiveSubscription.js';
 import { getStripe } from '../lib/stripe.js';
 
 const router = Router();
@@ -29,17 +30,18 @@ const passwordRecoveryLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const SESSION_IDLE_MS = 10 * 60 * 1000;
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'lax',
-  maxAge: 7 * 24 * 60 * 60 * 1000,
+  maxAge: SESSION_IDLE_MS,
 };
 
 function setSession(res, userId) {
   const token = jwt.sign({}, process.env.JWT_SECRET, {
     subject: String(userId),
-    expiresIn: '7d',
+    expiresIn: '10m',
   });
   res.cookie('token', token, cookieOptions);
 }
@@ -109,8 +111,7 @@ router.post('/setup-password', passwordSetupLimiter, async (req, res) => {
     return user;
   });
   if (!updated) return res.status(400).json({ error: 'El enlace no es válido o ya venció.' });
-  setSession(res, updated.id);
-  res.json({ id: updated.id, name: updated.name, email: updated.email, role: updated.role });
+  res.json({ ok: true });
 });
 
 router.post('/forgot-password', passwordRecoveryLimiter, async (req, res) => {
@@ -205,12 +206,17 @@ router.post('/logout', async (req, res) => {
   res.json({ ok: true });
 });
 
+router.post('/session/refresh', requireAuth, async (req, res) => {
+  setSession(res, req.userId);
+  res.json({ ok: true });
+});
+
 router.get('/me', requireAuth, async (req, res) => {
-  const user = await prisma.user.findUnique({
+  const [user, access] = await Promise.all([prisma.user.findUnique({
     where: { id: req.userId },
     select: { id: true, name: true, email: true, role: true },
-  });
-  res.json(user);
+  }), getSubscriptionAccess(req.userId)]);
+  res.json({ ...user, ...access });
 });
 
 router.get('/account', requireAuth, async (req, res) => {
@@ -227,13 +233,16 @@ router.get('/account', requireAuth, async (req, res) => {
   ]);
 
   const current = subscriptions[0] ?? null;
+  const access = await getSubscriptionAccess(req.userId);
   res.json({
     user,
+    hasAccess: access.hasAccess,
     subscription: current ? {
       id: current.id,
       plan: current.plan,
       status: current.status,
       price: Number(current.price),
+      currency: current.currency,
       startedAt: current.startedAt,
       renewsAt: current.renewsAt,
       canceledAt: current.canceledAt,
@@ -246,6 +255,7 @@ router.get('/account', requireAuth, async (req, res) => {
       paidAt: payment.paidAt,
       createdAt: payment.createdAt,
       plan: subscription.plan,
+      currency: subscription.currency,
     }))).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 20),
   });
 });

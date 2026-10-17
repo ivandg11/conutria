@@ -16,6 +16,7 @@
 .client-nav-link:hover { background: #f4f8f5; }
 .client-nav-link.is-active { border-color: #dcebe1; outline: 2px solid #79d9ad; outline-offset: 1px; color: #0e7254 !important; background: #eaf4ed; font-weight: 750 !important; }
 .client-nav-icon { display: grid; width: 27px; height: 27px; flex: 0 0 27px; place-items: center; border-radius: 8px; color: #638176; background: #f1f5f1; font-size: 15px; }
+.client-nav-icon svg { display: block; }
 .client-nav-link.is-active .client-nav-icon { color: #fff; background: #13805e; }
 .client-sidebar-help { margin-top: 34px; padding: 15px; border: 1px solid #e4ebe5; border-radius: 12px; background: #f8faf8; }
 .client-sidebar-help strong { color: #285042; font-size: 12px; }

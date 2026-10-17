@@ -115,9 +115,9 @@ router.get('/dashboard', async (req, res) => {
       include: { subscription: { include: { user: { select: { name: true, email: true } } } } },
       orderBy: { createdAt: 'desc' }, take: 12,
     }),
-    prisma.payment.aggregate({
+    prisma.payment.findMany({
       where: { status: 'PAID', paidAt: { gte: monthStart, lte: now } },
-      _sum: { amount: true },
+      select: { amount: true, subscription: { select: { currency: true } } },
     }),
     prisma.systemError.findMany({ orderBy: { createdAt: 'desc' }, take: 10 }),
     prisma.auditLog.findMany({
@@ -143,8 +143,13 @@ router.get('/dashboard', async (req, res) => {
   const currentSubs = [...latestByUser.values()];
   const countStatus = (status) => currentSubs.filter((s) => s.status === status).length;
   const activeSubs = currentSubs.filter((s) => s.status === 'ACTIVE');
-  const recurringSubs = activeSubs.filter((s) => ['MONTHLY', 'ANNUAL', 'PRODUCTION_TEST'].includes(s.plan));
-  const mrr = recurringSubs.reduce((sum, s) => sum + money(s.price) / (s.plan === 'ANNUAL' ? 12 : 1), 0);
+  const recurringSubs = activeSubs.filter((s) => ['MONTHLY', 'ANNUAL', 'PRODUCTION_TEST', 'WEEKLY_USD', 'MONTHLY_USD', 'ANNUAL_USD'].includes(s.plan));
+  const mrr = Object.fromEntries(['MXN', 'USD'].map((currency) => [currency, recurringSubs
+    .filter((s) => s.currency === currency)
+    .reduce((sum, s) => sum + money(s.price) * (s.plan === 'ANNUAL' || s.plan === 'ANNUAL_USD' ? 1 / 12 : s.plan === 'WEEKLY_USD' ? 52 / 12 : 1), 0)]));
+  const monthlyRevenue = Object.fromEntries(['MXN', 'USD'].map((currency) => [currency, monthPayments
+    .filter((payment) => payment.subscription.currency === currency)
+    .reduce((sum, payment) => sum + money(payment.amount), 0)]));
   const renewals = currentSubs.filter((s) => s.status === 'ACTIVE' && s.renewsAt && s.renewsAt >= now);
   const presentUserIds = new Set(currentSubs.filter((s) => s.status !== 'CANCELED').map((s) => s.userId));
 
@@ -156,14 +161,17 @@ router.get('/dashboard', async (req, res) => {
       totalUsers, subscribers: presentUserIds.size,
     },
     plans: {
+      weeklyUsd: activeSubs.filter((s) => s.plan === 'WEEKLY_USD').length,
+      monthlyUsd: activeSubs.filter((s) => s.plan === 'MONTHLY_USD').length,
+      annualUsd: activeSubs.filter((s) => s.plan === 'ANNUAL_USD').length,
       monthly: activeSubs.filter((s) => s.plan === 'MONTHLY').length,
       annual: activeSubs.filter((s) => s.plan === 'ANNUAL').length,
       productionTest: activeSubs.filter((s) => s.plan === 'PRODUCTION_TEST').length,
-      monthlyRevenue: money(monthPayments._sum.amount), annualProjection: mrr * 12,
+      monthlyRevenue, annualProjection: { MXN: mrr.MXN * 12, USD: mrr.USD * 12 },
     },
     subscriptions: subscriptions.map((s) => ({
       id: s.id, userId: s.userId, name: s.user.name, email: s.user.email,
-      plan: s.plan, status: s.status, price: money(s.price), renewsAt: s.renewsAt,
+      plan: s.plan, status: s.status, price: money(s.price), currency: s.currency, renewsAt: s.renewsAt,
       cancelAtPeriodEnd: s.cancelAtPeriodEnd, stripeSubscriptionId: s.stripeSubscriptionId,
       createdAt: s.createdAt,
     })),
@@ -172,26 +180,26 @@ router.get('/dashboard', async (req, res) => {
       return {
         id: user.id, name: user.name, email: user.email, createdAt: user.createdAt,
         lastLoginAt: user.lastLoginAt, patientCount: user.patients.length,
-        plan: sub?.plan ?? null, status: sub?.status ?? 'NO_PLAN',
+        plan: sub?.plan ?? null, currency: sub?.currency ?? null, status: sub?.status ?? 'NO_PLAN',
         nextChargeAt: sub?.renewsAt ?? null,
       };
     }),
     payments: recentPayments.map((p) => ({
       id: p.id, amount: money(p.amount), status: p.status, paidAt: p.paidAt,
-      createdAt: p.createdAt, name: p.subscription.user.name, email: p.subscription.user.email,
+      createdAt: p.createdAt, name: p.subscription.user.name, email: p.subscription.user.email, currency: p.subscription.currency,
     })),
     failedPayments: failedPayments.map((p) => ({
       id: p.id, amount: money(p.amount), createdAt: p.createdAt,
-      name: p.subscription.user.name, email: p.subscription.user.email,
+      name: p.subscription.user.name, email: p.subscription.user.email, currency: p.subscription.currency,
     })),
     renewals: {
       next7Days: renewals.filter((s) => s.renewsAt <= in7Days).map((s) => ({
         id: s.id, name: s.user.name, email: s.user.email, plan: s.plan,
-        price: money(s.price), renewsAt: s.renewsAt,
+        price: money(s.price), currency: s.currency, renewsAt: s.renewsAt,
       })),
       next30Days: renewals.filter((s) => s.renewsAt > in7Days && s.renewsAt <= in30Days).map((s) => ({
         id: s.id, name: s.user.name, email: s.user.email, plan: s.plan,
-        price: money(s.price), renewsAt: s.renewsAt,
+        price: money(s.price), currency: s.currency, renewsAt: s.renewsAt,
       })),
     },
     audit: logs.map((log) => ({

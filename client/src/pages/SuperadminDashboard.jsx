@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useAuth } from '../context/useAuth';
 import Logo from '../components/Logo';
+import AppIcon from '../components/AppIcon';
 import ConfirmDialog from '../components/ConfirmDialog';
 import './SuperadminDashboard.css';
 
@@ -17,14 +18,14 @@ const sections = [
   'Sistema',
 ];
 const sectionIcons = {
-  Resumen: '⌂',
-  Planes: '▤',
-  Suscripciones: '↻',
-  Cobros: '$',
-  Usuarios: '♧',
-  Soporte: '✉',
-  Bitácora: '≡',
-  Sistema: '⚙',
+  Resumen: 'dashboard',
+  Planes: 'plans',
+  Suscripciones: 'subscriptions',
+  Cobros: 'payments',
+  Usuarios: 'users',
+  Soporte: 'support',
+  Bitácora: 'audit',
+  Sistema: 'system',
 };
 const sectionDescriptions = {
   Resumen: 'Indicadores generales de suscripciones e ingresos.',
@@ -43,15 +44,18 @@ const date = (value) =>
         timeStyle: 'short',
       })
     : '—';
-const currency = (value) =>
+const currency = (value, currencyCode = 'USD') =>
   new Intl.NumberFormat('es-MX', {
     style: 'currency',
-    currency: 'MXN',
-    maximumFractionDigits: 0,
+    currency: currencyCode,
+    maximumFractionDigits: 2,
   }).format(value ?? 0);
 const planText = {
-  MONTHLY: 'Mensual',
-  ANNUAL: 'Anual',
+  WEEKLY_USD: 'Cada 7 días · USD',
+  MONTHLY_USD: 'Mensual · USD',
+  ANNUAL_USD: 'Anual · USD',
+  MONTHLY: 'Mensual · MXN (anterior)',
+  ANNUAL: 'Anual · MXN (anterior)',
   PRODUCTION_TEST: 'Prueba $10/mes',
   LIFETIME: 'De por vida',
 };
@@ -215,7 +219,8 @@ export default function SuperadminDashboard() {
     ['En prueba', data.summary.trial],
     ['Morosas', data.summary.pastDue],
     ['Canceladas', data.summary.canceled],
-    ['MRR', currency(data.summary.mrr)],
+    ['MRR (USD)', currency(data.summary.mrr.USD, 'USD')],
+    ['MRR (MXN)', currency(data.summary.mrr.MXN, 'MXN')],
     ['Altas este mes', data.summary.newThisMonth],
     ['Bajas este mes', data.summary.cancellationsThisMonth],
   ];
@@ -264,7 +269,7 @@ export default function SuperadminDashboard() {
                 onClick={() => setSection(item)}
               >
                 <span className="sa-nav-icon" aria-hidden="true">
-                  {sectionIcons[item]}
+                  <AppIcon name={sectionIcons[item]} size={17} />
                 </span>
                 <span>{item}</span>
                 {item === 'Soporte' &&
@@ -330,24 +335,32 @@ export default function SuperadminDashboard() {
             <>
               <div className="sa-card-grid">
                 <article className="sa-stat">
-                  <span>Plan mensual</span>
-                  <strong>{data.plans.monthly}</strong>
+                  <span>Plan de 7 días · USD 1.99</span>
+                  <strong>{data.plans.weeklyUsd}</strong>
                 </article>
                 <article className="sa-stat">
-                  <span>Plan anual</span>
-                  <strong>{data.plans.annual}</strong>
+                  <span>Plan mensual · USD 7.99</span>
+                  <strong>{data.plans.monthlyUsd}</strong>
                 </article>
                 <article className="sa-stat">
-                  <span>Plan de prueba ($10/mes)</span>
-                  <strong>{data.plans.productionTest}</strong>
+                  <span>Plan anual · USD 79.99</span>
+                  <strong>{data.plans.annualUsd}</strong>
                 </article>
                 <article className="sa-stat">
-                  <span>Ingreso del mes</span>
-                  <strong>{currency(data.plans.monthlyRevenue)}</strong>
+                  <span>Ingreso del mes · USD</span>
+                  <strong>{currency(data.plans.monthlyRevenue.USD, 'USD')}</strong>
                 </article>
                 <article className="sa-stat">
-                  <span>Proyección anual (MRR × 12)</span>
-                  <strong>{currency(data.plans.annualProjection)}</strong>
+                  <span>Ingreso del mes · MXN anterior</span>
+                  <strong>{currency(data.plans.monthlyRevenue.MXN, 'MXN')}</strong>
+                </article>
+                <article className="sa-stat">
+                  <span>Proyección anual · USD</span>
+                  <strong>{currency(data.plans.annualProjection.USD, 'USD')}</strong>
+                </article>
+                <article className="sa-stat">
+                  <span>Proyección anual · MXN</span>
+                  <strong>{currency(data.plans.annualProjection.MXN, 'MXN')}</strong>
                 </article>
               </div>
               <p className="sa-note">
@@ -370,7 +383,7 @@ export default function SuperadminDashboard() {
                     subscription.email,
                     planText[subscription.plan] ?? subscription.plan,
                     subscription.cancelAtPeriodEnd ? 'Cancelacion programada' : (statusText[subscription.status] ?? subscription.status),
-                    currency(subscription.price),
+                    currency(subscription.price, subscription.currency),
                     date(subscription.renewsAt),
                     subscription.stripeSubscriptionId && subscription.status !== 'CANCELED'
                       ? <button type="button" className="sa-subscription-cancel" onClick={() => { setSubscriptionError(''); setSubscriptionToCancel(subscription); }}>Cancelar ahora</button>
@@ -392,7 +405,7 @@ export default function SuperadminDashboard() {
                       key: p.id,
                       cells: [
                         p.name,
-                        currency(p.amount),
+                        currency(p.amount, p.currency),
                         statusText[p.status] ?? p.status,
                         date(p.paidAt ?? p.createdAt),
                       ],
@@ -406,7 +419,7 @@ export default function SuperadminDashboard() {
                     empty="No hay pagos fallidos."
                     rows={data.failedPayments.map((p) => ({
                       key: p.id,
-                      cells: [p.name, currency(p.amount), date(p.createdAt)],
+                      cells: [p.name, currency(p.amount, p.currency), date(p.createdAt)],
                     }))}
                   />
                 </div>
@@ -659,7 +672,7 @@ function Renewals({ items }) {
               {date(item.renewsAt)}
             </small>
           </span>
-          <b>{currency(item.price)}</b>
+          <b>{currency(item.price, item.currency)}</b>
         </li>
       ))}
     </ul>

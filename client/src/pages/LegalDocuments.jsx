@@ -181,11 +181,11 @@ function TermsOfUse() {
       </p>
       <h2>3. Planes y pagos</h2>
       <p>
-        Los precios se muestran en pesos mexicanos antes de iniciar el pago:
-        plan mensual por <strong>$199 MXN por periodo mensual</strong> y plan
-        anual por <strong>$1,990 MXN por periodo anual</strong>. Tambien hay un
-        plan temporal de prueba por <strong>$10 MXN por periodo mensual</strong>,
-        con renovacion automatica hasta que se cancele desde Cuenta. El pago se
+        Los precios se muestran en dólares estadounidenses antes de iniciar el
+        pago: plan de 7 días por <strong>$1.99 USD cada 7 días</strong>, plan
+        mensual por <strong>$7.99 USD por periodo mensual</strong> y plan anual
+        por <strong>$79.99 USD por periodo anual</strong>. Los planes se renuevan
+        automáticamente hasta que se cancelen desde Cuenta. El pago se
         realiza mediante Stripe. El importe y las condiciones se muestran
         antes de confirmar el pago.{' '}
         <strong>

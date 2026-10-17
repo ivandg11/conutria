@@ -2,9 +2,10 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth } from '../middleware/auth.js';
+import { requireActiveSubscription } from '../middleware/requireActiveSubscription.js';
 
 const router = Router();
-router.use(requireAuth);
+router.use(requireAuth, requireActiveSubscription);
 
 const idSchema = z.coerce.number().int().positive();
 

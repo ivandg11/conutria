@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../lib/api';
 import ConfirmDialog from '../components/ConfirmDialog';
+import AppIcon from '../components/AppIcon';
+import { Link } from 'react-router-dom';
 
 const date = (value) =>
   value
@@ -11,12 +13,12 @@ const date = (value) =>
         year: 'numeric',
       })
     : 'Sin fecha registrada';
-const money = (value) =>
-  new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
+const money = (value, currency = 'USD') =>
+  new Intl.NumberFormat('es-MX', { style: 'currency', currency }).format(
     value ?? 0,
   );
 const planName = (plan) =>
-  ({ MONTHLY: 'Mensual', ANNUAL: 'Anual', PRODUCTION_TEST: 'Prueba temporal de produccion ($10)' , LIFETIME: 'De por vida' })[plan] ??
+  ({ WEEKLY_USD: 'Cada 7 días', MONTHLY_USD: 'Mensual', ANNUAL_USD: 'Anual', MONTHLY: 'Mensual (MXN)', ANNUAL: 'Anual (MXN)', PRODUCTION_TEST: 'Prueba temporal (MXN)', LIFETIME: 'De por vida' })[plan] ??
   plan ??
   'Sin plan';
 const statusName = (status) =>
@@ -94,6 +96,13 @@ export default function Account() {
         </div>
       </header>
 
+      {account && !account.hasAccess && !loading && (
+        <section className="account-renewal-alert" role="alert">
+          <div><strong>Tu suscripción está vencida</strong><p>Renueva para volver a crear pacientes, consultas y citas.</p></div>
+          <Link to="/planes">Ver planes para renovar</Link>
+        </section>
+      )}
+
       {error && (
         <p className="account-error" role="alert">
           {error}
@@ -105,7 +114,7 @@ export default function Account() {
         <div className="account-grid">
           <section className="account-card account-profile">
             <div className="account-card-heading">
-              <span className="account-icon">◎</span>
+              <span className="account-icon"><AppIcon name="account" size={20} /></span>
               <div>
                 <h2>Perfil</h2>
                 <p>Datos de acceso a Conutria</p>
@@ -129,7 +138,7 @@ export default function Account() {
 
           <section className="account-card account-subscription">
             <div className="account-card-heading">
-              <span className="account-icon">✳</span>
+              <span className="account-icon"><AppIcon name="plans" size={20} /></span>
               <div>
                 <h2>Suscripción</h2>
                 <p>Plan y estado actual</p>
@@ -150,9 +159,9 @@ export default function Account() {
                     'Acceso sin costo'
                   ) : (
                     <>
-                      {money(subscription.price)}{' '}
+                  {money(subscription.price, subscription.currency)}{' '}
                       <span>
-                        / {subscription.plan === 'ANNUAL' ? 'año' : 'mes'}
+                        / {['ANNUAL', 'ANNUAL_USD'].includes(subscription.plan) ? 'año' : subscription.plan === 'WEEKLY_USD' ? '7 días' : 'mes'}
                       </span>
                     </>
                   )}
@@ -167,23 +176,23 @@ export default function Account() {
                       {isLifetime
                         ? 'Vigencia'
                         : subscription.cancelAtPeriodEnd
-                          ? 'Acceso hasta'
-                          : subscription.status === 'CANCELED'
-                            ? 'Cancelada el'
-                            : 'Próxima renovación'}
+                          ? 'Vence el'
+                          : !account.hasAccess || subscription.status === 'CANCELED'
+                            ? 'Venció el'
+                            : 'Vence / renueva el'}
                     </dt>
                     <dd>
                       {isLifetime
                         ? 'De por vida'
                         : date(
                             subscription.status === 'CANCELED'
-                              ? subscription.canceledAt
+                              ? subscription.renewsAt ?? subscription.canceledAt
                               : subscription.renewsAt,
                           )}
                     </dd>
                   </div>
                 </dl>
-                {subscription.status === 'ACTIVE' && !subscription.cancelAtPeriodEnd && !isLifetime && (
+                {account.hasAccess && subscription.status === 'ACTIVE' && !subscription.cancelAtPeriodEnd && !isLifetime && (
                   <button
                     className="account-cancel"
                     type="button"
@@ -211,7 +220,7 @@ export default function Account() {
 
           <section className="account-card account-payments">
             <div className="account-card-heading">
-              <span className="account-icon">＄</span>
+              <span className="account-icon"><AppIcon name="payments" size={20} /></span>
               <div>
                 <h2>Historial de pagos</h2>
                 <p>Tus movimientos recientes</p>
@@ -234,7 +243,7 @@ export default function Account() {
                         <td>{date(payment.paidAt || payment.createdAt)}</td>
                         <td>Plan {planName(payment.plan)}</td>
                         <td>{paymentStatus(payment.status)}</td>
-                        <td>{money(payment.amount)}</td>
+                        <td>{money(payment.amount, payment.currency)}</td>
                       </tr>
                     ))}
                   </tbody>

@@ -1,15 +1,25 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
-import Logo from '../components/Logo';
+import AppIcon from '../components/AppIcon';
+import { useAuth } from '../context/useAuth';
 import './SuscriptionPlans.css';
 
 const plans = [
   {
+    id: 'weekly',
+    name: 'Plan de 7 días',
+    description: 'Acceso completo con un periodo de pago corto.',
+    price: '$1.99',
+    period: '/ cada 7 días',
+    features: ['Gestión de pacientes', 'Historial de consultas y mediciones', 'Planes de alimentación', 'Exportación a PDF', 'Cancela cuando quieras'],
+    button: 'Elegir plan de 7 días',
+  },
+  {
     id: 'monthly',
     name: 'Plan mensual',
     description: 'Flexibilidad para tu consulta.',
-    price: '$199',
+    price: '$7.99',
     period: '/ mes',
     features: [
       'Gestión de pacientes',
@@ -24,32 +34,19 @@ const plans = [
     id: 'annual',
     name: 'Plan anual',
     description: 'Para llevar tu consulta al siguiente nivel.',
-    price: '$1,990',
+    price: '$79.99',
     period: '/ año',
-    equivalent: '$165.83 MXN al mes',
+    equivalent: '$6.67 USD al mes',
+    savings: 'AHORRA $15.89 USD AL AÑO (17%)',
     features: [
       'Todo lo incluido en el plan mensual',
       'Un año completo de acceso',
       'Mismas funciones y condiciones',
-      'AHORRA $398 AL AÑO',
+      'Ahorra frente a 12 pagos mensuales',
       'Ideal para una práctica continua',
     ],
     button: 'Elegir plan anual',
     featured: true,
-  },
-  {
-    id: 'production_test',
-    name: 'Plan de prueba en produccion',
-    description: 'Plan temporal para verificar un cobro real de Stripe.',
-    price: '$10',
-    period: '/ mes',
-    features: [
-      'Acceso completo a Conutria',
-      'Cobro recurrente de $10 MXN cada mes',
-      'Cancela desde Cuenta para detener renovaciones',
-    ],
-    button: 'Probar suscripcion por $10',
-    testOnly: true,
   },
 ];
 
@@ -62,6 +59,7 @@ function CheckIcon() {
 }
 
 export default function SubscriptionPlans() {
+  const { user } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [form, setForm] = useState({ name: '', email: '' });
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -73,7 +71,9 @@ export default function SubscriptionPlans() {
     setError('');
     setLoading(true);
     try {
-      const { data } = await api.post('/checkout/start', { ...form, plan: selectedPlan.id });
+      const { data } = user
+        ? await api.post('/checkout/renew', { plan: selectedPlan.id })
+        : await api.post('/checkout/start', { ...form, plan: selectedPlan.id });
       window.location.assign(data.checkoutUrl);
     } catch (requestError) {
       setError(requestError.response?.data?.error || 'No se pudo iniciar el pago. Inténtalo de nuevo.');
@@ -105,12 +105,9 @@ export default function SubscriptionPlans() {
             {plan.featured && (
               <span className="nc-plan-badge">MEJOR AHORRO</span>
             )}
-            {plan.testOnly && (
-              <span className="nc-plan-badge">PRUEBA TEMPORAL</span>
-            )}
 
             <div className="nc-plan-icon" aria-hidden="true">
-              {plan.id === 'monthly' ? '◷' : <Logo size={36} showName={false} />}
+              <AppIcon name={plan.id === 'weekly' ? 'calendar' : plan.id === 'monthly' ? 'subscriptions' : 'plans'} size={25} />
             </div>
 
             <h3>{plan.name}</h3>
@@ -146,31 +143,27 @@ export default function SubscriptionPlans() {
               {plan.button} <span aria-hidden="true">→</span>
             </button>
 
-            <p className="nc-plan-footnote">
-              {plan.id === 'monthly'
-                ? 'Pago mensual. Consulta las condiciones antes de contratar.'
-                : plan.id === 'production_test'
-                  ? 'Cargo real de $10 MXN cada mes con renovacion automatica. Cancela desde Cuenta para detener futuros cargos.'
-                  : 'Pago anual anticipado. Consulta las condiciones antes de contratar.'}
-            </p>
+            <p className="nc-plan-footnote">{plan.id === 'weekly' ? 'Cargo recurrente cada 7 días. Cancela desde Cuenta para detener futuros cargos.' : plan.id === 'monthly' ? 'Cargo recurrente mensual. Cancela desde Cuenta para detener futuros cargos.' : 'Cargo anual anticipado. Cancela desde Cuenta para detener futuras renovaciones.'}</p>
           </article>
         ))}
       </div>
 
-      <p className="nc-pricing-note">Precios en MXN. Se solicitará tu nombre y correo para continuar al pago seguro.</p>
+      <p className="nc-pricing-note">Precios en USD. El pago seguro se procesa con Stripe.</p>
       {selectedPlan && (
         <div className="nc-checkout-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget && !loading) setSelectedPlan(null); }}>
           <section className="nc-checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="nc-checkout-title">
             <button className="nc-checkout-close" type="button" aria-label="Cerrar" disabled={loading} onClick={() => setSelectedPlan(null)}>×</button>
             <span className="nc-pricing-eyebrow">CONTINUAR CON {selectedPlan.name.toUpperCase()}</span>
-            <h2 id="nc-checkout-title">Tus datos de contacto</h2>
-            <p>Te enviaremos el acceso a este correo después de confirmar tu pago.</p>
+            <h2 id="nc-checkout-title">{user ? 'Confirma tu renovación' : 'Tus datos de contacto'}</h2>
+            <p>{user ? 'Confirma la renovación de tu cuenta con Stripe.' : 'Te enviaremos el acceso a este correo después de confirmar tu pago.'}</p>
             <form onSubmit={startCheckout}>
-              <label>Nombre<input autoComplete="name" required minLength={2} maxLength={100} value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} /></label>
-              <label>Correo electrónico<input type="email" autoComplete="email" required value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} /></label>
+              {!user && <>
+                <label>Nombre<input autoComplete="name" required minLength={2} maxLength={100} value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} /></label>
+                <label>Correo electrónico<input type="email" autoComplete="email" required value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} /></label>
+              </>}
               <label className="nc-legal-consent"><input type="checkbox" required checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} /><span>Leí y acepto los <Link to="/terminos-de-uso" target="_blank" rel="noreferrer">Términos de uso</Link>. He leído el <Link to="/aviso-de-privacidad" target="_blank" rel="noreferrer">Aviso de privacidad</Link>.</span></label>
               {error && <p className="nc-checkout-error" role="alert">{error}</p>}
-              <button className="nc-checkout-submit" disabled={loading}>{loading ? 'Conectando con Stripe…' : `Continuar al pago · ${selectedPlan.price} MXN`}</button>
+              <button className="nc-checkout-submit" disabled={loading}>{loading ? 'Conectando con Stripe…' : `Continuar al pago · ${selectedPlan.price} USD`}</button>
             </form>
           </section>
         </div>

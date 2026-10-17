@@ -30,6 +30,7 @@ model Subscription {
   plan      String
   status    String
   price     Decimal   @db.Decimal(10, 2)
+  currency  String    @default("MXN") @db.VarChar(3)
   startedAt DateTime  @default(now())
   renewsAt  DateTime?
   canceledAt DateTime?
@@ -63,6 +64,8 @@ model PendingSignup {
   email               String
   plan                String
   amount              Decimal  @db.Decimal(10, 2)
+  currency            String   @default("MXN") @db.VarChar(3)
+  renewalForUserId    Int?
   status              String   @default("PENDING")
   expiresAt           DateTime
   createdAt           DateTime @default(now())
