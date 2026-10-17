@@ -69,7 +69,7 @@ router.post('/subscriptions/:id/cancel', async (req, res) => {
     const canceledAt = canceled.canceled_at ? new Date(canceled.canceled_at * 1000) : new Date();
     const updated = await prisma.subscription.update({
       where: { id },
-      data: { status: 'CANCELED', canceledAt, cancelAtPeriodEnd: false },
+      data: { status: 'CANCELED', canceledAt, renewsAt: new Date(), cancelAtPeriodEnd: false },
     });
     await prisma.auditLog.create({
       data: {

@@ -14,9 +14,12 @@ export async function getSubscriptionAccess(userId) {
     },
   });
   const isLifetime = subscription?.plan === 'LIFETIME' && subscription.status === 'ACTIVE';
+  const periodIsPaid = Boolean(subscription?.renewsAt && subscription.renewsAt > new Date());
   const hasAccess = Boolean(isLifetime || (
-    subscription && ['ACTIVE', 'TRIAL', 'PAST_DUE'].includes(subscription.status) &&
-    subscription.renewsAt && subscription.renewsAt > new Date()
+    subscription && periodIsPaid && (
+      ['ACTIVE', 'TRIAL', 'PAST_DUE'].includes(subscription.status) ||
+      subscription.status === 'CANCELED'
+    )
   ));
   return {
     hasAccess,

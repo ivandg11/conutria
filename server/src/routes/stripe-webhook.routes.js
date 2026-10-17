@@ -40,12 +40,21 @@ async function upsertInvoicePayment(local, invoice, status, tx = prisma) {
 async function syncSubscription(sub) {
   const local = await prisma.subscription.findUnique({ where: { stripeSubscriptionId: sub.id } });
   if (!local) return;
+  const scheduledCancellation = Boolean(sub.cancel_at_period_end || local.cancelAtPeriodEnd);
   await prisma.subscription.update({
     where: { id: local.id },
     data: {
       status: localStatus(sub.status),
-      renewsAt: periodEnd(sub) ?? local.renewsAt,
-      cancelAtPeriodEnd: Boolean(sub.cancel_at_period_end),
+      // An immediate cancellation ends access now; a scheduled cancellation
+      // keeps the Stripe period end as the entitlement boundary.
+      renewsAt: sub.status === 'canceled' && !scheduledCancellation
+        ? new Date()
+        : periodEnd(sub) ?? local.renewsAt,
+      // Preserve a scheduled cancellation through its paid period even if
+      // Stripe reports the subscription as canceled before renewsAt passes.
+      cancelAtPeriodEnd: sub.status === 'canceled'
+        ? scheduledCancellation
+        : Boolean(sub.cancel_at_period_end),
       canceledAt: sub.status === 'canceled' ? unixDate(sub.canceled_at) ?? new Date() : null,
       stripeCustomerId: idOf(sub.customer),
     },

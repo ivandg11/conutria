@@ -175,8 +175,10 @@ export default function Account() {
                     <dt>
                       {isLifetime
                         ? 'Vigencia'
-                        : subscription.cancelAtPeriodEnd
-                          ? 'Vence el'
+                        : (subscription.cancelAtPeriodEnd || subscription.status === 'CANCELED') && account.hasAccess
+                          ? 'Acceso hasta'
+                          : subscription.cancelAtPeriodEnd
+                            ? 'Vence el'
                           : !account.hasAccess || subscription.status === 'CANCELED'
                             ? 'Venció el'
                             : 'Vence / renueva el'}
