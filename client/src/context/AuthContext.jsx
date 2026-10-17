@@ -93,6 +93,7 @@ export function AuthProvider({ children }) {
   async function logout() {
     clearLocalSession();
     try { await api.post('/auth/logout'); } catch { /* The local session is already cleared. */ }
+    window.location.replace('/login');
   }
 
   return <AuthContext.Provider value={{ user, loading, login, logout, setUser }}>{children}</AuthContext.Provider>;
