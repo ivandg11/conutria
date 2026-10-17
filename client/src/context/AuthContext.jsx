@@ -12,13 +12,18 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const lastRefreshRef = useRef(0);
   const lastBroadcastRef = useRef(0);
+  const logoutInProgressRef = useRef(false);
 
   const clearLocalSession = useCallback(() => {
     setUser(null);
   }, []);
 
   useEffect(() => {
-    api.get('/auth/me').then((res) => setUser(res.data)).catch(() => setUser(null)).finally(() => setLoading(false));
+    api.get('/auth/me').then((res) => {
+      if (!logoutInProgressRef.current) setUser(res.data);
+    }).catch(() => {
+      if (!logoutInProgressRef.current) setUser(null);
+    }).finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -27,7 +32,7 @@ export function AuthProvider({ children }) {
     const checkAccess = async () => {
       try {
         const { data } = await api.get('/auth/me');
-        setUser(data);
+        if (!logoutInProgressRef.current) setUser(data);
       } catch {
         setUser((current) => current ? { ...current, hasAccess: false } : current);
       }
@@ -91,6 +96,7 @@ export function AuthProvider({ children }) {
   }
 
   async function logout() {
+    logoutInProgressRef.current = true;
     clearLocalSession();
     try { await api.post('/auth/logout'); } catch { /* The local session is already cleared. */ }
     window.location.replace('/login');
