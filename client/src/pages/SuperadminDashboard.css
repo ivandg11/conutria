@@ -109,19 +109,26 @@ main.sa-shell {
 }
 
 @media (max-width: 560px) {
+  .sa-shell { width: 100%; max-width: 100%; overflow-x: clip; }
   .sa-header { height: 64px; padding: 0 14px; }
   .sa-brand-section, .sa-account-name { display: none; }
   .sa-account { gap: 9px; }
-  .sa-layout { min-height: calc(100vh - 64px); }
+  .sa-layout { width: 100%; min-width: 0; min-height: calc(100vh - 64px); grid-template-columns: minmax(0, 1fr); }
+  .sa-sidebar { width: 100%; min-width: 0; padding-inline: 14px; }
+  .sa-sidebar nav { width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; }
+  .sa-sidebar nav button { flex: 0 0 auto; }
   .sa-sidebar nav button { gap: 7px; padding: 8px; font-size: 12px; }
   .sa-nav-icon { width: 23px; height: 23px; flex-basis: 23px; font-size: 12px; }
-  .sa-content { padding: 24px 15px; }
+  .sa-content { width: 100%; min-width: 0; padding: 24px 15px; }
   .sa-title { align-items: flex-start; }
   .sa-title > div > p { max-width: 235px; font-size: 12px; }
   .sa-refresh { min-height: 38px; padding: 8px; font-size: 11px; }
   .sa-ticket-detail-heading { flex-direction: column; }
-  .sa-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .sa-card-grid { width: 100%; min-width: 0; grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .sa-stat { min-height: 96px; padding: 15px; }
+  .sa-stat strong { overflow-wrap: anywhere; }
+  .sa-panel, .sa-note { max-width: 100%; overflow-wrap: anywhere; }
+  .sa-table-wrap { width: 100%; overflow-x: auto; }
 }
 .sa-header .sa-brand > span { margin: 0; padding: 0; border: 0; }
 .sa-header .sa-brand-section { margin-left: 8px; padding-left: 17px; border-left: 1px solid rgba(255,255,255,.25); }
