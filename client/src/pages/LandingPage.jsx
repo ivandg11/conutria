@@ -130,7 +130,7 @@ export default function LandingPage() {
           <Link className="nc-login" to="/login">
             Iniciar sesión
           </Link>
-          <Link className="nc-button nc-button-yellow" to="/login">
+          <Link className="nc-button nc-button-yellow" to="/planes">
             Comenzar <span>→</span>
           </Link>
         </div>
@@ -277,7 +277,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <Link className="nc-button nc-button-yellow" to="/login">
+        <Link className="nc-button nc-button-yellow" to="/planes">
           Comenzar ahora →
         </Link>
       </section>
