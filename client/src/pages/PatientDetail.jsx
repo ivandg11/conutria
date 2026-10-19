@@ -16,6 +16,7 @@ import { HISTORY_FIELDS, FREQ_GROUPS, FREQ_OPTIONS, displayHistoryValue } from '
 import EnergyCalculator from '../components/EnergyCalculator';
 import SomatotypePanel from '../components/SomatotypePanel';
 import WeeklyCheckins from '../components/WeeklyCheckins';
+import MealPlans from '../components/MealPlans';
 const fmtDate = (iso) =>
   new Date(iso).toLocaleDateString('es-MX', {
     timeZone: 'UTC',
@@ -209,6 +210,9 @@ export default function PatientDetail() {
       {consultations.length > 0 && (
         <SomatotypePanel consultations={consultations} />
       )}
+      <div className="rounded bg-white p-4 shadow">
+        <MealPlans patientId={id} />
+      </div>
       {consultations.length > 0 && (
         <div className="rounded bg-white p-4 shadow">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">

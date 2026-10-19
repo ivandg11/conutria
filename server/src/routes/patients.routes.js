@@ -29,6 +29,24 @@ const patientSchema = z.object({
   medicalHistory: z.record(z.string().max(40), z.string().max(2000)).optional(),
 });
 
+const mealPlanSchema = z.object({
+  title: z.string().trim().min(1).max(120),
+  startDate: z.coerce.date(),
+  content: z.object({
+    meals: z.array(z.object({
+      name: z.string().trim().min(1).max(80),
+      time: z.string().max(5).optional(),
+      foods: z.array(z.object({
+        name: z.string().trim().min(1).max(120),
+        group: z.string().trim().max(80),
+        portion: z.string().trim().min(1).max(80),
+        equivalents: z.coerce.number().min(0).max(100),
+      })).max(40),
+    })).max(12),
+    notes: z.string().max(3000).optional(),
+  }),
+});
+
 router.get('/', async (req, res) => {
   const q = String(req.query.q ?? '').trim();
   const status = req.query.status === 'DISCHARGED' ? 'DISCHARGED' : 'ACTIVE';
@@ -61,6 +79,45 @@ router.get('/:id', async (req, res) => {
   if (!patient)
     return res.status(404).json({ error: 'Paciente no encontrado' });
   res.json(patient);
+});
+
+router.get('/:id/meal-plans', async (req, res) => {
+  const id = idSchema.parse(req.params.id);
+  const patient = await prisma.patient.findFirst({ where: { id, userId: req.userId }, select: { id: true } });
+  if (!patient) return res.status(404).json({ error: 'Paciente no encontrado' });
+  const plans = await prisma.mealPlan.findMany({ where: { patientId: id }, orderBy: [{ startDate: 'desc' }, { createdAt: 'desc' }] });
+  res.json(plans);
+});
+
+router.post('/:id/meal-plans', async (req, res) => {
+  const id = idSchema.parse(req.params.id);
+  const patient = await prisma.patient.findFirst({ where: { id, userId: req.userId }, select: { id: true } });
+  if (!patient) return res.status(404).json({ error: 'Paciente no encontrado' });
+  const data = mealPlanSchema.parse(req.body);
+  const plan = await prisma.mealPlan.create({ data: { ...data, patientId: id } });
+  res.status(201).json(plan);
+});
+
+router.put('/:id/meal-plans/:planId', async (req, res) => {
+  const id = idSchema.parse(req.params.id);
+  const planId = idSchema.parse(req.params.planId);
+  const patient = await prisma.patient.findFirst({ where: { id, userId: req.userId }, select: { id: true } });
+  if (!patient) return res.status(404).json({ error: 'Paciente no encontrado' });
+  const data = mealPlanSchema.partial().parse(req.body);
+  const exists = await prisma.mealPlan.findFirst({ where: { id: planId, patientId: id } });
+  if (!exists) return res.status(404).json({ error: 'Plan no encontrado' });
+  res.json(await prisma.mealPlan.update({ where: { id: planId }, data }));
+});
+
+router.delete('/:id/meal-plans/:planId', async (req, res) => {
+  const id = idSchema.parse(req.params.id);
+  const planId = idSchema.parse(req.params.planId);
+  const patient = await prisma.patient.findFirst({ where: { id, userId: req.userId }, select: { id: true } });
+  if (!patient) return res.status(404).json({ error: 'Paciente no encontrado' });
+  const exists = await prisma.mealPlan.findFirst({ where: { id: planId, patientId: id } });
+  if (!exists) return res.status(404).json({ error: 'Plan no encontrado' });
+  await prisma.mealPlan.delete({ where: { id: planId } });
+  res.status(204).end();
 });
 
 router.put('/:id', async (req, res) => {
