@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useAuth } from '../context/useAuth';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { getCachedPatients, getPatients, invalidatePatientLists } from '../lib/patientCache';
 
 export default function Patients() {
   const { user } = useAuth();
@@ -10,14 +11,27 @@ export default function Patients() {
   const [q, setQ] = useState('');
   const [status, setStatus] = useState('ACTIVE');
   const [pendingDelete, setPendingDelete] = useState(null);
+  const [loading, setLoading] = useState(() => !getCachedPatients({ q: '', status: 'ACTIVE' }));
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      api
-        .get('/patients', { params: { q, status } })
-        .then((res) => setPatients(res.data));
-    }, 300);
-    return () => clearTimeout(timer);
+    const params = { q: q.trim(), status };
+    const cached = getCachedPatients(params);
+    let active = true;
+    if (cached) {
+      setPatients(cached);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+    setLoadError('');
+    const timer = window.setTimeout(() => {
+      getPatients(params)
+        .then((data) => { if (active) setPatients(data); })
+        .catch(() => { if (active) setLoadError('No se pudieron cargar los pacientes. Intenta de nuevo.'); })
+        .finally(() => { if (active) setLoading(false); });
+    }, q ? 250 : 0);
+    return () => { active = false; window.clearTimeout(timer); };
   }, [q, status]);
 
   function handleDelete(id) {
@@ -28,6 +42,7 @@ export default function Patients() {
     const id = pendingDelete;
     setPendingDelete(null);
     await api.delete(`/patients/${id}`);
+    invalidatePatientLists();
     setPatients((list) => list.filter((p) => p.id !== id));
   }
 
@@ -85,6 +100,8 @@ export default function Patients() {
       </section>
 
       <section className="patient-grid" aria-label="Lista de pacientes">
+        {loadError && <p role="alert" className="patient-empty">{loadError}</p>}
+        {loading && patients.length === 0 && <p className="patient-empty">Cargando pacientes…</p>}
         {patients.map((patient) => {
           const initials = `${patient.firstName?.[0] ?? ''}${patient.lastName?.[0] ?? ''}`;
           return (
@@ -116,7 +133,7 @@ export default function Patients() {
           <strong>Agregar paciente</strong>
         </Link>
 
-        {patients.length === 0 && (
+        {!loading && !loadError && patients.length === 0 && (
           <p className="patient-empty">
             {status === 'ACTIVE' ? 'Sin pacientes en seguimiento. Agrega uno para comenzar.' : 'Sin pacientes dados de alta.'}
           </p>

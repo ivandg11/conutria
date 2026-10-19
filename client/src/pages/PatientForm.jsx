@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../lib/api';
 import { HISTORY_FIELDS, parseHistoryValue, serializeHistoryValue } from '../lib/clinical';
+import { invalidatePatientLists } from '../lib/patientCache';
 const empty = {
   firstName: '',
   lastName: '',
@@ -20,6 +21,8 @@ export default function PatientForm() {
   const navigate = useNavigate();
   const [form, setForm] = useState(empty);
   const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+  const submittingRef = useRef(false);
 
   useEffect(() => {
     if (!id) return;
@@ -48,6 +51,9 @@ export default function PatientForm() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    setSaving(true);
     setError('');
     // Quitar campos vacíos para que Zod no los rechace
     const payload = Object.fromEntries(
@@ -58,6 +64,7 @@ export default function PatientForm() {
     try {
       if (id) await api.put(`/patients/${id}`, payload);
       else await api.post('/patients', payload);
+      invalidatePatientLists();
       navigate('/dashboard');
     } catch (err) {
       const details = err.response?.data?.details;
@@ -66,6 +73,8 @@ export default function PatientForm() {
           ? details.map((d) => `${d.field}: ${d.message}`).join(' · ')
           : 'No se pudo guardar',
       );
+      submittingRef.current = false;
+      setSaving(false);
     }
   }
 
@@ -206,8 +215,8 @@ export default function PatientForm() {
         </div>
       </details>
       <div className="flex gap-3">
-        <button className="rounded bg-emerald-700 px-4 py-2 text-white hover:bg-emerald-800">
-          Guardar
+        <button disabled={saving} className="rounded bg-emerald-700 px-4 py-2 text-white hover:bg-emerald-800 disabled:cursor-wait disabled:opacity-60">
+          {saving ? 'Guardando…' : 'Guardar'}
         </button>
         <button
           type="button"

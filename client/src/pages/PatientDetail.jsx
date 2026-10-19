@@ -17,6 +17,7 @@ import EnergyCalculator from '../components/EnergyCalculator';
 import SomatotypePanel from '../components/SomatotypePanel';
 import WeeklyCheckins from '../components/WeeklyCheckins';
 import MealPlans from '../components/MealPlans';
+import { invalidatePatientLists } from '../lib/patientCache';
 const fmtDate = (iso) =>
   new Date(iso).toLocaleDateString('es-MX', {
     timeZone: 'UTC',
@@ -88,6 +89,7 @@ export default function PatientDetail() {
       onConfirm: async () => {
         setConfirmation(null);
         const res = await api.patch(`/patients/${id}/status`, { status: next });
+        invalidatePatientLists();
         setPatient(res.data);
       },
     });

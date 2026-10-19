@@ -18,7 +18,11 @@ export function parseHistoryValue(value) {
   const yesPrefix = `S\u00ed:`;
   if (value === `S\u00ed`) return { answer: 'yes', details: '' };
   if (value.startsWith(yesPrefix)) {
-    return { answer: 'yes', details: value.slice(yesPrefix.length).trim() };
+    const serializedDetails = value.slice(yesPrefix.length);
+    const details = serializedDetails.startsWith(' ')
+      ? serializedDetails.slice(1)
+      : serializedDetails;
+    return { answer: 'yes', details: details.trim() ? details : '' };
   }
   // Treat existing free-text history as a yes answer with its text as details.
   return { answer: 'yes', details: value };
@@ -26,7 +30,7 @@ export function parseHistoryValue(value) {
 
 export function serializeHistoryValue(answer, details = '') {
   if (answer === 'no') return 'No';
-  if (answer === 'yes') return `S\u00ed: ${details.trim()}`;
+  if (answer === 'yes') return `S\u00ed: ${details}`;
   return '';
 }
 

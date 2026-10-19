@@ -59,6 +59,14 @@ router.get('/', async (req, res) => {
       }),
     },
     orderBy: { lastName: 'asc' },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      phone: true,
+      goal: true,
+      status: true,
+    },
   });
   res.json(patients);
 });

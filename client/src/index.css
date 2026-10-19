@@ -280,6 +280,24 @@ body:has(.login-shell) { background: #f5f6f0; }
 .history-legacy { grid-column: 1 / -1; margin: 0; padding: 12px 14px; border: 1px solid #f0dfb7; border-radius: 12px; color: #725d2c; background: #fffbef; font-size: .85rem; }
 @media (max-width: 720px) { .history-grid { grid-template-columns: 1fr; } .history-panel { padding: 14px; } }
 
+.meal-plan-editor-backdrop { display: flex; align-items: flex-start; justify-content: center; backdrop-filter: blur(3px); }
+.meal-plan-editor { box-sizing: border-box; width: 100%; max-height: calc(100vh - 2rem); overflow-y: auto; border: 1px solid #e3ebe5; box-shadow: 0 24px 80px rgba(15, 40, 29, .22); }
+.meal-plan-editor fieldset { min-width: 0; border-color: #e4ebe5; background: linear-gradient(145deg, #fff, #fbfdfb); }
+.meal-plan-editor legend { color: #254b3a; font-weight: 700; }
+.meal-food-entry { border: 1px solid #edf1ed; background: #f8faf8 !important; }
+.meal-food-search { min-width: 0; }
+.meal-food-search > label, .meal-plan-editor label { color: #425b4d; font-weight: 600; }
+.meal-food-search input { min-width: 0; }
+.meal-food-suggestions { position: absolute; z-index: 30; top: calc(100% + 5px); left: 0; right: 0; max-height: 230px; overflow-y: auto; padding: 5px; border: 1px solid #dce8df; border-radius: 13px; background: #fff; box-shadow: 0 14px 32px rgba(24, 55, 39, .16); }
+.meal-food-suggestions button { display: block; width: 100%; padding: .65rem .75rem; border: 0; border-radius: 9px; color: #30483b; background: transparent; font-size: .86rem; text-align: left; cursor: pointer; }
+.meal-food-suggestions button:hover, .meal-food-suggestions button:focus-visible { color: #125a40; background: #edf7f0; outline: 0; }
+.meal-plans article { border: 1px solid #e6ede7; }
+@media (max-width: 640px) {
+  .meal-plan-editor-backdrop { padding: .6rem !important; }
+  .meal-plan-editor { max-height: calc(100vh - 1.2rem); margin: 0 !important; padding: 1rem !important; border-radius: 18px; }
+  .meal-food-suggestions { max-height: 180px; }
+}
+
 
 .login-decor-leaf svg {
   display: block;

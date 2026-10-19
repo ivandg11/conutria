@@ -67,6 +67,7 @@ export default function MealPlans({ patientId }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [activeFood, setActiveFood] = useState('');
 
   async function loadPlans() {
     try {
@@ -138,7 +139,7 @@ export default function MealPlans({ patientId }) {
   }
 
   return (
-    <section className="space-y-4">
+    <section className="meal-plans space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="font-semibold">Planes de alimentación</h2>
@@ -169,21 +170,28 @@ export default function MealPlans({ patientId }) {
         </article>
       ))}
 
-      {open && <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 p-3 sm:p-6">
-        <form onSubmit={save} className="mx-auto my-4 max-w-4xl space-y-5 rounded-2xl bg-white p-5 shadow-xl sm:p-7">
+      {open && <div className="meal-plan-editor-backdrop fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 p-3 sm:p-6">
+        <form onSubmit={save} className="meal-plan-editor mx-auto my-4 max-w-4xl space-y-5 rounded-2xl bg-white p-5 shadow-xl sm:p-7">
           <div className="flex items-start justify-between gap-4"><div><h2 className="text-xl font-bold">{editingId ? 'Editar plan' : 'Nuevo plan de alimentación'}</h2><p className="mt-1 text-sm text-gray-500">Agrega alimentos, porción indicada y equivalentes por grupo.</p></div><button type="button" onClick={() => setOpen(false)} aria-label="Cerrar" className="text-2xl text-gray-400">×</button></div>
           {error && <p role="alert" className="rounded bg-red-50 p-3 text-sm text-red-700">{error}</p>}
           <div className="grid gap-4 sm:grid-cols-2"><label className="grid gap-1 text-sm">Nombre del plan<input required maxLength="120" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></label><label className="grid gap-1 text-sm">Fecha de inicio<input required type="date" value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} /></label></div>
           <div className="space-y-4">
             {form.meals.map((meal, mi) => <fieldset key={mi} className="space-y-3 rounded-xl border border-gray-200 p-3 sm:p-4">
               <div className="flex flex-wrap items-end gap-3"><label className="grid flex-1 gap-1 text-sm">Tiempo de comida<input required maxLength="80" value={meal.name} onChange={(e) => updateMeal(mi, 'name', e.target.value)} /></label><label className="grid gap-1 text-sm">Hora<input type="time" value={meal.time ?? ''} onChange={(e) => updateMeal(mi, 'time', e.target.value)} /></label><button type="button" onClick={() => setForm({ ...form, meals: form.meals.filter((_, i) => i !== mi) })} className="pb-2 text-sm text-red-600">Quitar tiempo</button></div>
-              <div className="space-y-2">{meal.foods.map((food, fi) => <div key={fi} className="grid gap-2 rounded-lg bg-gray-50 p-3 sm:grid-cols-12 sm:items-end">
-                <label className="grid gap-1 text-sm sm:col-span-3">Alimento<input required maxLength="120" list={`foods-${mi}-${fi}`} placeholder="Busca o escribe un alimento" value={food.name} onChange={(e) => updateFood(mi, fi, 'name', e.target.value)} /><datalist id={`foods-${mi}-${fi}`}>{(FOOD_SUGGESTIONS[food.group] ?? []).map((name) => <option key={name} value={name} />)}</datalist></label>
+              <div className="space-y-2">{meal.foods.map((food, fi) => {
+                const foodKey = `${mi}-${fi}`;
+                const suggestions = (FOOD_SUGGESTIONS[food.group] ?? []).filter((name) => name.toLocaleLowerCase('es-MX').includes(food.name.trim().toLocaleLowerCase('es-MX')));
+                return <div key={foodKey} className="meal-food-entry grid gap-2 rounded-lg bg-gray-50 p-3 sm:grid-cols-12 sm:items-end">
+                <div className="meal-food-search relative grid gap-1 text-sm sm:col-span-3">
+                  <label htmlFor={`food-${foodKey}`}>Alimento</label>
+                  <input id={`food-${foodKey}`} required maxLength="120" autoComplete="off" placeholder="Busca o escribe un alimento" value={food.name} onFocus={() => setActiveFood(foodKey)} onBlur={() => window.setTimeout(() => setActiveFood((current) => current === foodKey ? '' : current), 120)} onChange={(e) => { updateFood(mi, fi, 'name', e.target.value); setActiveFood(foodKey); }} />
+                  {activeFood === foodKey && suggestions.length > 0 && <div className="meal-food-suggestions" role="listbox">{suggestions.map((name) => <button key={name} type="button" role="option" aria-selected={food.name === name} onMouseDown={(e) => e.preventDefault()} onClick={() => { updateFood(mi, fi, 'name', name); setActiveFood(''); }}>{name}</button>)}</div>}
+                </div>
                 <label className="grid gap-1 text-sm sm:col-span-4">Grupo SMAE<select value={food.group} onChange={(e) => updateFood(mi, fi, 'group', e.target.value)}>{GROUPS.map((g) => <option key={g}>{g}</option>)}</select></label>
                 <label className="grid gap-1 text-sm sm:col-span-2">Porción<input required maxLength="80" placeholder="1 pieza, ½ taza" value={food.portion} onChange={(e) => updateFood(mi, fi, 'portion', e.target.value)} /></label>
                 <label className="grid gap-1 text-sm sm:col-span-2">Equivalentes<input required type="number" min="0" max="100" step="0.25" value={food.equivalents} onChange={(e) => updateFood(mi, fi, 'equivalents', e.target.value)} /></label>
                 <button type="button" aria-label="Quitar alimento" onClick={() => updateMeal(mi, 'foods', meal.foods.filter((_, i) => i !== fi))} className="pb-2 text-sm text-red-600 sm:col-span-1">Quitar</button>
-              </div>)}</div>
+              </div>; })}</div>
               <button type="button" onClick={() => updateMeal(mi, 'foods', [...meal.foods, emptyFood()])} className="text-sm font-medium text-emerald-700">+ Agregar alimento</button>
             </fieldset>)}
           </div>
