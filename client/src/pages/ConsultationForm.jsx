@@ -113,7 +113,7 @@ export default function ConsultationForm() {
       className="space-y-4 rounded bg-white p-6 shadow"
     >
       <h1 className="text-xl font-bold">
-        {editing ? 'Editar consulta' : 'Nueva consulta'}
+        {editing ? 'Editar consulta' : 'Crear consulta'}
       </h1>
 
       {errors.length > 0 && (
@@ -264,29 +264,6 @@ export default function ConsultationForm() {
         </div>
       </details>
 
-      {patientId && <MealPlans patientId={patientId} defaultStartDate={form.date} consultationContext />}
-
-      <details className="rounded border p-3" open>
-        <summary className="cursor-pointer font-medium">Contenido del reporte para el paciente</summary>
-        <p className="mt-2 text-sm text-gray-500">Estos datos quedan guardados en esta consulta y se cargan automáticamente en la vista previa del PDF. Las notas clínicas de abajo se mantienen privadas.</p>
-        <div className="mt-3 grid gap-4 sm:grid-cols-2">
-          <label className="grid gap-1 text-sm">Motivo de consulta<textarea className={input} rows={2} maxLength={1000} value={patientReport.reason ?? ''} onChange={(e) => setPatientReport({ ...patientReport, reason: e.target.value })} /></label>
-          <label className="grid gap-1 text-sm">Objetivo acordado<textarea className={input} rows={2} maxLength={1000} value={patientReport.objective ?? ''} onChange={(e) => setPatientReport({ ...patientReport, objective: e.target.value })} /></label>
-          <label className="grid gap-1 text-sm sm:col-span-2">Observación para el paciente<textarea className={input} rows={3} maxLength={2000} value={patientReport.patientNote ?? ''} onChange={(e) => setPatientReport({ ...patientReport, patientNote: e.target.value })} /></label>
-          <label className="flex items-center gap-2 text-sm sm:col-span-2"><input type="checkbox" checked={Boolean(patientReport.includeMacros)} onChange={(e) => setPatientReport({ ...patientReport, includeMacros: e.target.checked })} /> Incluir calorías y macronutrientes en el PDF</label>
-          {patientReport.includeMacros && <>
-            <label className="grid gap-1 text-sm">Calorías<textarea className={input} rows={2} maxLength={80} value={patientReport.calories ?? ''} onChange={(e) => setPatientReport({ ...patientReport, calories: e.target.value })} placeholder="Ej. 1,800 kcal" /></label>
-            <label className="grid gap-1 text-sm">Distribución de macronutrientes<textarea className={input} rows={2} maxLength={300} value={patientReport.macros ?? ''} onChange={(e) => setPatientReport({ ...patientReport, macros: e.target.value })} placeholder="Ej. carbohidratos, proteínas y grasas" /></label>
-          </>}
-          {[
-            ['hydration', 'Hidratación'], ['activity', 'Actividad física'], ['rest', 'Descanso'],
-            ['foodsToLimit', 'Alimentos a evitar o limitar'], ['supplements', 'Suplementos (dosis y duración)'],
-            ['goals', 'Metas medibles para la próxima consulta'], ['labs', 'Estudios de laboratorio'],
-            ['warningSigns', 'Señales de alerta e indicaciones médicas'], ['rescheduleInfo', 'Cómo reprogramar la próxima cita'],
-          ].map(([key, title]) => <label key={key} className="grid gap-1 text-sm">{title}<textarea className={input} rows={2} maxLength={2000} value={patientReport[key] ?? ''} onChange={(e) => setPatientReport({ ...patientReport, [key]: e.target.value })} /></label>)}
-        </div>
-      </details>
-
       <details className="rounded border p-3">
         <summary className="cursor-pointer font-medium">
           Frecuencia de alimentos · valoración habitual
@@ -313,6 +290,29 @@ export default function ConsultationForm() {
               </select>
             </div>
           ))}
+        </div>
+      </details>
+
+      {patientId && <MealPlans patientId={patientId} defaultStartDate={form.date} consultationContext />}
+
+      <details className="rounded border p-3" open>
+        <summary className="cursor-pointer font-medium">Contenido del reporte para el paciente</summary>
+        <p className="mt-2 text-sm text-gray-500">Estos datos quedan guardados en esta consulta y se cargan automáticamente en la vista previa del PDF. Las notas clínicas de abajo se mantienen privadas.</p>
+        <div className="mt-3 grid gap-4 sm:grid-cols-2">
+          <label className="grid gap-1 text-sm">Motivo de consulta<textarea className={input} rows={2} maxLength={1000} value={patientReport.reason ?? ''} onChange={(e) => setPatientReport({ ...patientReport, reason: e.target.value })} /></label>
+          <label className="grid gap-1 text-sm">Objetivo acordado<textarea className={input} rows={2} maxLength={1000} value={patientReport.objective ?? ''} onChange={(e) => setPatientReport({ ...patientReport, objective: e.target.value })} /></label>
+          <label className="grid gap-1 text-sm sm:col-span-2">Observación para el paciente<textarea className={input} rows={3} maxLength={2000} value={patientReport.patientNote ?? ''} onChange={(e) => setPatientReport({ ...patientReport, patientNote: e.target.value })} /></label>
+          <label className="flex items-center gap-2 text-sm sm:col-span-2"><input type="checkbox" checked={Boolean(patientReport.includeMacros)} onChange={(e) => setPatientReport({ ...patientReport, includeMacros: e.target.checked })} /> Incluir calorías y macronutrientes en el PDF</label>
+          {patientReport.includeMacros && <>
+            <label className="grid gap-1 text-sm">Calorías<textarea className={input} rows={2} maxLength={80} value={patientReport.calories ?? ''} onChange={(e) => setPatientReport({ ...patientReport, calories: e.target.value })} placeholder="Ej. 1,800 kcal" /></label>
+            <label className="grid gap-1 text-sm">Distribución de macronutrientes<textarea className={input} rows={2} maxLength={300} value={patientReport.macros ?? ''} onChange={(e) => setPatientReport({ ...patientReport, macros: e.target.value })} placeholder="Ej. carbohidratos, proteínas y grasas" /></label>
+          </>}
+          {[
+            ['hydration', 'Hidratación'], ['activity', 'Actividad física'], ['rest', 'Descanso'],
+            ['foodsToLimit', 'Alimentos a evitar o limitar'], ['supplements', 'Suplementos (dosis y duración)'],
+            ['goals', 'Metas medibles para la próxima consulta'], ['labs', 'Estudios de laboratorio'],
+            ['warningSigns', 'Señales de alerta e indicaciones médicas'], ['rescheduleInfo', 'Cómo reprogramar la próxima cita'],
+          ].map(([key, title]) => <label key={key} className="grid gap-1 text-sm">{title}<textarea className={input} rows={2} maxLength={2000} value={patientReport[key] ?? ''} onChange={(e) => setPatientReport({ ...patientReport, [key]: e.target.value })} /></label>)}
         </div>
       </details>
 

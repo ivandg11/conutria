@@ -16,7 +16,6 @@ import { HISTORY_FIELDS, FREQ_GROUPS, FREQ_OPTIONS, displayHistoryValue } from '
 import EnergyCalculator from '../components/EnergyCalculator';
 import SomatotypePanel from '../components/SomatotypePanel';
 import WeeklyCheckins from '../components/WeeklyCheckins';
-import MealPlans from '../components/MealPlans';
 import ConsultationPdf from '../components/ConsultationPdf';
 import { invalidatePatientLists } from '../lib/patientCache';
 const fmtDate = (iso) =>
@@ -222,9 +221,6 @@ export default function PatientDetail() {
       {consultations.length > 0 && (
         <SomatotypePanel consultations={consultations} />
       )}
-      <div className="rounded bg-white p-4 shadow">
-        <MealPlans patientId={id} />
-      </div>
       {consultations.length > 0 && (
         <div className="rounded bg-white p-4 shadow">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
@@ -304,7 +300,7 @@ export default function PatientDetail() {
             }}
             className="rounded bg-emerald-700 px-4 py-2 text-sm text-white hover:bg-emerald-800"
           >
-            + Nueva consulta
+            + Crear consulta
           </Link>
         </div>
 
