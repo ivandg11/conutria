@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../lib/api';
 import { MEASURE_GROUPS } from '../lib/measures';
 import { DEFAULT_MEALS, FREQ_GROUPS, FREQ_OPTIONS } from '../lib/clinical';
+import MealPlans from '../components/MealPlans';
 
 const today = () => new Date().toISOString().slice(0, 10);
 const defaultRecall = () =>
@@ -260,10 +261,13 @@ export default function ConsultationForm() {
         </div>
       </details>
 
+      {patientId && <MealPlans patientId={patientId} defaultStartDate={form.date} consultationContext />}
+
       <details className="rounded border p-3">
         <summary className="cursor-pointer font-medium">
-          Frecuencia de alimentos
+          Frecuencia de alimentos · valoración habitual
         </summary>
+        <p className="mt-2 text-sm text-gray-500">Registra el patrón que el paciente ya tiene; el plan de alimentación se captura arriba como intervención para esta etapa.</p>
         <div className="mt-3 space-y-2">
           {FREQ_GROUPS.map((g) => (
             <div

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { api } from '../lib/api';
 
 const GROUPS = [
@@ -44,7 +45,7 @@ const MEALS = ['Desayuno', 'Colación matutina', 'Comida', 'Colación vespertina
 const today = () => new Date().toISOString().slice(0, 10);
 const emptyFood = () => ({ name: '', group: GROUPS[0], portion: '', equivalents: '1' });
 const emptyMeal = (name = 'Nuevo tiempo') => ({ name, time: '', foods: [emptyFood()] });
-const emptyForm = () => ({ title: 'Plan de alimentación', startDate: today(), meals: [emptyMeal(MEALS[0]), emptyMeal(MEALS[2]), emptyMeal(MEALS[4])], notes: '' });
+const emptyForm = (startDate = today()) => ({ title: 'Plan de alimentación', startDate, meals: [emptyMeal(MEALS[0]), emptyMeal(MEALS[2]), emptyMeal(MEALS[4])], notes: '' });
 
 function asDate(value) {
   return new Date(value).toLocaleDateString('es-MX', { timeZone: 'UTC', day: '2-digit', month: 'short', year: 'numeric' });
@@ -59,7 +60,7 @@ function equivalentTotals(meals = []) {
   return Object.entries(totals).filter(([, amount]) => amount > 0);
 }
 
-export default function MealPlans({ patientId }) {
+export default function MealPlans({ patientId, defaultStartDate, consultationContext = false }) {
   const [plans, setPlans] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -68,6 +69,7 @@ export default function MealPlans({ patientId }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [activeFood, setActiveFood] = useState('');
+  const [activeGroup, setActiveGroup] = useState('');
 
   async function loadPlans() {
     try {
@@ -83,8 +85,10 @@ export default function MealPlans({ patientId }) {
   useEffect(() => { loadPlans(); }, [patientId]);
 
   function startNew() {
-    setForm(emptyForm());
+    setForm(emptyForm(defaultStartDate || today()));
     setEditingId(null);
+    setActiveFood('');
+    setActiveGroup('');
     setError('');
     setOpen(true);
   }
@@ -92,8 +96,16 @@ export default function MealPlans({ patientId }) {
   function editPlan(plan) {
     setForm({ title: plan.title, startDate: plan.startDate.slice(0, 10), meals: plan.content?.meals ?? [], notes: plan.content?.notes ?? '' });
     setEditingId(plan.id);
+    setActiveFood('');
+    setActiveGroup('');
     setError('');
     setOpen(true);
+  }
+
+  function closeEditor() {
+    setOpen(false);
+    setActiveFood('');
+    setActiveGroup('');
   }
 
   function updateMeal(mealIndex, field, value) {
@@ -119,7 +131,7 @@ export default function MealPlans({ patientId }) {
     try {
       if (editingId) await api.put(`/patients/${patientId}/meal-plans/${editingId}`, payload);
       else await api.post(`/patients/${patientId}/meal-plans`, payload);
-      setOpen(false);
+      closeEditor();
       await loadPlans();
     } catch (err) {
       setError(err.response?.data?.error ?? 'No se pudo guardar el plan. Revisa los datos e inténtalo de nuevo.');
@@ -142,8 +154,8 @@ export default function MealPlans({ patientId }) {
     <section className="meal-plans space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="font-semibold">Planes de alimentación</h2>
-          <p className="mt-1 text-sm text-gray-500">Organiza por tiempos, porciones y equivalentes de grupos SMAE.</p>
+          <h2 className="font-semibold">{consultationContext ? 'Plan de alimentación' : 'Planes de alimentación'}</h2>
+          <p className="mt-1 text-sm text-gray-500">{consultationContext ? 'Prepara el plan para esta etapa. Se guarda en el expediente del paciente con la fecha de la consulta.' : 'Organiza por tiempos, porciones y equivalentes de grupos SMAE.'}</p>
         </div>
         <button type="button" onClick={startNew} className="rounded bg-emerald-700 px-4 py-2 text-sm text-white">+ Crear plan</button>
       </div>
@@ -170,9 +182,9 @@ export default function MealPlans({ patientId }) {
         </article>
       ))}
 
-      {open && <div className="meal-plan-editor-backdrop fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 p-3 sm:p-6">
-        <form onSubmit={save} className="meal-plan-editor mx-auto my-4 max-w-4xl space-y-5 rounded-2xl bg-white p-5 shadow-xl sm:p-7">
-          <div className="flex items-start justify-between gap-4"><div><h2 className="text-xl font-bold">{editingId ? 'Editar plan' : 'Nuevo plan de alimentación'}</h2><p className="mt-1 text-sm text-gray-500">Agrega alimentos, porción indicada y equivalentes por grupo.</p></div><button type="button" onClick={() => setOpen(false)} aria-label="Cerrar" className="text-2xl text-gray-400">×</button></div>
+      {open && createPortal(<div className="meal-plan-editor-backdrop fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 p-3 sm:p-6">
+        <form onSubmit={(event) => { event.stopPropagation(); save(event); }} className="meal-plan-editor mx-auto my-4 max-w-4xl space-y-5 rounded-2xl bg-white p-5 shadow-xl sm:p-7">
+          <div className="flex items-start justify-between gap-4"><div><h2 className="text-xl font-bold">{editingId ? 'Editar plan' : 'Nuevo plan de alimentación'}</h2><p className="mt-1 text-sm text-gray-500">Agrega alimentos, porción indicada y equivalentes por grupo.</p></div><button type="button" onClick={closeEditor} aria-label="Cerrar" className="text-2xl text-gray-400">×</button></div>
           {error && <p role="alert" className="rounded bg-red-50 p-3 text-sm text-red-700">{error}</p>}
           <div className="grid gap-4 sm:grid-cols-2"><label className="grid gap-1 text-sm">Nombre del plan<input required maxLength="120" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></label><label className="grid gap-1 text-sm">Fecha de inicio<input required type="date" value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} /></label></div>
           <div className="space-y-4">
@@ -187,10 +199,16 @@ export default function MealPlans({ patientId }) {
                   <input id={`food-${foodKey}`} required maxLength="120" autoComplete="off" placeholder="Busca o escribe un alimento" value={food.name} onFocus={() => setActiveFood(foodKey)} onBlur={() => window.setTimeout(() => setActiveFood((current) => current === foodKey ? '' : current), 120)} onChange={(e) => { updateFood(mi, fi, 'name', e.target.value); setActiveFood(foodKey); }} />
                   {activeFood === foodKey && suggestions.length > 0 && <div className="meal-food-suggestions" role="listbox">{suggestions.map((name) => <button key={name} type="button" role="option" aria-selected={food.name === name} onMouseDown={(e) => e.preventDefault()} onClick={() => { updateFood(mi, fi, 'name', name); setActiveFood(''); }}>{name}</button>)}</div>}
                 </div>
-                <label className="grid gap-1 text-sm sm:col-span-4">Grupo SMAE<select value={food.group} onChange={(e) => updateFood(mi, fi, 'group', e.target.value)}>{GROUPS.map((g) => <option key={g}>{g}</option>)}</select></label>
-                <label className="grid gap-1 text-sm sm:col-span-2">Porción<input required maxLength="80" placeholder="1 pieza, ½ taza" value={food.portion} onChange={(e) => updateFood(mi, fi, 'portion', e.target.value)} /></label>
-                <label className="grid gap-1 text-sm sm:col-span-2">Equivalentes<input required type="number" min="0" max="100" step="0.25" value={food.equivalents} onChange={(e) => updateFood(mi, fi, 'equivalents', e.target.value)} /></label>
-                <button type="button" aria-label="Quitar alimento" onClick={() => updateMeal(mi, 'foods', meal.foods.filter((_, i) => i !== fi))} className="pb-2 text-sm text-red-600 sm:col-span-1">Quitar</button>
+                <div className="meal-group-picker relative grid gap-1 text-sm sm:col-span-4">
+                  <span id={`group-label-${foodKey}`}>Grupo SMAE</span>
+                  <button type="button" className="meal-group-trigger" aria-labelledby={`group-label-${foodKey}`} aria-haspopup="listbox" aria-expanded={activeGroup === foodKey} onClick={() => setActiveGroup((current) => current === foodKey ? '' : foodKey)}>
+                    <span>{food.group}</span><span aria-hidden="true" className="meal-group-chevron">⌄</span>
+                  </button>
+                  {activeGroup === foodKey && <div className="meal-group-options" role="listbox" aria-label="Grupos SMAE">{GROUPS.map((group) => <button key={group} type="button" role="option" aria-selected={food.group === group} onClick={() => { updateFood(mi, fi, 'group', group); setActiveGroup(''); }}>{group}</button>)}</div>}
+                </div>
+                <label className="meal-portion-field grid gap-1 text-sm sm:col-span-2">Porción<input required maxLength="80" placeholder="1 pieza, ½ taza" value={food.portion} onChange={(e) => updateFood(mi, fi, 'portion', e.target.value)} /></label>
+                <label className="meal-equivalents-field grid gap-1 text-sm sm:col-span-2">Equivalentes<input required type="number" min="0" max="100" step="0.25" value={food.equivalents} onChange={(e) => updateFood(mi, fi, 'equivalents', e.target.value)} /></label>
+                <button type="button" aria-label="Quitar alimento" onClick={() => updateMeal(mi, 'foods', meal.foods.filter((_, i) => i !== fi))} className="meal-food-remove pb-2 text-sm text-red-600 sm:col-span-1">Quitar</button>
               </div>; })}</div>
               <button type="button" onClick={() => updateMeal(mi, 'foods', [...meal.foods, emptyFood()])} className="text-sm font-medium text-emerald-700">+ Agregar alimento</button>
             </fieldset>)}
@@ -199,9 +217,9 @@ export default function MealPlans({ patientId }) {
           {equivalentTotals(form.meals).length > 0 && <div className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-900"><b>Equivalentes del día:</b><p className="mt-1">{equivalentTotals(form.meals).map(([group, amount]) => `${group}: ${amount}`).join(' · ')}</p></div>}
           <label className="grid gap-1 text-sm">Indicaciones o notas<textarea rows="3" maxLength="3000" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></label>
           <p className="text-xs text-gray-500">Los grupos siguen la organización SMAE. Verifica porciones y equivalentes con la edición o fuente profesional que utilizas.</p>
-          <div className="flex justify-end gap-3 border-t border-gray-100 pt-4"><button type="button" onClick={() => setOpen(false)} className="rounded border px-4 py-2 text-sm">Cancelar</button><button disabled={saving} className="rounded bg-emerald-700 px-4 py-2 text-sm text-white">{saving ? 'Guardando…' : 'Guardar plan'}</button></div>
+          <div className="flex justify-end gap-3 border-t border-gray-100 pt-4"><button type="button" onClick={closeEditor} className="rounded border px-4 py-2 text-sm">Cancelar</button><button disabled={saving} className="rounded bg-emerald-700 px-4 py-2 text-sm text-white">{saving ? 'Guardando…' : 'Guardar plan'}</button></div>
         </form>
-      </div>}
+      </div>, document.body)}
     </section>
   );
 }

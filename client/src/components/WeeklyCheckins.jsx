@@ -103,12 +103,22 @@ export default function WeeklyCheckins({ patient }) {
                   <p><b>Hambre:</b> {scaleLabel(item.hunger, 'Muy baja', 'Muy alta')}</p>
                 </div>
                 {item.challenges && <p className="mt-3 whitespace-pre-wrap text-sm"><b>Dificultades:</b> {item.challenges}</p>}
-                <label className="mt-3 grid gap-1 text-sm font-medium">Nota profesional para la siguiente consulta
-                  <textarea rows="2" maxLength="1000" value={reviewDrafts[item.id] ?? ''} onChange={(event) => setReviewDrafts((previous) => ({ ...previous, [item.id]: event.target.value }))} placeholder="Notas privadas para tu revisión" />
-                </label>
-                <button type="button" className="mt-3 rounded bg-emerald-700 px-3 py-2 text-sm text-white" onClick={() => saveReview(item)}>
-                  Guardar revisión
-                </button>
+                {item.reviewedAt ? (
+                  <div className="mt-3 rounded-xl bg-emerald-50/70 p-3 text-sm">
+                    <p className="font-semibold text-emerald-950">Nota de revisión</p>
+                    <p className="mt-1 whitespace-pre-wrap text-emerald-950">{item.reviewNotes || 'Revisión completada sin notas.'}</p>
+                    <p className="mt-2 text-xs text-emerald-800">Revisado el {new Date(item.reviewedAt).toLocaleDateString('es-MX')}</p>
+                  </div>
+                ) : (
+                  <>
+                    <label className="mt-3 grid gap-1 text-sm font-medium">Nota profesional para la siguiente consulta
+                      <textarea rows="2" maxLength="1000" value={reviewDrafts[item.id] ?? ''} onChange={(event) => setReviewDrafts((previous) => ({ ...previous, [item.id]: event.target.value }))} placeholder="Notas privadas para tu revisión" />
+                    </label>
+                    <button type="button" className="mt-3 rounded bg-emerald-700 px-3 py-2 text-sm text-white" onClick={() => saveReview(item)}>
+                      Guardar revisión
+                    </button>
+                  </>
+                )}
               </article>
             ))}
           </div>
