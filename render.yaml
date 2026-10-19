@@ -5,7 +5,7 @@ services:
     plan: free
     rootDir: server
     buildCommand: npm ci --include=dev && npx prisma generate
-    startCommand: node src/write-db-ca.js && (npx prisma migrate resolve --rolled-back 20261019120000_nutritionist_pdf_profile || npx prisma migrate status) && npx prisma migrate deploy && npm start
+    startCommand: node src/write-db-ca.js && node src/resolve-failed-migration.js && npx prisma migrate deploy && npm start
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
