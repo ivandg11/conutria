@@ -17,6 +17,7 @@ import EnergyCalculator from '../components/EnergyCalculator';
 import SomatotypePanel from '../components/SomatotypePanel';
 import WeeklyCheckins from '../components/WeeklyCheckins';
 import MealPlans from '../components/MealPlans';
+import ConsultationPdf from '../components/ConsultationPdf';
 import { invalidatePatientLists } from '../lib/patientCache';
 const fmtDate = (iso) =>
   new Date(iso).toLocaleDateString('es-MX', {
@@ -45,6 +46,7 @@ export default function PatientDetail() {
   const [loading, setLoading] = useState(true);
   const [metric, setMetric] = useState('weightKg');
   const [confirmation, setConfirmation] = useState(null);
+  const [pdfConsultation, setPdfConsultation] = useState(null);
 
   useEffect(() => {
     Promise.all([
@@ -135,6 +137,14 @@ export default function PatientDetail() {
           {...confirmation}
           onCancel={() => setConfirmation(null)}
           onConfirm={confirmation.onConfirm}
+        />
+      )}
+      {pdfConsultation && (
+        <ConsultationPdf
+          patient={patient}
+          consultation={pdfConsultation}
+          consultations={consultations}
+          onClose={() => setPdfConsultation(null)}
         />
       )}
       <div className="rounded bg-white p-4 shadow">
@@ -313,6 +323,13 @@ export default function PatientDetail() {
                   </span>
                 </p>
                 <div className="space-x-3 text-sm">
+                  <button
+                    onClick={() => setPdfConsultation(c)}
+                    className="text-emerald-700 hover:underline"
+                    type="button"
+                  >
+                    Exportar PDF
+                  </button>
                   <Link
                     to={`/consultations/${c.id}/edit`}
                     className="text-emerald-700 hover:underline"

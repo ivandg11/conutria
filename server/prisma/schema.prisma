@@ -12,6 +12,10 @@ model User {
   email        String    @unique
   passwordHash String?
   name         String
+  professionalLicense String?
+  whatsapp     String?
+  logoUrl      String?   @db.Text
+  brandColor   String    @default("#047857") @db.VarChar(7)
   createdAt    DateTime  @default(now())
   role         String    @default("NUTRITIONIST")
   lastLoginAt  DateTime?
@@ -221,6 +225,7 @@ model Consultation {
   bodyFatPct    Decimal? @db.Decimal(4, 1)
   recall24h     Json?
   foodFrequency Json?
+  patientReport Json?
   @@index([patientId, date])
 }
 

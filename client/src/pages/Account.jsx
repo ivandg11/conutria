@@ -38,18 +38,47 @@ export default function Account() {
   const [loading, setLoading] = useState(true);
   const [canceling, setCanceling] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [profileForm, setProfileForm] = useState({ professionalLicense: '', whatsapp: '', logoUrl: '', brandColor: '#047857' });
+  const [profileMessage, setProfileMessage] = useState('');
+  const [savingProfile, setSavingProfile] = useState(false);
 
   const loadAccount = useCallback(async () => {
     setError('');
     try {
       const response = await api.get('/auth/account');
       setAccount(response.data);
+      setProfileForm({
+        professionalLicense: response.data.user?.professionalLicense ?? '',
+        whatsapp: response.data.user?.whatsapp ?? '',
+        logoUrl: response.data.user?.logoUrl ?? '',
+        brandColor: response.data.user?.brandColor ?? '#047857',
+      });
     } catch {
       setError('No pudimos cargar los datos de tu cuenta. Intenta de nuevo.');
     } finally {
       setLoading(false);
     }
   }, []);
+
+  async function saveProfile(event) {
+    event.preventDefault();
+    setSavingProfile(true);
+    setProfileMessage('');
+    try {
+      const response = await api.put('/auth/account/profile', {
+        ...profileForm,
+        professionalLicense: profileForm.professionalLicense || null,
+        whatsapp: profileForm.whatsapp || null,
+        logoUrl: profileForm.logoUrl || null,
+      });
+      setAccount((current) => ({ ...current, user: { ...current.user, ...response.data } }));
+      setProfileMessage('Datos profesionales guardados.');
+    } catch (requestError) {
+      setProfileMessage(requestError.response?.data?.error || 'No pudimos guardar el perfil.');
+    } finally {
+      setSavingProfile(false);
+    }
+  }
 
   useEffect(() => {
     let active = true;
@@ -136,6 +165,15 @@ export default function Account() {
                 <dd>{date(account?.user?.createdAt)}</dd>
               </div>
             </dl>
+            <form className="mt-5 grid gap-3 border-t border-gray-100 pt-4" onSubmit={saveProfile}>
+              <h3 className="font-semibold">Datos para tus reportes PDF</h3>
+              <label className="grid gap-1 text-sm">Cédula profesional (opcional)<input maxLength="80" value={profileForm.professionalLicense} onChange={(event) => setProfileForm({ ...profileForm, professionalLicense: event.target.value })} /></label>
+              <label className="grid gap-1 text-sm">WhatsApp de contacto<input maxLength="40" value={profileForm.whatsapp} onChange={(event) => setProfileForm({ ...profileForm, whatsapp: event.target.value })} /></label>
+              <label className="grid gap-1 text-sm">URL del logo (opcional)<input type="url" maxLength="2000" value={profileForm.logoUrl} onChange={(event) => setProfileForm({ ...profileForm, logoUrl: event.target.value })} placeholder="https://…" /></label>
+              <label className="flex items-center gap-2 text-sm">Color de marca<input type="color" value={profileForm.brandColor} onChange={(event) => setProfileForm({ ...profileForm, brandColor: event.target.value })} /></label>
+              {profileMessage && <p className="text-sm text-gray-600" role="status">{profileMessage}</p>}
+              <button disabled={savingProfile} className="w-fit rounded bg-emerald-700 px-4 py-2 text-sm text-white disabled:opacity-50">{savingProfile ? 'Guardando…' : 'Guardar datos profesionales'}</button>
+            </form>
           </section>
 
           <section className="account-card account-subscription">

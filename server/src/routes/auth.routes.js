@@ -242,7 +242,7 @@ router.get('/account', requireAuth, async (req, res) => {
   const [user, subscriptions] = await Promise.all([
     prisma.user.findUnique({
       where: { id: req.userId },
-      select: { id: true, name: true, email: true, createdAt: true },
+      select: { id: true, name: true, email: true, createdAt: true, professionalLicense: true, whatsapp: true, logoUrl: true, brandColor: true },
     }),
     prisma.subscription.findMany({
       where: { userId: req.userId },
@@ -277,6 +277,21 @@ router.get('/account', requireAuth, async (req, res) => {
       currency: subscription.currency,
     }))).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 20),
   });
+});
+
+router.put('/account/profile', requireAuth, async (req, res) => {
+  const data = z.object({
+    professionalLicense: z.string().trim().max(80).nullable().optional(),
+    whatsapp: z.string().trim().max(40).nullable().optional(),
+    logoUrl: z.string().trim().max(2000).url().refine((value) => value.startsWith('https://'), 'El logo debe usar HTTPS.').nullable().optional(),
+    brandColor: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+  }).parse(req.body);
+  const profile = await prisma.user.update({
+    where: { id: req.userId },
+    data: Object.fromEntries(Object.entries(data).map(([key, value]) => [key, value === '' ? null : value])),
+    select: { id: true, name: true, email: true, professionalLicense: true, whatsapp: true, logoUrl: true, brandColor: true },
+  });
+  res.json(profile);
 });
 
 router.post('/account/cancel-subscription', requireAuth, async (req, res) => {

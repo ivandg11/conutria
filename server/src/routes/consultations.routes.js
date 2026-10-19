@@ -70,6 +70,24 @@ const recallSchema = z
 const frequencySchema = z
   .record(z.string().max(40), z.enum(['diario', '4-6', '1-3', 'rara', 'nunca']))
   .optional();
+const patientReportSchema = z.object({
+  reason: z.string().max(1000).optional(),
+  objective: z.string().max(1000).optional(),
+  patientNote: z.string().max(2000).optional(),
+  showMetrics: z.boolean().optional(),
+  includeMacros: z.boolean().optional(),
+  calories: z.string().max(80).optional(),
+  macros: z.string().max(300).optional(),
+  hydration: z.string().max(1000).optional(),
+  activity: z.string().max(1000).optional(),
+  rest: z.string().max(1000).optional(),
+  foodsToLimit: z.string().max(1000).optional(),
+  supplements: z.string().max(1500).optional(),
+  goals: z.string().max(2000).optional(),
+  labs: z.string().max(1500).optional(),
+  warningSigns: z.string().max(1500).optional(),
+  rescheduleInfo: z.string().max(500).optional(),
+}).optional();
 const consultationSchema = z.object({
   date: z.coerce.date(),
   notes: z.preprocess(
@@ -83,6 +101,7 @@ const consultationSchema = z.object({
   bodyFatPct: num(1, 80),
   recall24h: recallSchema,
   foodFrequency: frequencySchema,
+  patientReport: patientReportSchema,
 });
 
 async function ownPatient(patientId, userId) {

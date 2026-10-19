@@ -16,7 +16,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 const app = express();
 app.set('trust proxy', 'loopback');
 
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: { directives: { 'img-src': ["'self'", 'data:', 'https:'] } } }));
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use('/api/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWebhookRoutes);
 app.use(express.json());
