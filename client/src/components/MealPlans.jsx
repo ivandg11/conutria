@@ -42,6 +42,7 @@ const FOOD_SUGGESTIONS = {
 };
 
 const MEALS = ['Desayuno', 'Colación matutina', 'Comida', 'Colación vespertina', 'Cena'];
+const PORTION_OPTIONS = ['1 taza', '½ taza', '¼ taza', '1 pieza', '2 piezas', '100 g', '50 g', '30 g', '1 cucharada', '1 cucharadita', '1 rebanada', '1 vaso', '240 ml'];
 const today = () => new Date().toISOString().slice(0, 10);
 const emptyFood = () => ({ name: '', group: GROUPS[0], portion: '', equivalents: '' });
 const emptyMeal = (name = 'Nuevo tiempo') => ({ name, time: '', foods: [emptyFood()] });
@@ -70,7 +71,10 @@ export default function MealPlans({ patientId, defaultStartDate, consultationCon
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [activeFood, setActiveFood] = useState('');
   const [activeGroup, setActiveGroup] = useState('');
+  const [activePortion, setActivePortion] = useState('');
+  const [customPortion, setCustomPortion] = useState('');
 
   async function loadPlans() {
     try {
@@ -93,7 +97,9 @@ export default function MealPlans({ patientId, defaultStartDate, consultationCon
     setForm(emptyForm(defaultStartDate || today()));
     setEditingId(null);
     setFoodDraft(null);
+    setActiveFood('');
     setActiveGroup('');
+    setActivePortion('');
     setError('');
     setOpen(true);
   }
@@ -102,7 +108,9 @@ export default function MealPlans({ patientId, defaultStartDate, consultationCon
     setForm({ title: plan.title, startDate: plan.startDate.slice(0, 10), meals: plan.content?.meals ?? [], notes: plan.content?.notes ?? '' });
     setEditingId(plan.id);
     setFoodDraft(null);
+    setActiveFood('');
     setActiveGroup('');
+    setActivePortion('');
     setError('');
     setOpen(true);
   }
@@ -110,7 +118,9 @@ export default function MealPlans({ patientId, defaultStartDate, consultationCon
   function closeEditor() {
     setOpen(false);
     setFoodDraft(null);
+    setActiveFood('');
     setActiveGroup('');
+    setActivePortion('');
   }
 
   function updateMeal(mealIndex, field, value) {
@@ -142,10 +152,17 @@ export default function MealPlans({ patientId, defaultStartDate, consultationCon
 
   function selectGroup(mealIndex, foodIndex, group) {
     setForm((current) => ({ ...current, meals: current.meals.map((meal, i) => i === mealIndex ? { ...meal, foods: meal.foods.map((food, j) => j === foodIndex ? { ...food, group, name: '', equivalents: '' } : food) } : meal) }));
+    setActiveFood('');
+    setActivePortion('');
   }
 
   async function save(e) {
     e.preventDefault();
+    const incompleteFood = form.meals.some((meal) => meal.foods.some((food) => food.name && (!food.portion.trim() || food.equivalents === '')));
+    if (incompleteFood) {
+      setError('Completa la porción y los equivalentes de cada alimento seleccionado.');
+      return;
+    }
     setSaving(true);
     setError('');
     const payload = {
@@ -220,38 +237,32 @@ export default function MealPlans({ patientId, defaultStartDate, consultationCon
               <div className="flex flex-wrap items-end gap-3"><label className="grid flex-1 gap-1 text-sm">Tiempo de comida<input required maxLength="80" value={meal.name} onChange={(e) => updateMeal(mi, 'name', e.target.value)} /></label><label className="grid gap-1 text-sm">Hora<input type="time" value={meal.time ?? ''} onChange={(e) => updateMeal(mi, 'time', e.target.value)} /></label><button type="button" onClick={() => setForm({ ...form, meals: form.meals.filter((_, i) => i !== mi) })} className="pb-2 text-sm text-red-600">Quitar tiempo</button></div>
               <div className="space-y-2">{meal.foods.map((food, fi) => {
                 const foodKey = `${mi}-${fi}`;
-                const suggestions = FOOD_SUGGESTIONS[food.group] ?? [];
+                const suggestions = [...(FOOD_SUGGESTIONS[food.group] ?? []), ...customFoods.filter((item) => item.group === food.group).map((item) => item.name)].filter((name, index, all) => all.indexOf(name) === index);
                 return <div key={foodKey} className="meal-food-entry grid gap-2 rounded-lg bg-gray-50 p-3 sm:grid-cols-12 sm:items-end">
                 <div className="meal-food-search relative grid gap-1 text-sm sm:col-span-3">
                   <label htmlFor={`food-${foodKey}`}>Alimento</label>
-                  <select id={`food-${foodKey}`} required value={foodDraft?.mealIndex === mi && foodDraft?.foodIndex === fi ? '__create__' : food.name} onChange={(e) => {
-                    if (e.target.value === '__create__') {
-                      setFoodDraft({ mealIndex: mi, foodIndex: fi, name: '', group: food.group, portion: '', equivalents: '1' });
-                      return;
-                    }
-                    setFoodDraft(null);
-                    selectFood(mi, fi, e.target.value);
-                  }}>
-                    <option value="">Selecciona un alimento</option>
-                    {suggestions.map((name) => <option key={name} value={name}>{name}</option>)}
-                    {customFoods.filter((item) => item.group === food.group && !suggestions.includes(item.name)).map((item) => <option key={`custom-${item.id}`} value={item.name}>{item.name} · Mi catálogo</option>)}
-                    <option value="__create__">+ Crear alimento para mi cuenta…</option>
-                  </select>
+                  <button id={`food-${foodKey}`} type="button" className="meal-group-trigger" aria-haspopup="listbox" aria-expanded={activeFood === foodKey} onClick={() => { setActiveGroup(''); setActivePortion(''); setActiveFood((current) => current === foodKey ? '' : foodKey); }}>
+                    <span>{food.name || 'Selecciona un alimento'}</span><span aria-hidden="true" className="meal-group-chevron">⌄</span>
+                  </button>
+                  {activeFood === foodKey && <div className="meal-group-options" role="listbox" aria-label="Alimentos">
+                    {suggestions.map((name) => <button key={name} type="button" role="option" aria-selected={food.name === name} onClick={() => { selectFood(mi, fi, name); setActiveFood(''); }}>{name}{customFoods.some((item) => item.name === name && item.group === food.group) ? ' · Mi cuenta' : ''}</button>)}
+                    <button type="button" className="meal-create-food-option" onClick={() => { setFoodDraft({ mealIndex: mi, foodIndex: fi, name: '', group: food.group, portion: '', equivalents: '1' }); setActiveFood(''); }}>Crear alimento</button>
+                  </div>}
                   {foodDraft?.mealIndex === mi && foodDraft?.foodIndex === fi && <div className="mt-2 space-y-2 rounded-lg border border-emerald-200 bg-white p-3">
                     <label className="grid gap-1">Nuevo alimento<input required maxLength="120" value={foodDraft.name} onChange={(e) => setFoodDraft({ ...foodDraft, name: e.target.value })} /></label>
-                    <label className="grid gap-1">Porción de referencia<input required maxLength="80" placeholder="Define la porción equivalente" value={foodDraft.portion} onChange={(e) => setFoodDraft({ ...foodDraft, portion: e.target.value })} /></label>
+                    <div className="relative grid gap-1"><span>Porción de referencia</span><button type="button" className="meal-group-trigger" aria-haspopup="listbox" aria-expanded={activePortion === `draft-${foodKey}`} onClick={() => setActivePortion((current) => current === `draft-${foodKey}` ? '' : `draft-${foodKey}`)}><span>{foodDraft.portion || 'Selecciona una porción'}</span><span aria-hidden="true" className="meal-group-chevron">⌄</span></button>{activePortion === `draft-${foodKey}` && <div className="meal-group-options" role="listbox" aria-label="Porciones para alimento nuevo">{PORTION_OPTIONS.map((portion) => <button key={portion} type="button" role="option" aria-selected={foodDraft.portion === portion} onClick={() => { setFoodDraft({ ...foodDraft, portion }); setActivePortion(''); setCustomPortion(''); }}>{portion}</button>)}<button type="button" className="meal-create-food-option" onClick={() => setCustomPortion(`draft-${foodKey}`)}>Otra medida</button>{customPortion === `draft-${foodKey}` && <input autoFocus required maxLength="80" placeholder="Escribe la porción" value={foodDraft.portion} onChange={(e) => setFoodDraft({ ...foodDraft, portion: e.target.value })} />}</div>}</div>
                     <label className="grid gap-1">Equivalentes de esa porción<input required type="number" min="0" max="100" step="0.25" value={foodDraft.equivalents} onChange={(e) => setFoodDraft({ ...foodDraft, equivalents: e.target.value })} /></label>
-                    <div className="flex gap-3"><button type="button" disabled={!foodDraft.name.trim() || !foodDraft.portion.trim() || foodDraft.equivalents === ''} className="text-emerald-700 disabled:opacity-50" onClick={saveCustomFood}>Guardar en mi cuenta</button><button type="button" onClick={() => setFoodDraft(null)}>Cancelar</button></div>
+                    <div className="flex gap-3"><button type="button" disabled={!foodDraft.name.trim() || !foodDraft.portion.trim() || foodDraft.equivalents === ''} className="text-emerald-700 disabled:opacity-50" onClick={saveCustomFood}>Guardar en mi cuenta</button><button type="button" onClick={() => { setFoodDraft(null); setCustomPortion(''); }}>Cancelar</button></div>
                   </div>}
                 </div>
                 <div className="meal-group-picker relative grid gap-1 text-sm sm:col-span-4">
                   <span id={`group-label-${foodKey}`}>Grupo SMAE</span>
-                  <button type="button" className="meal-group-trigger" aria-labelledby={`group-label-${foodKey}`} aria-haspopup="listbox" aria-expanded={activeGroup === foodKey} onClick={() => setActiveGroup((current) => current === foodKey ? '' : foodKey)}>
+                  <button type="button" className="meal-group-trigger" aria-labelledby={`group-label-${foodKey}`} aria-haspopup="listbox" aria-expanded={activeGroup === foodKey} onClick={() => { setActiveFood(''); setActivePortion(''); setActiveGroup((current) => current === foodKey ? '' : foodKey); }}>
                     <span>{food.group}</span><span aria-hidden="true" className="meal-group-chevron">⌄</span>
                   </button>
                   {activeGroup === foodKey && <div className="meal-group-options" role="listbox" aria-label="Grupos SMAE">{GROUPS.map((group) => <button key={group} type="button" role="option" aria-selected={food.group === group} onClick={() => { selectGroup(mi, fi, group); setActiveGroup(''); }}>{group}</button>)}</div>}
                 </div>
-                <label className="meal-portion-field grid gap-1 text-sm sm:col-span-2">Porción<input required maxLength="80" placeholder="1 pieza, ½ taza" value={food.portion} onChange={(e) => updateFood(mi, fi, 'portion', e.target.value)} /></label>
+                <div className="meal-portion-field relative grid gap-1 text-sm sm:col-span-2"><span>Porción</span><button type="button" className="meal-group-trigger" aria-haspopup="listbox" aria-expanded={activePortion === foodKey} onClick={() => { setActiveFood(''); setActiveGroup(''); setActivePortion((current) => current === foodKey ? '' : foodKey); }}><span>{food.portion || 'Selecciona una porción'}</span><span aria-hidden="true" className="meal-group-chevron">⌄</span></button>{activePortion === foodKey && <div className="meal-group-options" role="listbox" aria-label="Porciones">{PORTION_OPTIONS.map((portion) => <button key={portion} type="button" role="option" aria-selected={food.portion === portion} onClick={() => { updateFood(mi, fi, 'portion', portion); setCustomPortion(''); setActivePortion(''); }}>{portion}</button>)}<button type="button" className="meal-create-food-option" onClick={() => setCustomPortion(foodKey)}>Otra medida</button>{customPortion === foodKey && <input autoFocus maxLength="80" placeholder="Escribe la porción" value={food.portion} onChange={(e) => updateFood(mi, fi, 'portion', e.target.value)} />}</div>}</div>
                 <label className="meal-equivalents-field grid gap-1 text-sm sm:col-span-2">Equivalentes<input required type="number" min="0" max="100" step="0.25" value={food.equivalents} onChange={(e) => updateFood(mi, fi, 'equivalents', e.target.value)} /></label>
                 <button type="button" aria-label="Quitar alimento" onClick={() => updateMeal(mi, 'foods', meal.foods.filter((_, i) => i !== fi))} className="meal-food-remove pb-2 text-sm text-red-600 sm:col-span-1">Quitar</button>
               </div>; })}</div>
