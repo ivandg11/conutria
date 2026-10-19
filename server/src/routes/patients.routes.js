@@ -47,6 +47,35 @@ const mealPlanSchema = z.object({
   }),
 });
 
+const mealFoodSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  group: z.string().trim().min(1).max(80),
+  portion: z.string().trim().min(1).max(80),
+  equivalents: z.coerce.number().min(0).max(100),
+});
+
+router.get('/meal-foods', async (req, res) => {
+  const foods = await prisma.mealFood.findMany({ where: { userId: req.userId }, orderBy: [{ group: 'asc' }, { name: 'asc' }] });
+  res.json(foods);
+});
+
+router.post('/meal-foods', async (req, res) => {
+  const data = mealFoodSchema.parse(req.body);
+  const food = await prisma.mealFood.upsert({
+    where: { userId_name_group: { userId: req.userId, name: data.name, group: data.group } },
+    create: { ...data, userId: req.userId },
+    update: { portion: data.portion, equivalents: data.equivalents },
+  });
+  res.status(201).json(food);
+});
+
+router.delete('/meal-foods/:foodId', async (req, res) => {
+  const foodId = idSchema.parse(req.params.foodId);
+  const result = await prisma.mealFood.deleteMany({ where: { id: foodId, userId: req.userId } });
+  if (!result.count) return res.status(404).json({ error: 'Alimento no encontrado.' });
+  res.status(204).end();
+});
+
 router.get('/', async (req, res) => {
   const q = String(req.query.q ?? '').trim();
   const status = req.query.status === 'DISCHARGED' ? 'DISCHARGED' : 'ACTIVE';

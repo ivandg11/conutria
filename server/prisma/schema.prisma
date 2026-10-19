@@ -27,6 +27,21 @@ model User {
   supportTickets SupportTicket[]
   supportMessages SupportMessage[]
   sessions       Session[]
+  mealFoods      MealFood[]
+}
+
+model MealFood {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  name        String   @db.VarChar(120)
+  group       String   @db.VarChar(80)
+  portion     String   @db.VarChar(80)
+  equivalents Decimal  @db.Decimal(5, 2)
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name, group])
+  @@index([userId, group])
 }
 
 model Session {

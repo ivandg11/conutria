@@ -43,7 +43,7 @@ const FOOD_SUGGESTIONS = {
 
 const MEALS = ['Desayuno', 'Colación matutina', 'Comida', 'Colación vespertina', 'Cena'];
 const today = () => new Date().toISOString().slice(0, 10);
-const emptyFood = () => ({ name: '', group: GROUPS[0], portion: '', equivalents: '1' });
+const emptyFood = () => ({ name: '', group: GROUPS[0], portion: '', equivalents: '' });
 const emptyMeal = (name = 'Nuevo tiempo') => ({ name, time: '', foods: [emptyFood()] });
 const emptyForm = (startDate = today()) => ({ title: 'Plan de alimentación', startDate, meals: [emptyMeal(MEALS[0]), emptyMeal(MEALS[2]), emptyMeal(MEALS[4])], notes: '' });
 
@@ -62,13 +62,14 @@ function equivalentTotals(meals = []) {
 
 export default function MealPlans({ patientId, defaultStartDate, consultationContext = false }) {
   const [plans, setPlans] = useState([]);
+  const [customFoods, setCustomFoods] = useState([]);
+  const [foodDraft, setFoodDraft] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [activeFood, setActiveFood] = useState('');
   const [activeGroup, setActiveGroup] = useState('');
 
   async function loadPlans() {
@@ -84,10 +85,14 @@ export default function MealPlans({ patientId, defaultStartDate, consultationCon
 
   useEffect(() => { loadPlans(); }, [patientId]);
 
+  useEffect(() => {
+    api.get('/patients/meal-foods').then(({ data }) => setCustomFoods(data)).catch(() => {});
+  }, []);
+
   function startNew() {
     setForm(emptyForm(defaultStartDate || today()));
     setEditingId(null);
-    setActiveFood('');
+    setFoodDraft(null);
     setActiveGroup('');
     setError('');
     setOpen(true);
@@ -96,7 +101,7 @@ export default function MealPlans({ patientId, defaultStartDate, consultationCon
   function editPlan(plan) {
     setForm({ title: plan.title, startDate: plan.startDate.slice(0, 10), meals: plan.content?.meals ?? [], notes: plan.content?.notes ?? '' });
     setEditingId(plan.id);
-    setActiveFood('');
+    setFoodDraft(null);
     setActiveGroup('');
     setError('');
     setOpen(true);
@@ -104,7 +109,7 @@ export default function MealPlans({ patientId, defaultStartDate, consultationCon
 
   function closeEditor() {
     setOpen(false);
-    setActiveFood('');
+    setFoodDraft(null);
     setActiveGroup('');
   }
 
@@ -114,6 +119,29 @@ export default function MealPlans({ patientId, defaultStartDate, consultationCon
 
   function updateFood(mealIndex, foodIndex, field, value) {
     setForm((current) => ({ ...current, meals: current.meals.map((meal, i) => i === mealIndex ? { ...meal, foods: meal.foods.map((food, j) => j === foodIndex ? { ...food, [field]: value } : food) } : meal) }));
+  }
+
+  function selectFood(mealIndex, foodIndex, name) {
+    const savedFood = customFoods.find((item) => item.name === name && item.group === form.meals[mealIndex]?.foods[foodIndex]?.group);
+    setForm((current) => ({ ...current, meals: current.meals.map((meal, i) => i === mealIndex ? { ...meal, foods: meal.foods.map((food, j) => j === foodIndex ? { ...food, name, portion: savedFood?.portion ?? '', equivalents: String(savedFood?.equivalents ?? '') } : food) } : meal) }));
+  }
+
+  async function saveCustomFood() {
+    if (!foodDraft) return;
+    try {
+      const { data } = await api.post('/patients/meal-foods', {
+        name: foodDraft.name, group: foodDraft.group, portion: foodDraft.portion, equivalents: foodDraft.equivalents,
+      });
+      setCustomFoods((current) => [...current.filter((food) => !(food.name === data.name && food.group === data.group)), data]);
+      setForm((current) => ({ ...current, meals: current.meals.map((meal, i) => i === foodDraft.mealIndex ? { ...meal, foods: meal.foods.map((food, j) => j === foodDraft.foodIndex ? { ...food, name: data.name, group: data.group, portion: data.portion, equivalents: String(data.equivalents) } : food) } : meal) }));
+      setFoodDraft(null);
+    } catch (err) {
+      setError(err.response?.data?.error ?? 'No se pudo guardar el alimento en tu catálogo.');
+    }
+  }
+
+  function selectGroup(mealIndex, foodIndex, group) {
+    setForm((current) => ({ ...current, meals: current.meals.map((meal, i) => i === mealIndex ? { ...meal, foods: meal.foods.map((food, j) => j === foodIndex ? { ...food, group, name: '', equivalents: '' } : food) } : meal) }));
   }
 
   async function save(e) {
@@ -192,19 +220,36 @@ export default function MealPlans({ patientId, defaultStartDate, consultationCon
               <div className="flex flex-wrap items-end gap-3"><label className="grid flex-1 gap-1 text-sm">Tiempo de comida<input required maxLength="80" value={meal.name} onChange={(e) => updateMeal(mi, 'name', e.target.value)} /></label><label className="grid gap-1 text-sm">Hora<input type="time" value={meal.time ?? ''} onChange={(e) => updateMeal(mi, 'time', e.target.value)} /></label><button type="button" onClick={() => setForm({ ...form, meals: form.meals.filter((_, i) => i !== mi) })} className="pb-2 text-sm text-red-600">Quitar tiempo</button></div>
               <div className="space-y-2">{meal.foods.map((food, fi) => {
                 const foodKey = `${mi}-${fi}`;
-                const suggestions = (FOOD_SUGGESTIONS[food.group] ?? []).filter((name) => name.toLocaleLowerCase('es-MX').includes(food.name.trim().toLocaleLowerCase('es-MX')));
+                const suggestions = FOOD_SUGGESTIONS[food.group] ?? [];
                 return <div key={foodKey} className="meal-food-entry grid gap-2 rounded-lg bg-gray-50 p-3 sm:grid-cols-12 sm:items-end">
                 <div className="meal-food-search relative grid gap-1 text-sm sm:col-span-3">
                   <label htmlFor={`food-${foodKey}`}>Alimento</label>
-                  <input id={`food-${foodKey}`} required maxLength="120" autoComplete="off" placeholder="Busca o escribe un alimento" value={food.name} onFocus={() => setActiveFood(foodKey)} onBlur={() => window.setTimeout(() => setActiveFood((current) => current === foodKey ? '' : current), 120)} onChange={(e) => { updateFood(mi, fi, 'name', e.target.value); setActiveFood(foodKey); }} />
-                  {activeFood === foodKey && suggestions.length > 0 && <div className="meal-food-suggestions" role="listbox">{suggestions.map((name) => <button key={name} type="button" role="option" aria-selected={food.name === name} onMouseDown={(e) => e.preventDefault()} onClick={() => { updateFood(mi, fi, 'name', name); setActiveFood(''); }}>{name}</button>)}</div>}
+                  <select id={`food-${foodKey}`} required value={foodDraft?.mealIndex === mi && foodDraft?.foodIndex === fi ? '__create__' : food.name} onChange={(e) => {
+                    if (e.target.value === '__create__') {
+                      setFoodDraft({ mealIndex: mi, foodIndex: fi, name: '', group: food.group, portion: '', equivalents: '1' });
+                      return;
+                    }
+                    setFoodDraft(null);
+                    selectFood(mi, fi, e.target.value);
+                  }}>
+                    <option value="">Selecciona un alimento</option>
+                    {suggestions.map((name) => <option key={name} value={name}>{name}</option>)}
+                    {customFoods.filter((item) => item.group === food.group && !suggestions.includes(item.name)).map((item) => <option key={`custom-${item.id}`} value={item.name}>{item.name} · Mi catálogo</option>)}
+                    <option value="__create__">+ Crear alimento para mi cuenta…</option>
+                  </select>
+                  {foodDraft?.mealIndex === mi && foodDraft?.foodIndex === fi && <div className="mt-2 space-y-2 rounded-lg border border-emerald-200 bg-white p-3">
+                    <label className="grid gap-1">Nuevo alimento<input required maxLength="120" value={foodDraft.name} onChange={(e) => setFoodDraft({ ...foodDraft, name: e.target.value })} /></label>
+                    <label className="grid gap-1">Porción de referencia<input required maxLength="80" placeholder="Define la porción equivalente" value={foodDraft.portion} onChange={(e) => setFoodDraft({ ...foodDraft, portion: e.target.value })} /></label>
+                    <label className="grid gap-1">Equivalentes de esa porción<input required type="number" min="0" max="100" step="0.25" value={foodDraft.equivalents} onChange={(e) => setFoodDraft({ ...foodDraft, equivalents: e.target.value })} /></label>
+                    <div className="flex gap-3"><button type="button" disabled={!foodDraft.name.trim() || !foodDraft.portion.trim() || foodDraft.equivalents === ''} className="text-emerald-700 disabled:opacity-50" onClick={saveCustomFood}>Guardar en mi cuenta</button><button type="button" onClick={() => setFoodDraft(null)}>Cancelar</button></div>
+                  </div>}
                 </div>
                 <div className="meal-group-picker relative grid gap-1 text-sm sm:col-span-4">
                   <span id={`group-label-${foodKey}`}>Grupo SMAE</span>
                   <button type="button" className="meal-group-trigger" aria-labelledby={`group-label-${foodKey}`} aria-haspopup="listbox" aria-expanded={activeGroup === foodKey} onClick={() => setActiveGroup((current) => current === foodKey ? '' : foodKey)}>
                     <span>{food.group}</span><span aria-hidden="true" className="meal-group-chevron">⌄</span>
                   </button>
-                  {activeGroup === foodKey && <div className="meal-group-options" role="listbox" aria-label="Grupos SMAE">{GROUPS.map((group) => <button key={group} type="button" role="option" aria-selected={food.group === group} onClick={() => { updateFood(mi, fi, 'group', group); setActiveGroup(''); }}>{group}</button>)}</div>}
+                  {activeGroup === foodKey && <div className="meal-group-options" role="listbox" aria-label="Grupos SMAE">{GROUPS.map((group) => <button key={group} type="button" role="option" aria-selected={food.group === group} onClick={() => { selectGroup(mi, fi, group); setActiveGroup(''); }}>{group}</button>)}</div>}
                 </div>
                 <label className="meal-portion-field grid gap-1 text-sm sm:col-span-2">Porción<input required maxLength="80" placeholder="1 pieza, ½ taza" value={food.portion} onChange={(e) => updateFood(mi, fi, 'portion', e.target.value)} /></label>
                 <label className="meal-equivalents-field grid gap-1 text-sm sm:col-span-2">Equivalentes<input required type="number" min="0" max="100" step="0.25" value={food.equivalents} onChange={(e) => updateFood(mi, fi, 'equivalents', e.target.value)} /></label>
