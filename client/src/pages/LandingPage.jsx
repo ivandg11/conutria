@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import BrandLogo from '../components/Logo';
 import './LadingPage.css';
 
@@ -47,6 +48,47 @@ function Logo() {
     <Link className="nc-brand" to="/" aria-label="Conutria, inicio">
       <BrandLogo size={42} />
     </Link>
+  );
+}
+
+function ContactSection() {
+  const [sent, setSent] = useState(false);
+  const email = 'conutriaoficial@gmail.com';
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const subject = encodeURIComponent(form.get('subject'));
+    const body = encodeURIComponent(`Nombre: ${form.get('name')}\nCorreo: ${form.get('email')}\n\n${form.get('message')}`);
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+    setSent(true);
+  }
+
+  return (
+    <section className="nc-home-contact" id="contacto">
+      <div className="nc-home-contact-inner nc-container">
+        <div className="nc-home-contact-copy">
+          <span className="nc-eyebrow">ESTAMOS PARA AYUDARTE</span>
+          <h2>Hablemos de tu consulta.</h2>
+          <p>¿Tienes dudas sobre Conutria? Escríbenos y con gusto te ayudamos.</p>
+          <a className="nc-home-contact-email" href={`mailto:${email}`}>{email}</a>
+          <a className="nc-home-contact-social" href="https://www.instagram.com/conutriaoficial/" target="_blank" rel="noreferrer">Síguenos en Instagram <span aria-hidden="true">↗</span></a>
+        </div>
+        <form className="nc-home-contact-form" onSubmit={handleSubmit}>
+          <div className="nc-home-contact-fields">
+            <label>Nombre<input name="name" autoComplete="name" required /></label>
+            <label>Correo electrónico<input name="email" type="email" autoComplete="email" required /></label>
+          </div>
+          <label>Asunto<input name="subject" required /></label>
+          <label>Mensaje<textarea name="message" rows="3" required /></label>
+          <div className="nc-home-contact-submit">
+            <button type="submit">Enviar mensaje <span aria-hidden="true">→</span></button>
+            <p>El mensaje se prepara en tu aplicación de correo.</p>
+          </div>
+          {sent && <p className="nc-home-contact-status" role="status">Se abrirá tu aplicación de correo para enviar el mensaje.</p>}
+        </form>
+      </div>
+    </section>
   );
 }
 
@@ -280,10 +322,12 @@ export default function LandingPage() {
         </Link>
       </section>
 
+      <ContactSection />
+
       <footer className="nc-footer nc-container">
         <p>Una herramienta para acompañar tu práctica profesional.</p>
         <div className="nc-footer-legal">
-          <Link to="/contacto">Contacto</Link>
+          <a href="#contacto">Contacto</a>
           <Link to="/aviso-de-privacidad">Aviso de privacidad</Link>
           <Link to="/terminos-de-uso">Términos de uso</Link>
           <span>© {new Date().getFullYear()} Conutria</span>

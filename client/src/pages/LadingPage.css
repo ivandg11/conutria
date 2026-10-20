@@ -981,3 +981,47 @@
   width: 23px;
   height: 23px;
 }
+
+/* Compact contact form at the end of the public landing page. */
+.nc-home-contact {
+  padding: 54px 0;
+  background: #f0f4ed;
+  border-top: 1px solid #e2e9e1;
+}
+.nc-home-contact-inner {
+  display: grid;
+  grid-template-columns: .8fr 1.2fr;
+  align-items: center;
+  gap: clamp(28px, 6vw, 76px);
+  padding: 30px clamp(22px, 4vw, 48px);
+  border: 1px solid #e1e9e1;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 16px 45px rgba(16, 63, 52, .06);
+}
+.nc-home-contact-copy h2 {
+  margin: 12px 0 8px;
+  color: var(--nc-green);
+  font: 900 clamp(25px, 3vw, 34px)/1.15 'Nunito Sans', sans-serif;
+  letter-spacing: -1px;
+}
+.nc-home-contact-copy > p { max-width: 350px; margin: 0 0 20px; color: var(--nc-muted); font-size: 14px; line-height: 1.65; }
+.nc-home-contact-email, .nc-home-contact-social { display: block; width: fit-content; margin-top: 10px; color: var(--nc-green-light); font-size: 13px; font-weight: 800; text-decoration: none; }
+.nc-home-contact-social { color: var(--nc-green); }
+.nc-home-contact-form { display: grid; gap: 12px; }
+.nc-home-contact-form label { display: grid; gap: 6px; color: #456158; font-size: 10px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.nc-home-contact-form input, .nc-home-contact-form textarea { box-sizing: border-box; width: 100%; min-width: 0; border: 1px solid #dce6e1; border-radius: 10px; background: #fbfdfa; padding: 10px 12px; color: var(--nc-text); font: 14px 'DM Sans', sans-serif; text-transform: none; letter-spacing: normal; }
+.nc-home-contact-form input { min-height: 40px; }
+.nc-home-contact-form textarea { min-height: 78px; resize: vertical; }
+.nc-home-contact-form input:focus, .nc-home-contact-form textarea:focus { border-color: #45a984; outline: 3px solid rgba(69,169,132,.14); }
+.nc-home-contact-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.nc-home-contact-submit { display: flex; align-items: center; flex-wrap: wrap; gap: 13px; }
+.nc-home-contact-submit button { min-height: 42px; border: 0; border-radius: 24px; background: var(--nc-green-light); padding: 0 20px; color: white; font: 800 13px 'DM Sans', sans-serif; cursor: pointer; }
+.nc-home-contact-submit button:hover { background: var(--nc-green); }
+.nc-home-contact-submit p, .nc-home-contact-status { margin: 0; color: #82928b; font-size: 11px; line-height: 1.45; }
+.nc-home-contact-status { color: var(--nc-green-light); }
+@media (max-width: 720px) {
+  .nc-home-contact { padding: 38px 0; }
+  .nc-home-contact-inner { grid-template-columns: 1fr; gap: 22px; padding: 24px 20px; }
+}
+@media (max-width: 460px) { .nc-home-contact-fields { grid-template-columns: 1fr; } }
