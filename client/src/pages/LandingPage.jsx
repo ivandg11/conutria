@@ -4,36 +4,24 @@ import './LadingPage.css';
 
 const features = [
   {
+    group: 'Evaluación y expediente',
     icon: 'patients',
-    title: 'Gestiona tus pacientes',
-    description:
-      'Organiza expedientes, objetivos y datos importantes en un solo lugar.',
+    items: ['Expediente clínico e historial', 'Consultas y objetivos por paciente', 'Antropometría y composición corporal', 'Registro de evolución'],
   },
   {
-    icon: 'progress',
-    title: 'Registra su evolución',
-    description:
-      'Consulta mediciones e historial para dar seguimiento a cada paciente.',
-  },
-  {
+    group: 'Planificación nutricional',
     icon: 'plans',
-    title: 'Planes de alimentación',
-    description: 'Organiza comidas, porciones e indicaciones personalizadas.',
+    items: ['Planes de alimentación personalizados', 'Alimentos y porciones por equivalentes SMAE', 'Distribución por tiempos de comida', 'Reporte de consulta listo para exportar'],
   },
   {
+    group: 'Gestión del consultorio',
     icon: 'calendar',
-    title: 'Administra tus consultas',
-    description: 'Mantén tus consultas y próximos seguimientos organizados.',
+    items: ['Agenda y próximas consultas', 'Historial de consultas y mediciones', 'Calculadora de energía y actividad física', 'Cuenta y suscripción en un solo lugar'],
   },
   {
-    icon: 'documents',
-    title: 'Genera documentos',
-    description: 'Prepara planes de alimentación con un formato profesional.',
-  },
-  {
+    group: 'Experiencia del paciente',
     icon: 'care',
-    title: 'Da seguimiento cercano',
-    description: 'Mantén visible el progreso y los objetivos de cada paciente.',
+    items: ['Invitación de seguimiento por correo', 'Formulario semanal con enlace privado', 'Registro de adherencia, energía y hambre', 'Respuestas disponibles en el expediente'],
   },
 ];
 
@@ -45,6 +33,7 @@ function FeatureIcon({ name }) {
     calendar: <><rect x="4" y="5.5" width="16" height="15" rx="2" /><path d="M8 3.5v4M16 3.5v4M4 10h16M8 14h2m3 0h2m-7 3h2m3 0h2" /></>,
     documents: <><path d="M6 3.5h8l4 4V20H6z" /><path d="M14 3.5V8h4M9 12h6m-6 3h6m-6 3h4" /></>,
     care: <><path d="M20 9c0 5-8 10-8 10S4 14 4 9a4 4 0 0 1 8-1 4 4 0 0 1 8 1Z" /><path d="M12 10v5m-2.5-2.5h5" /></>,
+    check: <><path d="m5 12 4 4L19 6" /></>,
   }[name];
 
   return (
@@ -201,55 +190,64 @@ export default function LandingPage() {
 
       <section className="nc-features nc-container" id="funciones">
         <div className="nc-section-heading">
-          <span className="nc-eyebrow">TODO EN UN SOLO LUGAR</span>
-          <h2>Más orden para tu consulta</h2>
+          <span className="nc-eyebrow">QUÉ INCLUYE</span>
+          <h2>Todo lo que necesitas para tu consulta, en un solo sistema.</h2>
           <p>
-            Herramientas sencillas para dedicar más tiempo a lo que realmente
-            importa: tus pacientes.
+            Expedientes, planes y seguimiento para acompañar el trabajo diario de tu consultorio.
           </p>
         </div>
 
         <div className="nc-feature-grid">
-          {features.map((feature) => (
-            <article className="nc-feature-card" key={feature.title}>
-              <span className="nc-feature-icon"><FeatureIcon name={feature.icon} /></span>
-              <div>
-                <h3>{feature.title}</h3>
-                <p>{feature.description}</p>
-              </div>
+          {features.map((feature, index) => (
+            <article className={`nc-feature-card nc-feature-card-${index + 1}`} key={feature.group}>
+              <span className="nc-feature-tag">{feature.group}</span>
+              <ul>
+                {feature.items.map((item) => (
+                  <li key={item}>
+                    <span className="nc-feature-icon"><FeatureIcon name={feature.icon === 'patients' ? 'documents' : feature.icon} /></span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="nc-how nc-container" id="como-funciona">
+      <section className="nc-how" id="como-funciona">
         <div className="nc-section-heading">
-          <span className="nc-eyebrow">SENCILLO Y PRÁCTICO</span>
-          <h2>Tu consulta, paso a paso</h2>
+          <span className="nc-eyebrow">EL RECORRIDO EN TU CONSULTORIO</span>
+          <h2>Así acompaña Conutria una consulta real.</h2>
+          <p>Desde el registro del paciente hasta el seguimiento de sus avances.</p>
         </div>
 
-        <div className="nc-steps">
+        <div className="nc-steps nc-container">
           <article>
             <span>01</span>
             <h3>Registra al paciente</h3>
             <p>
-              Crea su expediente y guarda la información necesaria para su
-              seguimiento.
+              Organiza su expediente, antecedentes, objetivos y mediciones en un solo lugar.
             </p>
           </article>
           <article>
             <span>02</span>
-            <h3>Planifica su atención</h3>
+            <h3>Diseña su plan</h3>
             <p>
-              Registra consultas, mediciones y planes adaptados a sus
-              necesidades.
+              Arma tiempos de comida con alimentos, porciones y equivalentes adaptados a cada paciente.
             </p>
           </article>
           <article>
             <span>03</span>
+            <h3>Compártelo con el paciente</h3>
+            <p>
+              Envía una invitación para que el paciente comparta su adherencia, energía y hambre.
+            </p>
+          </article>
+          <article>
+            <span>04</span>
             <h3>Da seguimiento</h3>
             <p>
-              Consulta el historial y revisa los avances en cada nueva visita.
+              Revisa consultas, mediciones y reportes para ajustar el acompañamiento en cada etapa.
             </p>
           </article>
         </div>

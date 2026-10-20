@@ -595,6 +595,143 @@
 .nc-footer-legal a { color: #54736a; text-decoration: none; font-size: 13px; }
 .nc-footer-legal a:hover { color: #087e60; }
 
+/* Landing: product capabilities and the real consultation workflow. */
+.nc-features {
+  width: 100%;
+  padding: 76px max(32px, calc((100% - 1200px) / 2)) 84px;
+  background: #f6f8fa;
+}
+
+.nc-features .nc-section-heading {
+  max-width: 760px;
+  margin-bottom: 48px;
+}
+
+.nc-features .nc-section-heading h2 {
+  color: #123f34;
+}
+
+.nc-feature-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.nc-feature-card {
+  display: block;
+  min-width: 0;
+  padding: 25px 23px;
+  border-color: #e8edf1;
+  border-radius: 17px;
+  box-shadow: 0 2px 5px rgba(22, 49, 67, .035);
+}
+
+.nc-feature-tag {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  margin-bottom: 13px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: #087855;
+  background: #e9f8f1;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.nc-feature-card-2 .nc-feature-tag { color: #245cc5; background: #edf3ff; }
+.nc-feature-card-3 .nc-feature-tag { color: #6942ca; background: #f3efff; }
+.nc-feature-card-4 .nc-feature-tag { color: #bd531f; background: #fff3e9; }
+
+.nc-feature-card ul {
+  display: grid;
+  gap: 15px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nc-feature-card li {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  color: #193d35;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.nc-feature-icon {
+  width: 25px;
+  height: 25px;
+  margin-top: 1px;
+  background: #f2f6f8;
+  color: #91a6b5;
+}
+
+.nc-feature-icon svg { width: 14px; height: 14px; }
+
+.nc-how {
+  width: 100%;
+  padding: 70px 0 40px;
+  background: #082116;
+}
+
+.nc-how .nc-section-heading {
+  max-width: 760px;
+  margin-bottom: 44px;
+}
+
+.nc-how .nc-section-heading h2 { color: #fff; }
+.nc-how .nc-section-heading > p { color: #b9ccc1; }
+.nc-how .nc-eyebrow { color: #19ba69; }
+
+.nc-steps {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.nc-steps article {
+  min-height: 235px;
+  padding: 24px 26px;
+  border-color: rgba(202, 228, 210, .15);
+  border-radius: 23px;
+  background: rgba(255, 255, 255, .055);
+}
+
+.nc-steps article > span {
+  width: auto;
+  height: auto;
+  display: block;
+  margin: 0 0 15px;
+  border-radius: 0;
+  background: transparent;
+  color: #21a95d;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 38px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.nc-steps h3 { color: white; font-size: 15px; }
+.nc-steps p { color: #bdd0c6; font-size: 13px; }
+
+@media (max-width: 1000px) {
+  .nc-features { padding-inline: 32px; }
+  .nc-feature-grid, .nc-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 720px) {
+  .nc-features { padding: 58px 18px 64px; }
+  .nc-features .nc-section-heading { margin-bottom: 30px; }
+  .nc-feature-grid, .nc-steps { grid-template-columns: 1fr; }
+  .nc-feature-card { padding: 22px; }
+  .nc-how { padding: 56px 0 34px; }
+  .nc-steps { width: min(100% - 36px, 560px); }
+  .nc-steps article { min-height: 0; }
+}
+
 @media (max-width: 1000px) {
   .nc-nav-links {
     gap: 15px;
