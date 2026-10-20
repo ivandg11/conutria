@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/ClientLayout';
 
 import LandingPage from './pages/LandingPage';
+import Contact from './pages/Contact';
 import SubscriptionPlans from './pages/SuscriptionPlans';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
@@ -28,6 +29,7 @@ export default function App() {
         <Routes>
           {/* Página pública */}
           <Route path="/" element={<LandingPage />} />
+          <Route path="/contacto" element={<Contact />} />
           <Route path="/planes" element={<SubscriptionPlans />} />
           <Route path="/crear-contrasena" element={<SetupPassword />} />
           <Route path="/pago/resultado" element={<PaymentResult />} />

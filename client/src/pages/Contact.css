@@ -1,0 +1,37 @@
+.nc-contact-page {
+  min-height: 100vh;
+  padding: 24px max(32px, calc((100vw - 1200px) / 2)) 56px;
+  background: #fbfaf6;
+  color: #193d35;
+  font-family: 'DM Sans', sans-serif;
+}
+.nc-contact-header { display:flex; align-items:center; justify-content:space-between; min-height:64px; margin-bottom:clamp(42px, 9vh, 92px); }
+.nc-contact-header > a:first-child { display:inline-flex; align-items:center; text-decoration:none; }
+.nc-contact-back { color:#47675d; font-size:14px; font-weight:700; text-decoration:none; }
+.nc-contact-back:hover, .nc-contact-social:hover { color:#0e8060; }
+.nc-contact-layout { display:grid; grid-template-columns:minmax(0, .92fr) minmax(380px, 1fr); gap:clamp(48px, 9vw, 132px); align-items:start; }
+.nc-contact-info { padding-top:12px; }
+.nc-contact-kicker { color:#0e8060; font-size:11px; font-weight:800; letter-spacing:.14em; }
+.nc-contact-info h1 { margin:14px 0 8px; color:#103f34; font-family:'Nunito Sans',sans-serif; font-size:clamp(36px, 4vw, 48px); font-weight:900; letter-spacing:-.04em; }
+.nc-contact-intro { max-width:400px; margin:0 0 34px; color:#6b827b; font-size:17px; line-height:1.65; }
+.nc-contact-email, .nc-contact-social { display:flex; width:fit-content; align-items:center; gap:14px; margin:16px 0; color:#103f34; font-weight:750; text-decoration:none; }
+.nc-contact-email { color:#0e8060; }
+.nc-contact-icon { display:grid; width:42px; height:42px; place-items:center; border-radius:14px; background:#e9f5ef; color:#0e8060; font-size:20px; }
+.nc-contact-note { display:flex; max-width:390px; align-items:center; gap:14px; margin-top:52px; padding:18px; border:1px solid #e4e8df; border-radius:18px; background:rgba(255,255,255,.68); color:#6b827b; font-size:13px; line-height:1.6; }
+.nc-contact-note p { margin:0; }
+.nc-contact-form { display:flex; flex-direction:column; gap:9px; }
+.nc-contact-form label { margin-top:9px; color:#456158; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+.nc-contact-form input, .nc-contact-form textarea { width:100%; border:1px solid #dce6e1; border-radius:13px; background:#fff; padding:14px 16px; color:#193d35; font:inherit; }
+.nc-contact-form input { min-height:51px; }
+.nc-contact-form textarea { min-height:148px; resize:vertical; }
+.nc-contact-form input:focus, .nc-contact-form textarea:focus { border-color:#45a984; outline:3px solid rgba(69,169,132,.14); }
+.nc-contact-form button { display:flex; width:fit-content; min-height:50px; align-items:center; justify-content:center; gap:12px; margin-top:12px; border:0; border-radius:28px; background:#0e8060; padding:0 28px; color:white; font:inherit; font-size:14px; font-weight:800; cursor:pointer; transition:background .15s, transform .15s; }
+.nc-contact-form button:hover { transform:translateY(-1px); background:#103f34; }
+.nc-contact-status { margin:3px 0 0; color:#0e8060; font-size:13px; }
+.nc-contact-hint { margin:4px 0 0; color:#82928b; font-size:12px; line-height:1.5; }
+@media (max-width:720px) {
+  .nc-contact-page { padding:18px 22px 40px; }
+  .nc-contact-header { margin-bottom:42px; }
+  .nc-contact-layout { grid-template-columns:1fr; gap:30px; }
+  .nc-contact-note { margin-top:28px; }
+}
