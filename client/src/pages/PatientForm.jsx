@@ -198,7 +198,19 @@ export default function PatientForm() {
                     </label>
                   ))}
                 </div>
-                {entry.answer === 'yes' && f.details !== false && (
+                {entry.answer === 'yes' && f.details !== false && f.detailType === 'number' && (
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={entry.details}
+                    onChange={(e) => handleHistory(f.key, 'yes', e.target.value)}
+                    placeholder={f.detailPrompt}
+                    className="history-detail"
+                    required
+                  />
+                )}
+                {entry.answer === 'yes' && f.details !== false && f.detailType !== 'number' && (
                   <textarea
                     value={entry.details}
                     onChange={(e) => handleHistory(f.key, 'yes', e.target.value)}

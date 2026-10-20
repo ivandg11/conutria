@@ -7,6 +7,7 @@ export const HISTORY_FIELDS = [
   { key: 'ciclo', label: '¿Presentas irregularidades o molestias en tu ciclo menstrual?', detailPrompt: 'Describe la duración, regularidad o molestias.' },
   { key: 'actividad', label: '¿Realizas actividad física?', detailPrompt: 'Indica el tipo de actividad, duración y frecuencia.' },
   { key: 'sueno', label: '¿Tienes dificultades para dormir?', detailPrompt: 'Describe el problema y cuántas horas duermes.' },
+  { key: 'cafe', label: '¿Consumes café?', detailPrompt: '¿Cuántas tazas al día?', detailType: 'number' },
   { key: 'agua', label: '¿Consumes agua durante el día?', detailPrompt: 'Indica aproximadamente cuántos vasos o litros al día.' },
   { key: 'alcohol', label: '¿Consumes bebidas alcohólicas?', details: false },
   { key: 'tabaco', label: '¿Consumes tabaco?', details: false },
