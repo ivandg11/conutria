@@ -283,6 +283,7 @@ export default function LandingPage() {
       <footer className="nc-footer nc-container">
         <p>Una herramienta para acompañar tu práctica profesional.</p>
         <div className="nc-footer-legal">
+          <a href="mailto:conutriaoficial@gmail.com">Contacto</a>
           <Link to="/aviso-de-privacidad">Aviso de privacidad</Link>
           <Link to="/terminos-de-uso">Términos de uso</Link>
           <span>© {new Date().getFullYear()} Conutria</span>

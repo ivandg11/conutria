@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import Logo from '../components/Logo';
 import './LegalDocuments.css';
 
-const revisionDate = '17 de octubre de 2026';
+const revisionDate = '20 de octubre de 2026';
 
 function DraftNotice() {
   return (
@@ -28,11 +28,12 @@ function PrivacyNotice() {
       <p>
         El responsable de los datos de cuenta y facturación de Conutria es{' '}
         <strong>
-          [NOMBRE LEGAL O NOMBRE COMPLETO DE QUIEN OPERA Conutria]
+          Ivan Dominguez Gomez
         </strong>
-        , con domicilio en <strong>[DOMICILIO COMPLETO]</strong>. Para dudas o
+        , quien opera bajo el nombre comercial Conutria, con domicilio en{' '}
+        <strong>Av. Monteverde 3021, El Fortín, Zapopan, Jalisco, C.P. 45066</strong>. Para dudas o
         solicitudes de privacidad, escribe a{' '}
-        <strong>[CORREO DE PRIVACIDAD]</strong>.
+        <a href="mailto:conutriaoficial@gmail.com">conutriaoficial@gmail.com</a>.
       </p>
       <h2>2. Datos que tratamos</h2>
       <ul>
@@ -108,11 +109,11 @@ function PrivacyNotice() {
         (Stripe) y envío de correo (Resend). Estos proveedores pueden
         procesar información desde la ubicación de sus centros de datos conforme
         a sus servicios y contratos.{' '}
-        <strong>
-          [CONFIRMAR PROVEEDORES, UBICACIONES, TRANSFERENCIAS Y CONTRATOS ANTES
-          DE PUBLICAR]
-        </strong>
-        .
+        La API se despliega en Render y la base de datos MySQL se aloja en
+        Aiven. La región configurada para esta base debe confirmarse en el panel
+        de Aiven; Aiven indica que los datos permanecen en la ubicación elegida
+        por el cliente. Render y los demás proveedores pueden tratar datos
+        conforme a sus condiciones y contratos.
       </p>
       <p>
         No vendemos datos personales. Solo comunicaremos información cuando sea
@@ -126,7 +127,9 @@ function PrivacyNotice() {
         resolver responsabilidades. Al terminar el servicio, se definirá el
         procedimiento para que el profesional exporte o solicite la eliminación
         de sus expedientes y el plazo de borrado de copias de respaldo.{' '}
-        <strong>[DEFINIR PLAZOS DE RETENCIÓN, RESPALDOS Y ELIMINACIÓN]</strong>.
+        Los plazos específicos de conservación y borrado de respaldos deben
+        definirse en el procedimiento de retención antes de publicar la versión
+        definitiva.
       </p>
       <p>
         Aplicamos controles de acceso por cuenta, autenticación y medidas
@@ -137,7 +140,8 @@ function PrivacyNotice() {
       <p>
         Puedes solicitar acceso, rectificación, cancelación u oposición
         (derechos ARCO), revocar consentimientos cuando proceda o limitar el uso
-        de tus datos escribiendo a <strong>[CORREO DE PRIVACIDAD]</strong>.
+        de tus datos escribiendo a{' '}
+        <a href="mailto:conutriaoficial@gmail.com">conutriaoficial@gmail.com</a>.
         Indica tu nombre, correo de cuenta, derecho que deseas ejercer y medios
         para responderte. Para expedientes de pacientes, el profesional
         responsable debe atender la solicitud del paciente y coordinar con
@@ -174,9 +178,9 @@ function TermsOfUse() {
       <h2>1. Quién presta el servicio</h2>
       <p>
         Conutria es operada por{' '}
-        <strong>[NOMBRE LEGAL O NOMBRE COMPLETO]</strong>, con domicilio en{' '}
-        <strong>[DOMICILIO COMPLETO]</strong> y contacto Conutria2027@gmail.com.{' '}
-        <strong>[AGREGAR RFC Y DATOS COMERCIALES QUE CORRESPONDAN]</strong>.
+        <strong>Ivan Dominguez Gomez</strong>, con domicilio en{' '}
+        <strong>Av. Monteverde 3021, El Fortín, Zapopan, Jalisco, C.P. 45066</strong>.{' '}
+        Contacto: <a href="mailto:conutriaoficial@gmail.com">conutriaoficial@gmail.com</a>.
       </p>
       <h2>2. Servicio y cuenta</h2>
       <p>
@@ -267,7 +271,7 @@ function TermsOfUse() {
       <p>
         Publicaremos cambios a estas condiciones en esta página e indicaremos la
         fecha de actualización. Para soporte o dudas contractuales escribe a{' '}
-        <a href="mailto:Conutria2027@gmail.com">Conutria2027@gmail.com</a>.
+        <a href="mailto:conutriaoficial@gmail.com">conutriaoficial@gmail.com</a>.
       </p>
       <h2>11. Legislación aplicable</h2>
       <p>
