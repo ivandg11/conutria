@@ -675,7 +675,7 @@
 .nc-how {
   width: 100%;
   padding: 70px 0 40px;
-  background: #082116;
+  background: var(--nc-green);
 }
 
 .nc-how .nc-section-heading {
@@ -707,7 +707,7 @@
   margin: 0 0 15px;
   border-radius: 0;
   background: transparent;
-  color: #21a95d;
+  color: var(--nc-yellow);
   font-family: 'Nunito Sans', sans-serif;
   font-size: 38px;
   font-weight: 900;
