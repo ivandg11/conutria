@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../lib/api';
 import Dietocalculo from '../components/Dietocalculo';
@@ -10,6 +10,56 @@ const today = () => new Date().toISOString().slice(0, 10);
 const defaultRecall = () =>
   DEFAULT_MEALS.map((meal) => ({ meal, time: '', description: '' }));
 
+function ConsultationTypeSelect({ value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef(null);
+  const options = [
+    { value: 'INITIAL', label: 'Inicial', hint: 'Primera valoración' },
+    { value: 'FOLLOWUP', label: 'Seguimiento', hint: 'Consulta de seguimiento' },
+  ];
+  const selected = options.find((option) => option.value === value) ?? options[0];
+
+  useEffect(() => {
+    if (!open) return undefined;
+    function closeOnOutsideClick(event) {
+      if (!rootRef.current?.contains(event.target)) setOpen(false);
+    }
+    function closeOnEscape(event) {
+      if (event.key === 'Escape') setOpen(false);
+    }
+    document.addEventListener('pointerdown', closeOnOutsideClick);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsideClick);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [open]);
+
+  return (
+    <div className="consultation-type-select" ref={rootRef}>
+      <button type="button" className="consultation-type-trigger" aria-haspopup="listbox" aria-expanded={open} onClick={() => setOpen((current) => !current)}>
+        <span className="consultation-type-current">
+          <span className="consultation-type-label">{selected.label}</span>
+          <span className="consultation-type-hint">{selected.hint}</span>
+        </span>
+        <span className={`consultation-type-chevron${open ? ' is-open' : ''}`} aria-hidden="true" />
+      </button>
+      {open && (
+        <div className="consultation-type-options" role="listbox" aria-label="Tipo de consulta">
+          {options.map((option) => (
+            <button key={option.value} type="button" role="option" aria-selected={value === option.value} className="consultation-type-option" onClick={() => { onChange(option.value); setOpen(false); }}>
+              <span className="consultation-type-option-mark" aria-hidden="true">{value === option.value ? '✓' : ''}</span>
+              <span className="consultation-type-current">
+                <span className="consultation-type-label">{option.label}</span>
+                <span className="consultation-type-hint">{option.hint}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 export default function ConsultationForm() {
   const { id: patientIdParam, consultationId } = useParams();
   const { state } = useLocation();
@@ -136,15 +186,10 @@ export default function ConsultationForm() {
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className={label}>Tipo de consulta</label>
-          <select
-            name="type"
+          <ConsultationTypeSelect
             value={form.type}
-            onChange={handleChange}
-            className={input}
-          >
-            <option value="INITIAL">Inicial</option>
-            <option value="FOLLOWUP">Seguimiento</option>
-          </select>
+            onChange={(type) => setForm((current) => ({ ...current, type }))}
+          />
         </div>
         <div>
           <label className={label}>Fecha *</label>
@@ -355,3 +400,4 @@ export default function ConsultationForm() {
     </form>
   );
 }
+
