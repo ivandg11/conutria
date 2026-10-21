@@ -29,21 +29,26 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const expiration = user?.subscription?.renewsAt;
     if (!user || user.role === 'SUPERADMIN' || user.hasAccess === false || user.subscription?.isLifetime || !expiration) return undefined;
+    let retryTimer;
     const checkAccess = async () => {
       try {
         const { data } = await api.get('/auth/me');
         if (!logoutInProgressRef.current) setUser(data);
       } catch {
-        setUser((current) => current ? { ...current, hasAccess: false } : current);
+        // A temporary API failure does not mean the subscription has expired.
+        retryTimer = window.setTimeout(checkAccess, 30 * 1000);
       }
     };
     const delay = new Date(expiration).getTime() - Date.now();
     if (delay <= 0) {
       checkAccess();
-      return undefined;
+      return () => window.clearTimeout(retryTimer);
     }
     const timer = window.setTimeout(checkAccess, delay + 250);
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(retryTimer);
+    };
   }, [user]);
 
   useEffect(() => {
