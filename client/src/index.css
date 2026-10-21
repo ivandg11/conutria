@@ -534,3 +534,9 @@ body:has(.consultation-form) #root,
 .agenda-page .agenda-day.is-today { border-color: #147a5b !important; color: #fff !important; background: #147a5b !important; box-shadow: 0 4px 10px rgba(20,122,91,.22); }
 .agenda-page .agenda-day.is-today > span { color: #fff !important; }
 .agenda-page .agenda-day.is-today > i { color: #0e644a; background: #d9eee2; }
+
+/* Encabezado de pacientes en verde claro uniforme, sin degradado */
+.patient-hero { background: #eef6ee !important; }
+
+/* Encabezados de cuenta, soporte y agenda con el mismo verde claro uniforme */
+.account-page-heading, .support-heading, .agenda-heading { background: #eef6ee !important; }
