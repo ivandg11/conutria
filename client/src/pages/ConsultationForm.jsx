@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../lib/api';
+import Dietocalculo from '../components/Dietocalculo';
 import { MEASURE_GROUPS } from '../lib/measures';
 import { DEFAULT_MEALS, FREQ_GROUPS, FREQ_OPTIONS } from '../lib/clinical';
 import MealPlans from '../components/MealPlans';
@@ -25,11 +26,19 @@ export default function ConsultationForm() {
     notes: '',
   });
   const [measures, setMeasures] = useState({});
+  const [patientProfile, setPatientProfile] = useState(null);
   const [recall, setRecall] = useState(defaultRecall());
   const [freq, setFreq] = useState({});
   const [patientReport, setPatientReport] = useState({});
   const [errors, setErrors] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!patientId) return undefined;
+    let active = true;
+    api.get(`/patients/${patientId}`).then((res) => { if (active) setPatientProfile(res.data); }).catch(() => {});
+    return () => { active = false; };
+  }, [patientId]);
 
   useEffect(() => {
     if (!editing) return;
@@ -182,6 +191,8 @@ export default function ConsultationForm() {
           />
         </div>
       </div>
+
+      {patientId && <Dietocalculo patient={patientProfile} weight={form.weightKg} height={form.heightCm} value={patientReport.dietCalculation ?? {}} onChange={(dietCalculation) => setPatientReport((prev) => ({ ...prev, dietCalculation }))} />}
 
       {MEASURE_GROUPS.map((group) => (
         <details key={group.key} className="consultation-section consultation-measures rounded border p-3">

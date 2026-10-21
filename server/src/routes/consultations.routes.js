@@ -70,6 +70,14 @@ const recallSchema = z
 const frequencySchema = z
   .record(z.string().max(40), z.enum(['diario', '4-6', '1-3', 'rara', 'nunca']))
   .optional();
+const dietCalculationSchema = z.object({
+  formulaSex: z.enum(['F', 'M']).optional(),
+  activityFactor: z.coerce.number().min(1).max(2).optional(),
+  energyAdjustment: z.coerce.number().min(-100).max(200).optional(),
+  targetWeight: z.preprocess((v) => v === '' || v === undefined ? undefined : v, z.coerce.number().min(1).max(500).optional()),
+  caloriesOverride: z.preprocess((v) => v === '' || v === undefined ? undefined : v, z.coerce.number().min(1).max(10000).optional()),
+  macroPct: z.object({ protein: z.coerce.number().min(0).max(100), carbs: z.coerce.number().min(0).max(100), fat: z.coerce.number().min(0).max(100) }).optional(),
+}).optional();
 const patientReportSchema = z.object({
   reason: z.string().max(1000).optional(),
   objective: z.string().max(1000).optional(),
@@ -78,6 +86,7 @@ const patientReportSchema = z.object({
   includeMacros: z.boolean().optional(),
   calories: z.string().max(80).optional(),
   macros: z.string().max(300).optional(),
+  dietCalculation: dietCalculationSchema,
   hydration: z.string().max(1000).optional(),
   activity: z.string().max(1000).optional(),
   rest: z.string().max(1000).optional(),
