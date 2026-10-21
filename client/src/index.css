@@ -543,3 +543,12 @@ body:has(.consultation-form) #root,
 
 /* Sobrescribe el fondo específico del encabezado de Agenda */
 .agenda-page .agenda-heading { background: #eef6ee !important; }
+
+/* Accesos principales del dashboard: pacientes, consultas y progreso */
+.dashboard-shortcuts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+.dashboard-shortcut { min-width: 0; display: flex; min-height: 116px; flex-direction: column; align-items: flex-start; justify-content: center; gap: .35rem; padding: 1rem 1.1rem; border: 1px solid #e1e9e2; border-radius: 16px; color: #203d32 !important; background: #fff; text-decoration: none; transition: border-color .15s, background .15s, transform .15s, box-shadow .15s; }
+.dashboard-shortcut:hover { transform: translateY(-2px); border-color: #b8dcc4; background: #f7fbf7; box-shadow: 0 6px 18px rgba(23,59,50,.06); }
+.dashboard-shortcut-arrow { color: #147a5b; font-size: 1.25rem; line-height: 1.2; }
+.dashboard-shortcut strong { color: #173b32; font-size: .95rem; }
+.dashboard-shortcut > span:last-child { color: #71847a; font-size: .78rem; }
+@media (max-width: 600px) { .dashboard-shortcuts { grid-template-columns: 1fr; gap: .55rem; } .dashboard-shortcut { min-height: 86px; padding: .85rem 1rem; } }

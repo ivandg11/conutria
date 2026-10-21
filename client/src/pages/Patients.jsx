@@ -71,7 +71,25 @@ export default function Patients() {
         </Link>
       </section>
 
-      <section className="patient-controls" aria-label="Buscar y filtrar pacientes">
+      <nav className="dashboard-shortcuts" aria-label="Resumen principal">
+        <a className="dashboard-shortcut" href="#patient-directory">
+          <span className="dashboard-shortcut-arrow" aria-hidden="true">→</span>
+          <strong>Pacientes</strong>
+          <span>{status === 'ACTIVE' ? 'Activos' : 'Dados de alta'}</span>
+        </a>
+        <a className="dashboard-shortcut" href="#patient-directory">
+          <span className="dashboard-shortcut-arrow" aria-hidden="true">→</span>
+          <strong>Consultas</strong>
+          <span>Organizadas por paciente</span>
+        </a>
+        <a className="dashboard-shortcut" href="#patient-directory">
+          <span className="dashboard-shortcut-arrow" aria-hidden="true">→</span>
+          <strong>Progreso</strong>
+          <span>Historial por paciente</span>
+        </a>
+      </nav>
+
+      <section id="patient-directory" className="patient-controls" aria-label="Buscar y filtrar pacientes">
         <label className="patient-search">
           <span aria-hidden="true">⌕</span>
           <input
@@ -142,3 +160,4 @@ export default function Patients() {
     </div>
   );
 }
+
