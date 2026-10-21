@@ -402,3 +402,18 @@ img, svg, video, canvas { max-width: 100%; }
 .consultation-form > details.consultation-section > summary::marker { font-size: 1.1em; }
 .consultation-form > details.consultation-section[open] { background: #fff !important; }
 .consultation-form > details.consultation-section[open] > summary { margin-left: -1rem; padding-left: 1rem; }
+
+/* Color permanente en encabezados de todas las secciones de consulta */
+.consultation-form > details.consultation-section > summary { display: block; margin: -.75rem; padding: .85rem 1rem; border-radius: 13px; background: #eaf5ed !important; color: #245641 !important; }
+.consultation-form > details.consultation-measures { border-left: 6px solid #4b9b70 !important; }
+.consultation-form > details.consultation-measures > summary { background: #eaf5ed !important; color: #245641 !important; }
+.consultation-form > details.consultation-recall { border-left: 6px solid #d4a72c !important; }
+.consultation-form > details.consultation-recall > summary { background: #fff3d1 !important; color: #72591d !important; }
+.consultation-form > details.consultation-frequency { border-left: 6px solid #4d91b3 !important; }
+.consultation-form > details.consultation-frequency > summary { background: #e5f2f8 !important; color: #315b76 !important; }
+.consultation-form > details.consultation-report { border-left: 6px solid #9174b5 !important; }
+.consultation-form > details.consultation-report > summary { background: #f0e9f7 !important; color: #5d4c7c !important; }
+.consultation-form > .meal-plans { padding: 1rem; border: 1px solid #b7d8c4; border-left: 6px solid #4b9b70; border-radius: 16px; background: #f0f8f2; }
+.consultation-form > .meal-plans h2 { color: #245641; }
+.consultation-form > details.consultation-section[open] > summary { margin: -.75rem; margin-bottom: .8rem; }
+@media (max-width: 640px) { .consultation-form > details.consultation-section > summary { margin: -.55rem; padding: .75rem; } .consultation-form > details.consultation-section[open] > summary { margin: -.55rem; margin-bottom: .7rem; } }
