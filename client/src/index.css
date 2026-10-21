@@ -418,7 +418,7 @@ img, svg, video, canvas { max-width: 100%; }
 .consultation-form > details.consultation-section[open] > summary { margin: -.75rem; margin-bottom: .8rem; }
 @media (max-width: 640px) { .consultation-form > details.consultation-section > summary { margin: -.55rem; padding: .75rem; } .consultation-form > details.consultation-section[open] > summary { margin: -.55rem; margin-bottom: .7rem; } }
 
-/* El borde mantiene el color de cada apartado abierto y cerrado; chevrón propio */
+/* El borde mantiene el color de cada apartado abierto y cerrado; chevrÃ³n propio */
 .consultation-form > details.consultation-section { --consultation-accent: #4b9b70; --consultation-tint: #eaf5ed; border-color: #b9d8c4 !important; border-left: 6px solid var(--consultation-accent) !important; }
 .consultation-form > details.consultation-recall { --consultation-accent: #d4a72c; --consultation-tint: #fff3d1; border-color: #ead69c !important; border-left-color: var(--consultation-accent) !important; }
 .consultation-form > details.consultation-frequency { --consultation-accent: #4d91b3; --consultation-tint: #e5f2f8; border-color: #b9d9e7 !important; border-left-color: var(--consultation-accent) !important; }
