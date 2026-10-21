@@ -488,3 +488,11 @@ body:has(.consultation-form) #root,
 .consultation-type-option[aria-selected="true"] { border-color: #c4dfcc; background: #eaf5ed; }
 .consultation-type-option-mark { display: grid; width: 23px; height: 23px; flex: 0 0 23px; place-items: center; border-radius: 50%; color: #fff; background: #4b9b70; font-size: .75rem; font-weight: 700; }
 @media (prefers-reduced-motion: reduce) { .consultation-type-trigger, .consultation-type-chevron { transition: none; } }
+
+/* Ajuste de consulta: el exterior conserva su tono original; el hueso queda dentro de la tarjeta */
+body:has(.consultation-form) { background: #f4f7f5 !important; }
+body:has(.consultation-form) #root,
+.client-app:has(.consultation-form),
+.client-app:has(.consultation-form) .client-layout { background: #f4f7f5 !important; }
+.consultation-form { background: #fffefa !important; }
+.consultation-type-option-mark { border: 1.5px solid #6b9b80; color: #388363; background: transparent; }
