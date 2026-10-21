@@ -552,3 +552,8 @@ body:has(.consultation-form) #root,
 .dashboard-shortcut strong { color: #173b32; font-size: .95rem; }
 .dashboard-shortcut > span:last-child { color: #71847a; font-size: .78rem; }
 @media (max-width: 600px) { .dashboard-shortcuts { grid-template-columns: 1fr; gap: .55rem; } .dashboard-shortcut { min-height: 86px; padding: .85rem 1rem; } }
+
+/* Tarjetas informativas del dashboard: conteos reales, sin affordance de enlace */
+.dashboard-shortcut { min-height: 132px; cursor: default; }
+.dashboard-shortcut:hover { transform: none; border-color: #e1e9e2; background: #fff; box-shadow: 0 6px 22px rgba(23,59,50,.045); }
+.dashboard-shortcut-count { color: #147a5b; font-size: 1.65rem; font-weight: 750; line-height: 1.1; }

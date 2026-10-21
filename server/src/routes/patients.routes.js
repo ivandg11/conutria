@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth } from '../middleware/auth.js';
@@ -108,6 +108,13 @@ router.post('/', async (req, res) => {
   res.status(201).json(patient);
 });
 
+router.get('/summary', async (req, res) => {
+  const [activePatients, consultations] = await Promise.all([
+    prisma.patient.count({ where: { userId: req.userId, status: 'ACTIVE' } }),
+    prisma.consultation.count({ where: { patient: { userId: req.userId } } }),
+  ]);
+  res.json({ activePatients, consultations });
+});
 router.get('/:id', async (req, res) => {
   const id = idSchema.parse(req.params.id);
   const patient = await prisma.patient.findFirst({
@@ -192,3 +199,4 @@ router.patch('/:id/status', async (req, res) => {
   res.json(updated);
 });
 export default router;
+

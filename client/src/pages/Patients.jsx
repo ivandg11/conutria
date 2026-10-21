@@ -8,11 +8,20 @@ import { getCachedPatients, getPatients, invalidatePatientLists } from '../lib/p
 export default function Patients() {
   const { user } = useAuth();
   const [patients, setPatients] = useState([]);
+  const [summary, setSummary] = useState(null);
   const [q, setQ] = useState('');
   const [status, setStatus] = useState('ACTIVE');
   const [pendingDelete, setPendingDelete] = useState(null);
   const [loading, setLoading] = useState(() => !getCachedPatients({ q: '', status: 'ACTIVE' }));
   const [loadError, setLoadError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+    api.get('/patients/summary')
+      .then(({ data }) => { if (active) setSummary(data); })
+      .catch(() => {});
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
     const params = { q: q.trim(), status };
@@ -44,6 +53,7 @@ export default function Patients() {
     await api.delete(`/patients/${id}`);
     invalidatePatientLists();
     setPatients((list) => list.filter((p) => p.id !== id));
+    api.get('/patients/summary').then(({ data }) => setSummary(data)).catch(() => {});
   }
 
   const firstName = user?.name?.trim().split(/\s+/)[0];
@@ -71,23 +81,18 @@ export default function Patients() {
         </Link>
       </section>
 
-      <nav className="dashboard-shortcuts" aria-label="Resumen principal">
-        <a className="dashboard-shortcut" href="#patient-directory">
-          <span className="dashboard-shortcut-arrow" aria-hidden="true">→</span>
+      <section className="dashboard-shortcuts" aria-label="Resumen principal">
+        <article className="dashboard-shortcut">
           <strong>Pacientes</strong>
-          <span>{status === 'ACTIVE' ? 'Activos' : 'Dados de alta'}</span>
-        </a>
-        <a className="dashboard-shortcut" href="#patient-directory">
-          <span className="dashboard-shortcut-arrow" aria-hidden="true">→</span>
+          <span className="dashboard-shortcut-count">{summary ? summary.activePatients : '—'}</span>
+          <span>Activos</span>
+        </article>
+        <article className="dashboard-shortcut">
           <strong>Consultas</strong>
-          <span>Organizadas por paciente</span>
-        </a>
-        <a className="dashboard-shortcut" href="#patient-directory">
-          <span className="dashboard-shortcut-arrow" aria-hidden="true">→</span>
-          <strong>Progreso</strong>
-          <span>Historial por paciente</span>
-        </a>
-      </nav>
+          <span className="dashboard-shortcut-count">{summary ? summary.consultations : '—'}</span>
+          <span>Registradas</span>
+        </article>
+      </section>
 
       <section id="patient-directory" className="patient-controls" aria-label="Buscar y filtrar pacientes">
         <label className="patient-search">
@@ -160,4 +165,6 @@ export default function Patients() {
     </div>
   );
 }
+
+
 
