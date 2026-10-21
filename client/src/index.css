@@ -388,3 +388,17 @@ img, svg, video, canvas { max-width: 100%; }
 .consultation-form > details.consultation-report[open] > summary { color: #5d4c7c; border-bottom-color: #e8e0f1; background: #f7f4fa; }
 .consultation-form > details.consultation-section[open] .bg-gray-50 { border: 1px solid #e6eee8; background: #f7faf7 !important; }
 @media (max-width: 640px) { .consultation-form { padding: 1.15rem !important; } .consultation-form > details.consultation-section[open] > summary { margin: -.55rem -.55rem .7rem; } }
+
+/* Hacer visibles los acentos incluso con los apartados cerrados */
+.consultation-form > details.consultation-section { border-left: 6px solid #4b9b70 !important; background: linear-gradient(90deg, #f0f8f2 0, #fff 34%) !important; }
+.consultation-form > details.consultation-measures > summary { color: #245641; }
+.consultation-form > details.consultation-recall { border-left-color: #d4a72c !important; background: linear-gradient(90deg, #fff8e6 0, #fff 34%) !important; }
+.consultation-form > details.consultation-recall > summary { color: #72591d; }
+.consultation-form > details.consultation-frequency { border-left-color: #4d91b3 !important; background: linear-gradient(90deg, #eff7fb 0, #fff 34%) !important; }
+.consultation-form > details.consultation-frequency > summary { color: #315b76; }
+.consultation-form > details.consultation-report { border-left-color: #9174b5 !important; background: linear-gradient(90deg, #f6f1fa 0, #fff 34%) !important; }
+.consultation-form > details.consultation-report > summary { color: #5d4c7c; }
+.consultation-form > details.consultation-section > summary { min-height: 2.5rem; padding-left: .2rem; }
+.consultation-form > details.consultation-section > summary::marker { font-size: 1.1em; }
+.consultation-form > details.consultation-section[open] { background: #fff !important; }
+.consultation-form > details.consultation-section[open] > summary { margin-left: -1rem; padding-left: 1rem; }
