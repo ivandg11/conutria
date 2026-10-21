@@ -434,3 +434,9 @@ img, svg, video, canvas { max-width: 100%; }
 .consultation-form > details.consultation-section[open] > summary { margin-bottom: .8rem; border-radius: 12px 12px 0 0; border-bottom: 2px solid var(--consultation-accent); }
 .consultation-form > details.consultation-section[open] > summary::before { transform: rotate(45deg); }
 @media (max-width: 640px) { .consultation-form > details.consultation-section > summary { margin: -.55rem; padding: .75rem; } .consultation-form > details.consultation-section[open] > summary { margin: -.55rem; margin-bottom: .7rem; } }
+
+/* Dietocalculo dropdowns: match the application palette */
+.consultation-form .dietocalculo-select { appearance: none; padding-right: 2.7rem !important; background-image: linear-gradient(45deg, transparent 50%, #147a5b 50%), linear-gradient(135deg, #147a5b 50%, transparent 50%); background-position: calc(100% - 17px) 50%, calc(100% - 11px) 50%; background-size: 6px 6px, 6px 6px; background-repeat: no-repeat; }
+.consultation-form .dietocalculo-select option { padding: .65rem .8rem; color: #24483a; background: #fff; }
+.consultation-form .dietocalculo-select option:checked { color: #145c42; background: #e7f4eb; font-weight: 650; }
+.consultation-form .dietocalculo-select option:hover, .consultation-form .dietocalculo-select option:focus { color: #145c42; background: #e7f4eb; }
