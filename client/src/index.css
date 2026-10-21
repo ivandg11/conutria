@@ -440,3 +440,11 @@ img, svg, video, canvas { max-width: 100%; }
 .consultation-form .dietocalculo-select option { padding: .65rem .8rem; color: #24483a; background: #fff; }
 .consultation-form .dietocalculo-select option:checked { color: #145c42; background: #e7f4eb; font-weight: 650; }
 .consultation-form .dietocalculo-select option:hover, .consultation-form .dietocalculo-select option:focus { color: #145c42; background: #e7f4eb; }
+
+/* Consultation page: warm bone canvas and styled native select options */
+body:has(.consultation-form) { background: #f6f2e9; }
+main:has(.consultation-form) { background: transparent; }
+.consultation-form select { color-scheme: light; }
+.consultation-form select option { color: #24483a; background-color: #fff; }
+.consultation-form select option:checked { color: #145c42; background: #e7f4eb linear-gradient(0deg, #e7f4eb, #e7f4eb); }
+.consultation-form select option:hover, .consultation-form select option:focus { color: #145c42; background: #e7f4eb linear-gradient(0deg, #e7f4eb, #e7f4eb); }
