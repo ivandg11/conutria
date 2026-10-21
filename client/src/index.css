@@ -503,3 +503,10 @@ body:has(.consultation-form) #root,
 .meal-plan-editor > .space-y-4 > fieldset { border-color: #c9dfcf !important; background: #f1f8f2 !important; }
 .meal-plan-editor > .space-y-4 > fieldset > .space-y-2 { padding: .35rem; border-radius: 12px; background: #eaf5ed; }
 .meal-plan-editor .meal-food-entry { border-color: #cfe2d4 !important; background: #eaf5ed !important; }
+
+/* Ajuste fino: verde solo en la fila de alimento y hueso muy suave en el fondo */
+.consultation-form { background: #fffefa !important; }
+.meal-plan-editor { background: #fffefa !important; }
+.meal-plan-editor > .space-y-4 > fieldset { background: linear-gradient(145deg, #fff, #fbfdfb) !important; }
+.meal-plan-editor > .space-y-4 > fieldset > .space-y-2 { padding: 0; background: transparent; }
+.meal-plan-editor .meal-food-entry { border-color: #c9dfcf !important; background: #eaf5ed !important; }
