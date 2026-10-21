@@ -510,3 +510,20 @@ body:has(.consultation-form) #root,
 .meal-plan-editor > .space-y-4 > fieldset { background: linear-gradient(145deg, #fff, #fbfdfb) !important; }
 .meal-plan-editor > .space-y-4 > fieldset > .space-y-2 { padding: 0; background: transparent; }
 .meal-plan-editor .meal-food-entry { border-color: #c9dfcf !important; background: #eaf5ed !important; }
+
+/* Dashboard de pacientes: misma familia cromática que Agenda */
+.patient-hero { border: 1px solid #e0e9df; color: #203d32; background: linear-gradient(115deg, #eef6ee 0%, #fbfcf9 66%, #fff 100%); box-shadow: 0 8px 24px rgba(23,59,50,.045); }
+.patient-hero h1 { color: #173b32 !important; }
+.patient-greeting { color: #147a5b; }
+.patient-hero-action { border-radius: 11px; color: #fff !important; background: #147a5b; }
+.patient-hero-action:hover { background: #10664c; }
+.patient-filter.is-active { border-color: #147a5b; color: #fff; background: #147a5b; }
+.patient-card { border-color: #e1e9e2; border-radius: 17px; box-shadow: 0 6px 22px rgba(23,59,50,.045); }
+.patient-card:hover { box-shadow: 0 10px 26px rgba(23,59,50,.09); }
+.patient-avatar { border-radius: 14px; color: #0e7857; background: #eaf5ed; }
+.patient-goal p { color: #0b674b; background: #eaf5ed; }
+.patient-card-actions .patient-view-link { border-color: #147a5b; background: #147a5b; }
+.patient-card-actions .patient-view-link:hover { background: #10664c; }
+.patient-add-card { border-color: #b8dcc4; border-radius: 17px; color: #137452 !important; }
+.patient-add-card:hover { border-color: #147a5b; background: #eaf5ed; }
+.patient-add-card > span { color: #0e7857; background: #eaf5ed; }
