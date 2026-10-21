@@ -496,3 +496,10 @@ body:has(.consultation-form) #root,
 .client-app:has(.consultation-form) .client-layout { background: #f4f7f5 !important; }
 .consultation-form { background: #fffefa !important; }
 .consultation-type-option-mark { border: 1.5px solid #6b9b80; color: #388363; background: transparent; }
+
+/* Tono hueso un poco más visible, solo en formularios de consulta y plan */
+.consultation-form { background: #fffaf0 !important; }
+.meal-plan-editor { background: #fffaf0 !important; }
+.meal-plan-editor > .space-y-4 > fieldset { border-color: #c9dfcf !important; background: #f1f8f2 !important; }
+.meal-plan-editor > .space-y-4 > fieldset > .space-y-2 { padding: .35rem; border-radius: 12px; background: #eaf5ed; }
+.meal-plan-editor .meal-food-entry { border-color: #cfe2d4 !important; background: #eaf5ed !important; }
