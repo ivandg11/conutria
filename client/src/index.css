@@ -527,3 +527,10 @@ body:has(.consultation-form) #root,
 .patient-add-card { border-color: #b8dcc4; border-radius: 17px; color: #137452 !important; }
 .patient-add-card:hover { border-color: #147a5b; background: #eaf5ed; }
 .patient-add-card > span { color: #0e7857; background: #eaf5ed; }
+
+/* Agenda: botón principal y día de hoy en el verde sólido del dashboard */
+.agenda-page .agenda-primary { border-color: #147a5b !important; color: #fff !important; background: #147a5b !important; }
+.agenda-page .agenda-primary:hover:not(:disabled) { border-color: #10664c !important; color: #fff !important; background: #10664c !important; }
+.agenda-page .agenda-day.is-today { border-color: #147a5b !important; color: #fff !important; background: #147a5b !important; box-shadow: 0 4px 10px rgba(20,122,91,.22); }
+.agenda-page .agenda-day.is-today > span { color: #fff !important; }
+.agenda-page .agenda-day.is-today > i { color: #0e644a; background: #d9eee2; }
