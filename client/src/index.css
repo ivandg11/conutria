@@ -374,3 +374,17 @@ img, svg, video, canvas { max-width: 100%; }
   .sa-content { padding-inline: 10px; }
   .sa-card-grid { grid-template-columns: 1fr; }
 }
+
+/* Formulario de consulta: acentos suaves para orientar entre secciones */
+.consultation-form > h1 { padding-bottom: .85rem; border-bottom: 3px solid #dceee4; }
+.consultation-form > details.consultation-section { overflow: hidden; border-color: #dce8df !important; background: #fff; transition: border-color .18s, box-shadow .18s; }
+.consultation-form > details.consultation-section[open] { border-color: #9bc9ae !important; box-shadow: 0 8px 24px rgba(23,59,50,.07), inset 4px 0 #4b9b70 !important; }
+.consultation-form > details.consultation-section > summary { display: flex; align-items: center; gap: .55rem; min-height: 2rem; color: #245641; font-weight: 700; }
+.consultation-form > details.consultation-section > summary::marker { color: #4b9b70; }
+.consultation-form > details.consultation-section[open] > summary { margin: -.75rem -.75rem .8rem; padding: .8rem .9rem; border-bottom: 1px solid #e4eee7; background: #f2f8f3; }
+.consultation-form > details.consultation-recall[open] { border-color: #e7d49a !important; box-shadow: 0 8px 24px rgba(94,74,25,.06), inset 4px 0 #d4a72c !important; }
+.consultation-form > details.consultation-recall[open] > summary { color: #72591d; border-bottom-color: #f0e6c8; background: #fff9e9; }
+.consultation-form > details.consultation-frequency[open] > summary { color: #315b76; border-bottom-color: #dceaf0; background: #f1f7fa; }
+.consultation-form > details.consultation-report[open] > summary { color: #5d4c7c; border-bottom-color: #e8e0f1; background: #f7f4fa; }
+.consultation-form > details.consultation-section[open] .bg-gray-50 { border: 1px solid #e6eee8; background: #f7faf7 !important; }
+@media (max-width: 640px) { .consultation-form { padding: 1.15rem !important; } .consultation-form > details.consultation-section[open] > summary { margin: -.55rem -.55rem .7rem; } }

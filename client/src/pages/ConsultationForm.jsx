@@ -110,7 +110,7 @@ export default function ConsultationForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 rounded bg-white p-6 shadow"
+      className="consultation-form space-y-4 rounded bg-white p-6 shadow"
     >
       <h1 className="text-xl font-bold">
         {editing ? 'Editar consulta' : 'Crear consulta'}
@@ -184,7 +184,7 @@ export default function ConsultationForm() {
       </div>
 
       {MEASURE_GROUPS.map((group) => (
-        <details key={group.key} className="rounded border p-3">
+        <details key={group.key} className="consultation-section consultation-measures rounded border p-3">
           <summary className="cursor-pointer font-medium">
             {group.title}
           </summary>
@@ -209,7 +209,7 @@ export default function ConsultationForm() {
         </details>
       ))}
 
-      <details className="rounded border p-3" open={form.type === 'INITIAL'}>
+      <details className="consultation-section consultation-recall rounded border p-3" open={form.type === 'INITIAL'}>
         <summary className="cursor-pointer font-medium">
           Recordatorio de 24 horas
         </summary>
@@ -264,7 +264,7 @@ export default function ConsultationForm() {
         </div>
       </details>
 
-      <details className="rounded border p-3">
+      <details className="consultation-section consultation-frequency rounded border p-3">
         <summary className="cursor-pointer font-medium">
           Frecuencia de alimentos · valoración habitual
         </summary>
@@ -295,7 +295,7 @@ export default function ConsultationForm() {
 
       {patientId && <MealPlans patientId={patientId} defaultStartDate={form.date} consultationContext />}
 
-      <details className="rounded border p-3" open>
+      <details className="consultation-section consultation-report rounded border p-3" open>
         <summary className="cursor-pointer font-medium">Contenido del reporte para el paciente</summary>
         <p className="mt-2 text-sm text-gray-500">Estos datos quedan guardados en esta consulta y se cargan automáticamente en la vista previa del PDF. Las notas clínicas de abajo se mantienen privadas.</p>
         <div className="mt-3 grid gap-4 sm:grid-cols-2">
