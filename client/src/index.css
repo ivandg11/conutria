@@ -540,3 +540,6 @@ body:has(.consultation-form) #root,
 
 /* Encabezados de cuenta, soporte y agenda con el mismo verde claro uniforme */
 .account-page-heading, .support-heading, .agenda-heading { background: #eef6ee !important; }
+
+/* Sobrescribe el fondo específico del encabezado de Agenda */
+.agenda-page .agenda-heading { background: #eef6ee !important; }
