@@ -178,12 +178,40 @@ function asDate(value) {
 function groupColor(group) {
   if (group.startsWith('Alimentos de origen animal')) return '#b91c1c';
   if (group === 'Frutas' || group === 'Verduras') return '#15803d';
-  if (group.startsWith('Cereales y')) return '#c2410c';
+  if (group.startsWith('Cereales y')) return '#e85d04';
   if (group === 'Leguminosas') return '#7c3f16';
-  if (group.startsWith('Grasas')) return '#946c00';
+  if (group.startsWith('Grasas')) return '#b8860b';
   if (group.startsWith('Alimentos libres')) return '#6b21a8';
   if (group === 'Leche') return '#1d4ed8';
   return '#30483b';
+}
+function formatPortion(portion) {
+  const value = String(portion || '');
+  const multiplied = value.match(/^(\d+(?:\.\d+)?) x (.*)$/);
+  const multiplier = multiplied ? Number(multiplied[1]) : 1;
+  const base = multiplied ? multiplied[2] : value;
+  const glyphs = { '1/2': '½', '1/3': '⅓', '2/3': '⅔', '1/4': '¼', '3/4': '¾', '1/5': '⅕', '2/5': '⅖', '3/5': '⅗', '4/5': '⅘', '1/6': '⅙', '5/6': '⅚' };
+  function formatAmount(amount) {
+    const whole = Math.floor(amount + 0.000001);
+    const fraction = amount - whole;
+    if (fraction < 0.0001) return String(whole);
+    let best = null;
+    for (let denominator = 2; denominator <= 12; denominator += 1) {
+      const numerator = Math.round(fraction * denominator);
+      if (numerator > 0 && Math.abs(fraction - numerator / denominator) < 0.015) {
+        best = `${numerator}/${denominator}`;
+        break;
+      }
+    }
+    const fractionText = best ? (glyphs[best] || best) : Number(fraction.toFixed(2)).toString().replace(/^0/, '');
+    return whole ? `${whole}${fractionText}` : fractionText;
+  }
+  return base.replace(/\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?/g, (quantity) => {
+    const mixed = quantity.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+    const fraction = quantity.match(/^(\d+)\/(\d+)$/);
+    const amount = mixed ? Number(mixed[1]) + Number(mixed[2]) / Number(mixed[3]) : fraction ? Number(fraction[1]) / Number(fraction[2]) : Number(quantity);
+    return formatAmount(amount * multiplier);
+  });
 }
 function displayGroup(group) {
   if (group === 'Cereales y tubérculos sin grasa') return 'Cereales y tubérculos · SIN GRASA';
@@ -422,7 +450,7 @@ export default function MealPlans({ patientId, defaultStartDate, consultationCon
                   <label>Porción</label>
                   <div className="meal-stepper">
                     <button type="button" aria-label={`Reducir ración de ${food.name}`} disabled={!food.portion || Number(food.equivalents) <= 0} onClick={() => adjustEquivalents(mi, fi, -0.25)}>−</button>
-                    <output>{food.portion || 'Elige un alimento'}</output>
+                    <output title={food.portion}>{formatPortion(food.portion) || 'Elige un alimento'}</output>
                     <button type="button" aria-label={`Aumentar ración de ${food.name}`} disabled={!food.portion || Number(food.equivalents) >= 100} onClick={() => adjustEquivalents(mi, fi, 0.25)}>+</button>
                   </div>
                 </div>
