@@ -439,14 +439,14 @@ export default function MealPlans({ patientId, defaultStartDate, consultationCon
                     <div className="flex gap-3"><button type="button" disabled={!foodDraft.name.trim() || !foodDraft.portion.trim() || foodDraft.equivalents === ''} className="text-emerald-700 disabled:opacity-50" onClick={saveCustomFood}>Guardar en mi cuenta</button><button type="button" onClick={() => { setFoodDraft(null); setCustomPortion(''); }}>Cancelar</button></div>
                   </div>}
                 </div>
-                <div className="meal-group-picker relative grid gap-1 text-sm sm:col-span-4">
+                <div className="meal-group-picker relative grid gap-1 text-sm sm:col-span-3">
                   <span id={`group-label-${foodKey}`}>Grupo SMAE</span>
                   <button type="button" className="meal-group-trigger" aria-labelledby={`group-label-${foodKey}`} aria-haspopup="listbox" aria-expanded={activeGroup === foodKey} onClick={() => { setActiveFood(''); setActivePortion(''); setActiveGroup((current) => current === foodKey ? '' : foodKey); }}>
                     <span style={{ color: groupColor(food.group), fontWeight: 700 }}>{displayGroup(food.group)}</span><span aria-hidden="true" className="meal-group-chevron">⌄</span>
                   </button>
                   {activeGroup === foodKey && <div className="meal-group-options" role="listbox" aria-label="Grupos SMAE">{GROUPS.map((group) => <button key={group} type="button" role="option" aria-selected={food.group === group} style={{ color: groupColor(group), fontWeight: 700 }} onClick={() => { selectGroup(mi, fi, group); setActiveGroup(''); }}>{displayGroup(group)}</button>)}</div>}
                 </div>
-                <div className="meal-portion-field grid gap-1 text-sm sm:col-span-2">
+                <div className="meal-portion-field grid gap-1 text-sm sm:col-span-3">
                   <label>Porción</label>
                   <div className="meal-stepper">
                     <button type="button" aria-label={`Reducir ración de ${food.name}`} disabled={!food.portion || Number(food.equivalents) <= 0} onClick={() => adjustEquivalents(mi, fi, -0.25)}>−</button>
