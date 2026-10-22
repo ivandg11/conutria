@@ -97,11 +97,9 @@ function DashboardPreview() {
     <div className="nc-product-previews" aria-label="Vistas de Conutria en computadora y celular">
       <figure className="nc-product-preview nc-product-preview-desktop">
         <img src="/images/monitor-web.png" alt="Vista de Conutria en computadora con el panel de pacientes" />
-        <figcaption>Administra tu consulta desde la web</figcaption>
       </figure>
       <figure className="nc-product-preview nc-product-preview-mobile">
         <img src="/images/app-paciente.png" alt="Vista de Conutria en celular con el formulario de consulta del paciente" />
-        <figcaption>Seguimiento también desde el celular</figcaption>
       </figure>
     </div>
   );
