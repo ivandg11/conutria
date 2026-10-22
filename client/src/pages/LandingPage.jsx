@@ -94,59 +94,15 @@ function ContactSection() {
 
 function DashboardPreview() {
   return (
-    <div className="nc-preview">
-      <div className="nc-preview-main">
-        <div className="nc-preview-header">
-          <BrandLogo />
-          <span>● &nbsp; Mi consulta</span>
-        </div>
-
-        <div className="nc-preview-body">
-          <span className="nc-eyebrow">PANEL PRINCIPAL</span>
-          <h3>Hola, nutrióloga 👋</h3>
-          <p>Este es el resumen de tu consulta.</p>
-
-          <div className="nc-stats">
-            <div>
-              <span>→</span>
-              <strong>Pacientes</strong>
-              <b>Activos</b>
-            </div>
-            <div>
-              <span>→</span>
-              <strong>Consultas</strong>
-              <b>Organizadas</b>
-            </div>
-            <div>
-              <span>→</span>
-              <strong>Progreso</strong>
-              <b>Historial</b>
-            </div>
-          </div>
-
-          <div className="nc-preview-card">
-            <strong>Seguimiento de pacientes</strong>
-            <p>Control de mediciones y evolución</p>
-            <div className="nc-chart">
-              {[75, 61, 68, 45, 51, 33, 39].map((height, index) => (
-                <div key={index} style={{ height: `${height}%` }} />
-              ))}
-            </div>
-            <div className="nc-chart-labels">
-              <span>Consulta 1</span>
-              <span>Consulta 7</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="nc-floating-card">
-        <span className="nc-floating-icon">✓</span>
-        <div>
-          <strong>Todo organizado</strong>
-          <p>Tu consulta, en un solo lugar.</p>
-        </div>
-      </div>
+    <div className="nc-product-previews" aria-label="Vistas de Conutria en computadora y celular">
+      <figure className="nc-product-preview nc-product-preview-desktop">
+        <img src="/images/monitor-web.png" alt="Vista de Conutria en computadora con el panel de pacientes" />
+        <figcaption>Administra tu consulta desde la web</figcaption>
+      </figure>
+      <figure className="nc-product-preview nc-product-preview-mobile">
+        <img src="/images/app-paciente.png" alt="Vista de Conutria en celular con el formulario de consulta del paciente" />
+        <figcaption>Seguimiento tambi?n desde el celular</figcaption>
+      </figure>
     </div>
   );
 }
