@@ -155,11 +155,7 @@ function TermsOfUse() {
       <h2>1. Quién presta el servicio</h2>
       <p>
         Conutria es operada por <strong>Ivan Dominguez Gomez</strong>, con
-        domicilio en{' '}
-        <strong>
-          Av. Monteverde 3021, El Fortín, Zapopan, Jalisco, C.P. 45066
-        </strong>
-        . Contacto:{' '}
+        domicilio en <strong>Zapopan, Jalisco, C.P. 45066</strong>. Contacto:{' '}
         <a href="mailto:conutriaoficial@gmail.com">conutriaoficial@gmail.com</a>
         .
       </p>
