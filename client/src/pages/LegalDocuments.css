@@ -13,8 +13,5 @@
 .legal-content li + li { margin-top: 7px; }
 .legal-content ul { padding-left: 22px; }
 .legal-lead { font-size: 17px !important; }
-.legal-draft-notice { padding: 16px 18px; border: 1px solid #efd38a; border-radius: 12px; background: #fff8e6; }
-.legal-draft-notice strong { color: #684e0b; }
-.legal-draft-notice p { margin: 5px 0 0; color: #665b3b; font-size: 14px; }
 .legal-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; margin-top: 42px; padding-top: 20px; border-top: 1px solid #e3ebe5; }
 @media (max-width: 560px) { .legal-page { padding-right: 14px !important; padding-left: 14px !important; } .legal-header { min-height: 72px; } .legal-home-button { padding: 0 12px; font-size: 12px !important; } .legal-content { padding: 25px 20px; } }
