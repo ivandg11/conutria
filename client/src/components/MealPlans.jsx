@@ -146,8 +146,8 @@ const OTHER_PORTIONS = {
   },
 };
 const FOOD_SUGGESTIONS = {
-  Verduras: [...new Set(["Calabacita", "Jitomate", "Nopal", "Brócoli", "Zanahoria", "Espinaca", "Pepino", "Lechuga", ...Object.keys(VEGETABLE_PORTIONS)])],
-  Frutas: [...new Set(["Manzana", "Plátano", "Naranja", "Papaya", "Guayaba", "Mango", "Pera", "Fresas", ...Object.keys(FRUIT_PORTIONS)])],
+  Verduras: Object.keys(VEGETABLE_PORTIONS),
+  Frutas: Object.keys(FRUIT_PORTIONS),
   'Cereales y tubérculos sin grasa': Object.keys(CEREAL_PORTIONS['Cereales y tubérculos sin grasa']),
   'Cereales y tubérculos con grasa': Object.keys(CEREAL_PORTIONS['Cereales y tubérculos con grasa']),
   Leguminosas: Object.keys(OTHER_PORTIONS.Leguminosas),
@@ -175,6 +175,16 @@ function asDate(value) {
   return new Date(value).toLocaleDateString('es-MX', { timeZone: 'UTC', day: '2-digit', month: 'short', year: 'numeric' });
 }
 
+function groupColor(group) {
+  if (group.startsWith('Alimentos de origen animal')) return '#b91c1c';
+  if (group === 'Frutas' || group === 'Verduras') return '#15803d';
+  if (group.startsWith('Cereales y')) return '#c2410c';
+  if (group === 'Leguminosas') return '#7c3f16';
+  if (group.startsWith('Grasas')) return '#946c00';
+  if (group.startsWith('Alimentos libres')) return '#6b21a8';
+  if (group === 'Leche') return '#1d4ed8';
+  return '#30483b';
+}
 function displayGroup(group) {
   if (group === 'Cereales y tubérculos sin grasa') return 'Cereales y tubérculos · SIN GRASA';
   if (group === 'Cereales y tubérculos con grasa') return 'Cereales y tubérculos · CON GRASA';
@@ -269,6 +279,11 @@ export default function MealPlans({ patientId, defaultStartDate, consultationCon
     }) } : meal) }));
   }
 
+  function adjustEquivalents(mealIndex, foodIndex, delta) {
+    const current = Number(form.meals[mealIndex]?.foods[foodIndex]?.equivalents || 0);
+    const next = Math.min(100, Math.max(0, Number((current + delta).toFixed(2))));
+    updateFood(mealIndex, foodIndex, 'equivalents', String(next));
+  }
   function selectFood(mealIndex, foodIndex, name) {
     const group = form.meals[mealIndex]?.foods[foodIndex]?.group;
     const savedFood = customFoods.find((item) => item.name === name && item.group === group);
@@ -399,12 +414,25 @@ export default function MealPlans({ patientId, defaultStartDate, consultationCon
                 <div className="meal-group-picker relative grid gap-1 text-sm sm:col-span-4">
                   <span id={`group-label-${foodKey}`}>Grupo SMAE</span>
                   <button type="button" className="meal-group-trigger" aria-labelledby={`group-label-${foodKey}`} aria-haspopup="listbox" aria-expanded={activeGroup === foodKey} onClick={() => { setActiveFood(''); setActivePortion(''); setActiveGroup((current) => current === foodKey ? '' : foodKey); }}>
-                    <span>{displayGroup(food.group)}</span><span aria-hidden="true" className="meal-group-chevron">⌄</span>
+                    <span style={{ color: groupColor(food.group), fontWeight: 700 }}>{displayGroup(food.group)}</span><span aria-hidden="true" className="meal-group-chevron">⌄</span>
                   </button>
-                  {activeGroup === foodKey && <div className="meal-group-options" role="listbox" aria-label="Grupos SMAE">{GROUPS.map((group) => <button key={group} type="button" role="option" aria-selected={food.group === group} onClick={() => { selectGroup(mi, fi, group); setActiveGroup(''); }}>{displayGroup(group)}</button>)}</div>}
+                  {activeGroup === foodKey && <div className="meal-group-options" role="listbox" aria-label="Grupos SMAE">{GROUPS.map((group) => <button key={group} type="button" role="option" aria-selected={food.group === group} style={{ color: groupColor(group), fontWeight: 700 }} onClick={() => { selectGroup(mi, fi, group); setActiveGroup(''); }}>{displayGroup(group)}</button>)}</div>}
                 </div>
-                <div className="meal-portion-field relative grid gap-1 text-sm sm:col-span-2"><span>Porción</span><button type="button" className="meal-group-trigger" aria-haspopup="listbox" aria-expanded={activePortion === foodKey} onClick={() => { setActiveFood(''); setActiveGroup(''); setActivePortion((current) => current === foodKey ? '' : foodKey); }}><span>{food.portion || 'Selecciona una porción'}</span><span aria-hidden="true" className="meal-group-chevron">⌄</span></button>{activePortion === foodKey && <div className="meal-group-options" role="listbox" aria-label="Porciones">{PORTION_OPTIONS.map((portion) => <button key={portion} type="button" role="option" aria-selected={food.portion === portion} onClick={() => { updateFood(mi, fi, 'portion', portion); setCustomPortion(''); setActivePortion(''); }}>{portion}</button>)}<button type="button" className="meal-create-food-option" onClick={() => setCustomPortion(foodKey)}>Otra medida</button>{customPortion === foodKey && <input autoFocus maxLength="80" placeholder="Escribe la porción" value={food.portion} onChange={(e) => updateFood(mi, fi, 'portion', e.target.value)} />}</div>}</div>
-                <label className="meal-equivalents-field grid gap-1 text-sm sm:col-span-2">Equivalentes<input required type="number" min="0" max="100" step="0.25" value={food.equivalents} onChange={(e) => updateFood(mi, fi, 'equivalents', e.target.value)} /></label>
+                <div className="meal-portion-field grid gap-1 text-sm sm:col-span-2">
+                  <label>Porción</label>
+                  <div className="meal-stepper">
+                    <button type="button" aria-label={`Reducir ración de ${food.name}`} disabled={!food.portion || Number(food.equivalents) <= 0} onClick={() => adjustEquivalents(mi, fi, -0.25)}>−</button>
+                    <output>{food.portion || 'Elige un alimento'}</output>
+                    <button type="button" aria-label={`Aumentar ración de ${food.name}`} disabled={!food.portion || Number(food.equivalents) >= 100} onClick={() => adjustEquivalents(mi, fi, 0.25)}>+</button>
+                  </div>
+                </div>
+                <label className="meal-equivalents-field grid gap-1 text-sm sm:col-span-2">Equivalentes
+                  <div className="meal-stepper">
+                    <button type="button" aria-label={`Reducir equivalentes de ${food.name}`} disabled={Number(food.equivalents) <= 0} onClick={() => adjustEquivalents(mi, fi, -0.25)}>−</button>
+                    <input required type="number" min="0" max="100" step="0.25" value={food.equivalents} onChange={(e) => updateFood(mi, fi, 'equivalents', e.target.value)} />
+                    <button type="button" aria-label={`Aumentar equivalentes de ${food.name}`} disabled={Number(food.equivalents) >= 100} onClick={() => adjustEquivalents(mi, fi, 0.25)}>+</button>
+                  </div>
+                </label>
                 <button type="button" aria-label="Quitar alimento" onClick={() => updateMeal(mi, 'foods', meal.foods.filter((_, i) => i !== fi))} className="meal-food-remove pb-2 text-sm text-red-600 sm:col-span-1">Quitar</button>
               </div>; })}</div>
               <button type="button" onClick={() => updateMeal(mi, 'foods', [...meal.foods, emptyFood()])} className="text-sm font-medium text-emerald-700">+ Agregar alimento</button>
