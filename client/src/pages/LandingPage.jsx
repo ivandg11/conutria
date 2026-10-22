@@ -17,7 +17,7 @@ const features = [
   {
     group: 'Gestión del consultorio',
     icon: 'calendar',
-    items: ['Agenda y próximas consultas', 'Historial de consultas y mediciones', 'Calculadora de energía y actividad física', 'Cuenta y suscripción en un solo lugar'],
+    items: ['Agenda y próximas consultas', 'Historial de consultas y mediciones', 'DietoC\u00E1lculo: gasto energ\u00E9tico y macronutrientes', 'Cuenta y suscripción en un solo lugar'],
   },
   {
     group: 'Experiencia del paciente',
