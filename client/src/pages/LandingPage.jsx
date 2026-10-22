@@ -101,7 +101,7 @@ function DashboardPreview() {
       </figure>
       <figure className="nc-product-preview nc-product-preview-mobile">
         <img src="/images/app-paciente.png" alt="Vista de Conutria en celular con el formulario de consulta del paciente" />
-        <figcaption>Seguimiento tambi?n desde el celular</figcaption>
+        <figcaption>Seguimiento también desde el celular</figcaption>
       </figure>
     </div>
   );
