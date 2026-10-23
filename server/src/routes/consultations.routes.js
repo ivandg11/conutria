@@ -117,6 +117,7 @@ const consultationSchema = z.object({
   measures: measuresSchema,
   type: z.enum(['INITIAL', 'FOLLOWUP']).optional(),
   bodyFatPct: num(1, 80),
+  bodyMusclePct: num(1, 100),
   recall24h: recallSchema,
   foodFrequency: frequencySchema,
   patientReport: patientReportSchema,

@@ -73,6 +73,7 @@ export default function ConsultationForm() {
     weightKg: '',
     heightCm: state?.lastHeight ?? '',
     bodyFatPct: '',
+    bodyMusclePct: '',
     notes: '',
   });
   const [measures, setMeasures] = useState({});
@@ -101,6 +102,7 @@ export default function ConsultationForm() {
         weightKg: c.weightKg ?? '',
         heightCm: c.heightCm ?? '',
         bodyFatPct: c.bodyFatPct ?? '',
+        bodyMusclePct: c.bodyMusclePct ?? '',
         notes: c.notes ?? '',
       });
       setMeasures(c.measures ?? {});
@@ -231,6 +233,17 @@ export default function ConsultationForm() {
             type="number"
             step="0.1"
             value={form.bodyFatPct}
+            onChange={handleChange}
+            className={input}
+          />
+        </div>
+        <div>
+          <label className={label}>% de masa muscular (báscula)</label>
+          <input
+            name="bodyMusclePct"
+            type="number"
+            step="0.1"
+            value={form.bodyMusclePct}
             onChange={handleChange}
             className={input}
           />

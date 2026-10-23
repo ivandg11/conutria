@@ -238,6 +238,7 @@ model Consultation {
   patient    Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
  type          String   @default("FOLLOWUP")
   bodyFatPct    Decimal? @db.Decimal(4, 1)
+  bodyMusclePct Decimal? @db.Decimal(4, 1)
   recall24h     Json?
   foodFrequency Json?
   patientReport Json?

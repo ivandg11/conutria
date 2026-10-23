@@ -79,10 +79,11 @@ export default function ConsultationPdf({ patient, consultation, consultations, 
 
   const comparison = [
     ['Peso', 'weightKg', 'kg'], ['Talla', 'heightCm', 'cm'], ['IMC', '__imc', ''],
-    ['Grasa corporal', 'bodyFatPct', '%'], ['Cintura', '__cintura', 'cm'],
+    ['Grasa corporal', 'bodyFatPct', '%'], ['Masa muscular', 'bodyMusclePct', '%'],
+    ['Cintura', '__cintura', 'cm'], ['Cadera', '__cadera', 'cm'],
   ].map(([label, key, unit]) => {
-    const value = key === '__imc' ? imc(consultation.weightKg, consultation.heightCm) : key === '__cintura' ? waist(consultation) : consultation[key];
-    const old = !previous ? null : key === '__imc' ? imc(previous.weightKg, previous.heightCm) : key === '__cintura' ? waist(previous) : previous[key];
+    const value = key === '__imc' ? imc(consultation.weightKg, consultation.heightCm) : key === '__cintura' ? waist(consultation) : key === '__cadera' ? consultation.measures?.perimetros?.cadera ?? null : consultation[key];
+    const old = !previous ? null : key === '__imc' ? imc(previous.weightKg, previous.heightCm) : key === '__cintura' ? waist(previous) : key === '__cadera' ? previous.measures?.perimetros?.cadera ?? null : previous[key];
     const delta = value != null && old != null ? (Number(value) - Number(old)).toFixed(1) : null;
     return { label, value, old, delta, unit };
   }).filter((item) => item.value != null);
