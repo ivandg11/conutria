@@ -540,6 +540,7 @@ const emptyMeal = (name = 'Nuevo tiempo') => ({
   foods: [emptyFood()],
 });
 const emptyForm = (startDate = today()) => ({
+  format: 'foods',
   title: 'Plan de alimentación',
   startDate,
   meals: [emptyMeal(MEALS[0]), emptyMeal(MEALS[2]), emptyMeal(MEALS[4])],
@@ -626,7 +627,7 @@ function equivalentTotals(meals = []) {
   const totals = {};
   meals.forEach((meal) =>
     meal.foods?.forEach((food) => {
-      if (!food.group || !food.name) return;
+      if (!food.group) return;
       totals[food.group] =
         (totals[food.group] ?? 0) + Number(food.equivalents || 0);
     }),
@@ -692,6 +693,7 @@ export default function MealPlans({
     setForm({
       title: plan.title,
       startDate: plan.startDate.slice(0, 10),
+      format: plan.content?.format === 'equivalents' ? 'equivalents' : 'foods',
       meals: plan.content?.meals ?? [],
       notes: plan.content?.notes ?? '',
     });
@@ -872,15 +874,16 @@ export default function MealPlans({
 
   async function save(e) {
     e.preventDefault();
-    const incompleteFood = form.meals.some((meal) =>
-      meal.foods.some(
-        (food) =>
-          food.name && (!food.portion.trim() || food.equivalents === ''),
-      ),
-    );
+    const incompleteFood = form.meals.some((meal) => meal.foods.some((food) =>
+      form.format === 'equivalents'
+        ? food.equivalents !== '' && !food.group
+        : food.name && (!food.portion.trim() || food.equivalents === ''),
+    ));
     if (incompleteFood) {
       setError(
-        'Completa la porción y los equivalentes de cada alimento seleccionado.',
+        form.format === 'equivalents'
+          ? 'Completa los equivalentes de cada grupo seleccionado.'
+          : 'Completa la porción y los equivalentes de cada alimento seleccionado.',
       );
       return;
     }
@@ -890,9 +893,14 @@ export default function MealPlans({
       title: form.title,
       startDate: form.startDate,
       content: {
+        format: form.format,
         meals: form.meals.map((meal) => ({
           ...meal,
-          foods: meal.foods.filter((food) => food.name.trim()),
+          foods: meal.foods.filter((food) => form.format === 'equivalents'
+            ? food.group && food.equivalents !== ''
+            : food.name.trim()).map((food) => form.format === 'equivalents'
+              ? { group: food.group, equivalents: Number(food.equivalents), name: '', portion: '' }
+              : food),
         })),
         notes: form.notes,
       },
@@ -1002,8 +1010,8 @@ export default function MealPlans({
                     <ul className="mt-2 space-y-1 text-sm text-gray-600">
                       {meal.foods.map((food, j) => (
                         <li key={`${food.name}-${j}`}>
-                          {food.name} — {food.portion}{' '}
-                          <span className="text-gray-400">
+                          {plan.content?.format === 'equivalents' ? food.group : food.name} — {plan.content?.format === 'equivalents' ? `${food.equivalents} eq.` : food.portion}{' '}
+                          <span className={plan.content?.format === 'equivalents' ? 'hidden' : 'text-gray-400'}>
                             ({food.equivalents} eq. · {food.group})
                           </span>
                         </li>
@@ -1092,6 +1100,19 @@ export default function MealPlans({
                   />
                 </label>
               </div>
+              <fieldset className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                <legend className="px-1 text-sm font-semibold text-emerald-950">Formato del plan</legend>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {[['foods', 'Alimentos específicos'], ['equivalents', 'Solo equivalentes']].map(([format, label]) => (
+                    <button key={format} type="button" aria-pressed={form.format === format}
+                      onClick={() => setForm((current) => ({ ...current, format }))}
+                      className={`rounded-lg border p-3 text-left ${form.format === format ? 'border-emerald-700 bg-white ring-2 ring-emerald-200' : 'border-emerald-100 bg-transparent'}`}>
+                      <span className="block font-semibold">{form.format === format ? '✓ ' : ''}{label}</span>
+                      <span className="mt-1 block text-xs text-gray-600">{format === 'foods' ? 'Indica alimento y porción para cada tiempo.' : 'Captura cantidades por grupo SMAE, sin elegir alimentos.'}</span>
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
               <div className="space-y-4">
                 {form.meals.map((meal, mi) => (
                   <fieldset
@@ -1149,7 +1170,7 @@ export default function MealPlans({
                             key={foodKey}
                             className="meal-food-entry grid gap-2 rounded-lg bg-gray-50 p-3 sm:grid-cols-12 sm:items-end"
                           >
-                            <div className="meal-food-search relative grid gap-1 text-sm sm:col-span-3">
+                            <div className={`meal-food-search relative grid gap-1 text-sm sm:col-span-3 ${form.format === 'equivalents' ? 'hidden' : ''}`}>
                               <label htmlFor={`food-${foodKey}`}>
                                 Alimento
                               </label>
@@ -1369,7 +1390,7 @@ export default function MealPlans({
                             </div>
                             <div className="meal-group-picker relative grid gap-1 text-sm sm:col-span-3">
                               <span id={`group-label-${foodKey}`}>
-                                Grupo SMAE
+                                {form.format === 'equivalents' ? 'Grupo de equivalentes' : 'Grupo SMAE'}
                               </span>
                               <button
                                 type="button"
@@ -1427,7 +1448,7 @@ export default function MealPlans({
                                 </div>
                               )}
                             </div>
-                            <div className="meal-portion-field grid gap-1 text-sm sm:col-span-3">
+                            <div className={`meal-portion-field grid gap-1 text-sm sm:col-span-3 ${form.format === 'equivalents' ? 'hidden' : ''}`}>
                               <label>Porción</label>
                               <div className="meal-stepper">
                                 <button
@@ -1463,7 +1484,7 @@ export default function MealPlans({
                               </div>
                             </div>
                             <label className="meal-equivalents-field grid gap-1 text-sm sm:col-span-2">
-                              Equivalentes
+                              {form.format === 'equivalents' ? 'Equivalentes del grupo' : 'Equivalentes'}
                               <div className="meal-stepper">
                                 <button
                                   type="button"

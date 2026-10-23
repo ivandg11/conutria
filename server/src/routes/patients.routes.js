@@ -33,13 +33,14 @@ const mealPlanSchema = z.object({
   title: z.string().trim().min(1).max(120),
   startDate: z.coerce.date(),
   content: z.object({
+    format: z.enum(['foods', 'equivalents']).optional(),
     meals: z.array(z.object({
       name: z.string().trim().min(1).max(80),
       time: z.string().max(5).optional(),
       foods: z.array(z.object({
-        name: z.string().trim().min(1).max(120),
+        name: z.string().trim().max(120).optional(),
         group: z.string().trim().max(80),
-        portion: z.string().trim().min(1).max(80),
+        portion: z.string().trim().max(80).optional(),
         equivalents: z.coerce.number().min(0).max(100),
       })).max(40),
     })).max(12),
