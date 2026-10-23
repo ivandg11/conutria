@@ -1106,7 +1106,7 @@ export default function MealPlans({
                   {[['foods', 'Alimentos específicos'], ['equivalents', 'Solo equivalentes']].map(([format, label]) => (
                     <button key={format} type="button" aria-pressed={form.format === format}
                       onClick={() => setForm((current) => ({ ...current, format }))}
-                      className={`rounded-lg border p-3 text-left ${form.format === format ? 'border-emerald-700 bg-white ring-2 ring-emerald-200' : 'border-emerald-100 bg-transparent'}`}>
+                      className={`rounded-lg border p-3 text-left transition-colors ${form.format === format ? 'border-emerald-700 bg-emerald-100 ring-2 ring-emerald-200' : 'border-emerald-100 bg-white/70 hover:bg-emerald-50'}`}>
                       <span className="block font-semibold">{form.format === format ? '✓ ' : ''}{label}</span>
                       <span className="mt-1 block text-xs text-gray-600">{format === 'foods' ? 'Indica alimento y porción para cada tiempo.' : 'Captura cantidades por grupo SMAE, sin elegir alimentos.'}</span>
                     </button>
