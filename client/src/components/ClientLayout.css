@@ -55,3 +55,13 @@ main.client-content { width: 100%; max-width: none !important; min-width: 0; box
 .patient-card, .dashboard-shortcut { transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
 .patient-search input:focus { outline: none; box-shadow: 0 0 0 3px rgba(20,122,91,.13); }
 @media (prefers-reduced-motion: reduce) { .patient-card, .dashboard-shortcut { transition: none; } .patient-card:hover { transform: none; } }
+
+.auth-loading { display: grid; min-height: 100vh; place-items: center; padding: 24px; box-sizing: border-box; background: radial-gradient(ellipse at 50% 0%, #e5f2e9 0, #f4f7f5 58%); color: #173b32; }
+.auth-loading-card { display: flex; width: min(100%, 420px); flex-direction: column; align-items: center; padding: 46px 34px 42px; border: 1px solid #e4ebe5; border-radius: 22px; background: rgba(255,255,255,.92); box-shadow: 0 20px 60px rgba(23,59,50,.09); text-align: center; }
+.auth-loading-mark { display: grid; width: 52px; height: 52px; place-items: center; border-radius: 16px; color: #fff; background: linear-gradient(145deg, #13805e, #0d5944); box-shadow: 0 8px 18px rgba(19,128,94,.2); font-size: 25px; font-weight: 800; }
+.auth-loading-spinner { width: 24px; height: 24px; margin-top: 28px; border: 2px solid #dcebe1; border-top-color: #13805e; border-radius: 50%; animation: auth-loading-spin .8s linear infinite; }
+.auth-loading-eyebrow { margin: 20px 0 8px; color: #198265; font-size: 10px; font-weight: 800; letter-spacing: .16em; }
+.auth-loading-card h1 { margin: 0; color: #173b32; font-size: clamp(19px, 4vw, 23px); font-weight: 700; letter-spacing: -.03em; line-height: 1.3; }
+.auth-loading-copy { margin: 9px 0 0; color: #728279; font-size: 14px; line-height: 1.6; }
+@keyframes auth-loading-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .auth-loading-spinner { animation-duration: 2s; } }
