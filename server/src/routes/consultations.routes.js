@@ -104,7 +104,16 @@ const consultationSchema = z.object({
     z.string().nullable().optional(),
   ),
   weightKg: num(1, 500),
-  heightCm: num(30, 260),
+  // A few older patient records contain height in metres (for example 1.65),
+  // while consultations store it in centimetres. Normalize those values so
+  // legacy data does not prevent an otherwise valid consultation from saving.
+  heightCm: z.preprocess((value) => {
+    if (value === '' || value === undefined || value === null) return null;
+    const height = Number(value);
+    return Number.isFinite(height) && height > 0 && height < 3
+      ? height * 100
+      : value;
+  }, num(30, 260)),
   measures: measuresSchema,
   type: z.enum(['INITIAL', 'FOLLOWUP']).optional(),
   bodyFatPct: num(1, 80),
