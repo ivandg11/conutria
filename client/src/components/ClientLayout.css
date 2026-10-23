@@ -39,7 +39,7 @@ main.client-content { width: 100%; max-width: none !important; min-width: 0; box
   main.client-content { padding: 20px 14px !important; }
 }
 
-/* Acabado del espacio de trabajo de nutrición */
+/* Acabado del espacio de trabajo de nutriciÃ³n */
 .client-app { background: #f3f6f3; }
 .client-header { background: linear-gradient(105deg, #103f34 0%, #155642 100%) !important; }
 .client-layout { max-width: 1600px; margin-inline: auto; }

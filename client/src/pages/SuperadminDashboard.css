@@ -136,7 +136,7 @@ main.sa-shell {
 .sa-subscription-cancel { padding: 7px 10px; border: 1px solid #e8c2bc; border-radius: 8px; color: #9a352b; background: #fff6f4; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 .sa-subscription-cancel:hover { background: #ffebe7; }
 
-/* Pulido visual para el centro de administración */
+/* Pulido visual para el centro de administraciÃ³n */
 .sa-shell { background: #f3f6f3; }
 .sa-header { background: linear-gradient(105deg, #103f34 0%, #155642 100%) !important; }
 .sa-layout { max-width: 1600px; margin-inline: auto; }
