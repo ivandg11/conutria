@@ -568,3 +568,15 @@ body:has(.consultation-form) #root,
 .meal-stepper:focus-within { border-color: #45a984; box-shadow: 0 0 0 3px rgba(69,169,132,.1); }
 .meal-stepper input::-webkit-inner-spin-button, .meal-stepper input::-webkit-outer-spin-button { margin: 0; -webkit-appearance: none; }
 .meal-stepper input[type=number] { -moz-appearance: textfield; }
+
+/* Pantalla de carga de sesión: centrado respecto a toda la ventana */
+.auth-loading { box-sizing: border-box; display: grid; width: 100%; max-width: none !important; min-height: 100vh; min-height: 100svh; place-items: center; margin: 0; padding: clamp(1rem, 4vw, 2.5rem) !important; background: radial-gradient(ellipse at 50% 38%, #e3f1e9 0, transparent 48%), #f4f7f5; }
+.auth-loading-card { box-sizing: border-box; width: min(100%, 460px); padding: clamp(1.5rem, 5vw, 3rem); border: 1px solid #e3ebe6; border-radius: 24px; background: rgba(255,255,255,.96); box-shadow: 0 24px 70px rgba(28,75,58,.10); text-align: center; }
+.auth-loading-mark { display: grid; width: 58px; height: 58px; place-items: center; margin: 0 auto 1.8rem; border-radius: 17px; color: #fff; background: linear-gradient(145deg, #14815f, #0e634c); box-shadow: 0 9px 20px rgba(20,122,91,.2); font-size: 1.8rem; font-weight: 800; }
+.auth-loading-spinner { display: block; width: 26px; height: 26px; margin: 0 auto 1.35rem; border: 2px solid #deeee5; border-top-color: #16805d; border-radius: 50%; animation: auth-loading-spin .8s linear infinite; }
+.auth-loading-eyebrow { margin: 0 0 .8rem; color: #14805f; font-size: .72rem; font-weight: 800; letter-spacing: .14em; }
+.auth-loading-card h1 { max-width: 390px; margin: 0 auto .65rem; color: #173b32; font-size: clamp(1.45rem, 5vw, 1.9rem) !important; line-height: 1.25; letter-spacing: -.04em; }
+.auth-loading-copy { margin: 0; color: #71847a; font-size: .94rem; line-height: 1.55; }
+@keyframes auth-loading-spin { to { transform: rotate(360deg); } }
+@media (max-width: 480px) { .auth-loading { padding: 1rem !important; } .auth-loading-card { padding: 2rem 1.25rem; border-radius: 20px; } .auth-loading-mark { margin-bottom: 1.5rem; } }
+@media (prefers-reduced-motion: reduce) { .auth-loading-spinner { animation-duration: 1.8s; } }
