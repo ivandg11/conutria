@@ -1,11 +1,52 @@
+
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../lib/api';
+import { somatotype } from '../lib/calculations';
 import './ConsultationPdf.css';
 
 const dateLabel = (value) => value ? new Date(value).toLocaleDateString('es-MX', { timeZone: 'UTC', day: '2-digit', month: 'long', year: 'numeric' }) : 'Sin fecha';
 const imc = (weight, height) => weight && height ? (Number(weight) / ((Number(height) / 100) ** 2)).toFixed(1) : null;
 const waist = (consultation) => consultation?.measures?.perimetros?.cintura ?? null;
 const showText = (value) => String(value ?? '').trim() || 'Sin indicaciones registradas.';
+const CATEGORY_LABELS = [
+  'Central', 'Endomorfo balanceado', 'Endomorfo mesomórfico', 'Mesomorfo-endomorfo',
+  'Mesomorfo endomórfico', 'Mesomorfo balanceado', 'Mesomorfo ectomórfico', 'Mesomorfo-ectomorfo',
+  'Ectomorfo mesomórfico', 'Ectomorfo balanceado', 'Endomorfo ectomórfico', 'Endomorfo-ectomorfo', 'Endomorfo ectomórfico',
+];
+
+function classifySomatotype({ endo, meso, ecto }) {
+  const max = Math.max(endo, meso, ecto);
+  const min = Math.min(endo, meso, ecto);
+  if (max - min <= 1) return CATEGORY_LABELS[0];
+  const sorted = [endo, meso, ecto].sort((a, b) => b - a);
+  if (sorted[0] - sorted[1] <= 0.5) {
+    if (Math.abs(endo - meso) <= 0.5 && ecto < Math.min(endo, meso)) return CATEGORY_LABELS[3];
+    if (Math.abs(meso - ecto) <= 0.5 && endo < Math.min(meso, ecto)) return CATEGORY_LABELS[7];
+    if (Math.abs(endo - ecto) <= 0.5 && meso < Math.min(endo, ecto)) return CATEGORY_LABELS[11];
+  }
+  if (endo > meso && endo > ecto) return Math.abs(meso - ecto) <= 0.5 ? CATEGORY_LABELS[1] : meso > ecto ? CATEGORY_LABELS[2] : CATEGORY_LABELS[12];
+  if (meso > endo && meso > ecto) return Math.abs(endo - ecto) <= 0.5 ? CATEGORY_LABELS[5] : endo > ecto ? CATEGORY_LABELS[4] : CATEGORY_LABELS[6];
+  if (ecto > endo && ecto > meso) return Math.abs(endo - meso) <= 0.5 ? CATEGORY_LABELS[9] : endo > meso ? CATEGORY_LABELS[10] : CATEGORY_LABELS[8];
+  return CATEGORY_LABELS[0];
+}
+
+function SomatotypeChart({ points, brandColor }) {
+  const unit = 14;
+  const pad = 22;
+  const px = (x) => pad + (x + 8) * unit;
+  const py = (y) => pad + (16 - y) * unit;
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const coords = points.map(({ s }) => ({ cx: px(clamp(s.x, -8, 8)), cy: py(clamp(s.y, -8, 16)) }));
+  return <svg viewBox="0 0 260 380" role="img" aria-label="Gráfica del somatotipo Heath-Carter" className="pdf-somato-chart">
+    {Array.from({ length: 9 }, (_, i) => -8 + i * 2).map((x) => <line key={`x${x}`} x1={px(x)} y1={py(16)} x2={px(x)} y2={py(-8)} stroke={x === 0 ? '#9ca3af' : '#e5e7eb'} />)}
+    {Array.from({ length: 13 }, (_, i) => -8 + i * 2).map((y) => <line key={`y${y}`} x1={px(-8)} y1={py(y)} x2={px(8)} y2={py(y)} stroke={y === 0 ? '#9ca3af' : '#e5e7eb'} />)}
+    <text x={px(0)} y="14" textAnchor="middle" fontSize="10" fill="#374151">Mesomorfia</text>
+    <text x={px(-8)} y="374" fontSize="10" fill="#374151">Endomorfia</text>
+    <text x={px(8)} y="374" textAnchor="end" fontSize="10" fill="#374151">Ectomorfia</text>
+    {coords.length > 1 && <polyline points={coords.map(({ cx, cy }) => `${cx},${cy}`).join(' ')} fill="none" stroke={brandColor} strokeOpacity=".45" strokeWidth="2" />}
+    {coords.map(({ cx, cy }, i) => <circle key={points[i].c.id} cx={cx} cy={cy} r={i === coords.length - 1 ? 5 : 3} fill={brandColor} />)}
+  </svg>;
+}
 
 export default function ConsultationPdf({ patient, consultation, consultations, onClose }) {
   const [plans, setPlans] = useState([]);
@@ -56,6 +97,8 @@ export default function ConsultationPdf({ patient, consultation, consultations, 
     const y = max === min ? 20 : 38 - ((Number(item.weightKg) - min) / (max - min)) * 32;
     return `${x},${y}`;
   }).join(' ');
+  const somatotypeHistory = history.filter((item) => new Date(item.date) <= new Date(consultation.date)).map((c) => ({ c, s: somatotype(c) })).filter(({ s }) => !s.missing);
+  const currentSomatotype = somatotypeHistory.find(({ c }) => c.id === consultation.id) ?? somatotypeHistory[somatotypeHistory.length - 1];
 
   async function saveReport() {
     setSaving(true);
@@ -67,13 +110,9 @@ export default function ConsultationPdf({ patient, consultation, consultations, 
     } catch (error) {
       setSaveMessage(error.response?.data?.error || 'No se pudieron guardar los cambios.');
       return false;
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   }
-  async function saveAndPrint() {
-    if (await saveReport()) window.print();
-  }
+  async function saveAndPrint() { if (await saveReport()) window.print(); }
   const setField = (key, value) => setReport((current) => ({ ...current, [key]: value }));
   const textEditor = (key, label, rows = 3) => <label className="pdf-editable"><span>{label}</span><textarea value={report[key] ?? ''} onChange={(event) => setField(key, event.target.value)} rows={rows} /></label>;
 
@@ -85,6 +124,7 @@ export default function ConsultationPdf({ patient, consultation, consultations, 
         <label className="pdf-option"><input type="checkbox" checked={report.showMetrics !== false} onChange={(event) => setField('showMetrics', event.target.checked)} /> Incluir mediciones</label>
         {report.showMetrics !== false && <table className="pdf-table"><thead><tr><th>Medición</th><th>Hoy</th><th>Anterior</th><th>Diferencia</th></tr></thead><tbody>{comparison.map((item) => <tr key={item.label}><td>{item.label}</td><td>{item.value}{item.unit ? ` ${item.unit}` : ''}</td><td>{item.old ?? '—'}{item.old != null && item.unit ? ` ${item.unit}` : ''}</td><td>{item.delta == null ? '—' : `${Number(item.delta) > 0 ? '+' : ''}${item.delta}${item.unit ? ` ${item.unit}` : ''}`}</td></tr>)}</tbody></table>}
         {report.showMetrics !== false && weightHistory.length > 1 && <div className="pdf-progress"><b>Progreso de peso</b><svg viewBox="0 0 100 44" role="img" aria-label="Gráfica de progreso del peso"><polyline points={weightPoints} fill="none" stroke={nutritionist?.brandColor || '#047857'} strokeWidth="2" />{weightHistory.map((item, index) => { const [cx, cy] = weightPoints.split(' ')[index].split(','); return <circle key={item.id} cx={cx} cy={cy} r="2" fill={nutritionist?.brandColor || '#047857'} />; })}</svg><div>{weightHistory.map((item) => <span key={item.id}>{dateLabel(item.date)}: {item.weightKg} kg</span>)}</div></div>}
+        {report.showMetrics !== false && <div className="pdf-somatotype"><h3>Tipo de cuerpo (somatotipo Heath‑Carter)</h3>{currentSomatotype ? <><p className="pdf-somatotype-result"><b>{currentSomatotype.s.endo} – {currentSomatotype.s.meso} – {currentSomatotype.s.ecto}</b><span>{classifySomatotype(currentSomatotype.s)}</span></p><p>Endomorfia {currentSomatotype.s.endo} · Mesomorfia {currentSomatotype.s.meso} · Ectomorfia {currentSomatotype.s.ecto}. Consulta del {dateLabel(currentSomatotype.c.date)}.</p><SomatotypeChart points={somatotypeHistory} brandColor={nutritionist?.brandColor || '#047857'} /></> : <p>No hay medidas suficientes para calcular el somatotipo de esta consulta.</p>}</div>}
         {textEditor('patientNote', 'Observación breve para el paciente')}
         <p className="pdf-print-value">{showText(report.patientNote)}</p>
         <label className="pdf-option"><input type="checkbox" checked={includeClinicalNote} onChange={(event) => setIncludeClinicalNote(event.target.checked)} /> Incluir nota clínica privada en este PDF</label>
