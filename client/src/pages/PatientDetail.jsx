@@ -18,6 +18,7 @@ import SomatotypePanel from '../components/SomatotypePanel';
 import WeeklyCheckins from '../components/WeeklyCheckins';
 import ConsultationPdf from '../components/ConsultationPdf';
 import { invalidatePatientLists } from '../lib/patientCache';
+import './PatientDetail.css';
 const fmtDate = (iso) =>
   new Date(iso).toLocaleDateString('es-MX', {
     timeZone: 'UTC',
@@ -222,14 +223,14 @@ export default function PatientDetail() {
         <SomatotypePanel consultations={consultations} />
       )}
       {consultations.length > 0 && (
-        <div className="rounded bg-white p-4 shadow">
-          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-3">
+        <div className="evolution-card rounded bg-white p-4 shadow">
+          <div className="evolution-header mb-2">
+            <div className="evolution-controls">
               <h2 className="font-semibold">Evolución</h2>
               <select
                 value={metric}
                 onChange={(e) => setMetric(e.target.value)}
-                className="rounded border p-1 text-sm"
+                className="evolution-metric-select rounded border p-1 text-sm"
               >
                 <option value="weightKg">Peso</option>
                 {MEASURE_GROUPS.map((g) => (
@@ -245,7 +246,7 @@ export default function PatientDetail() {
             </div>
             {diff !== null && (
               <span
-                className={`text-sm font-medium ${Number(diff) <= 0 ? 'text-emerald-700' : 'text-amber-600'}`}
+                className={`evolution-diff text-sm font-medium ${Number(diff) <= 0 ? 'text-emerald-700' : 'text-amber-600'}`}
               >
                 {Number(diff) > 0 ? '+' : ''}
                 {diff} {metricInfo.unit} desde la primera consulta
@@ -254,11 +255,11 @@ export default function PatientDetail() {
           </div>
 
           {chartData.length === 0 ? (
-            <p className="py-10 text-center text-sm text-gray-500">
+            <p className="evolution-empty py-10 text-center text-sm text-gray-500">
               Aún no hay datos de "{metricInfo.label}".
             </p>
           ) : (
-            <div className="h-64">
+            <div className="evolution-chart h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />

@@ -1,0 +1,84 @@
+.evolution-card,
+.evolution-chart {
+  min-width: 0;
+  width: 100%;
+}
+
+.evolution-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  flex-wrap: wrap;
+}
+
+.evolution-controls {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: .75rem;
+}
+
+.evolution-metric-select {
+  min-width: 12rem;
+  max-width: 100%;
+}
+
+.evolution-diff {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .evolution-card {
+    box-sizing: border-box;
+    padding: 1rem;
+  }
+
+  .evolution-header,
+  .evolution-controls {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .evolution-header,
+  .evolution-controls {
+    flex-direction: column;
+  }
+
+  .evolution-header {
+    gap: .65rem;
+  }
+
+  .evolution-controls {
+    gap: .5rem;
+  }
+
+  .evolution-controls h2 {
+    font-size: 1.35rem;
+    line-height: 1.25;
+  }
+
+  .evolution-metric-select {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    padding: .6rem .75rem;
+    font-size: 1rem;
+  }
+
+  .evolution-diff {
+    align-self: flex-start;
+    line-height: 1.4;
+  }
+
+  .evolution-chart {
+    height: 14rem;
+  }
+
+  .evolution-empty {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+}
