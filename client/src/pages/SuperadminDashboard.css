@@ -135,3 +135,28 @@ main.sa-shell {
 
 .sa-subscription-cancel { padding: 7px 10px; border: 1px solid #e8c2bc; border-radius: 8px; color: #9a352b; background: #fff6f4; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 .sa-subscription-cancel:hover { background: #ffebe7; }
+
+/* Pulido visual para el centro de administración */
+.sa-shell { background: #f3f6f3; }
+.sa-header { background: linear-gradient(105deg, #103f34 0%, #155642 100%) !important; }
+.sa-layout { max-width: 1600px; margin-inline: auto; }
+.sa-sidebar { background: #fbfcfa; }
+.sa-sidebar nav button { border-radius: 11px; }
+.sa-content { padding-top: clamp(30px, 4vw, 58px); }
+.sa-title { align-items: flex-end; }
+.sa-title > div { display: grid; gap: 3px; }
+.sa-eyebrow { display: inline-flex; align-items: center; gap: 7px; }
+.sa-title h1 { letter-spacing: -.045em; }
+.sa-refresh { border-radius: 11px; transition: transform .16s ease, box-shadow .16s ease, background .16s ease; }
+.sa-refresh:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(16,63,52,.1); }
+.sa-stat, .sa-panel { border-color: #e2e9e2; box-shadow: 0 8px 24px rgba(24,55,40,.045); }
+.sa-stat { position: relative; overflow: hidden; min-height: 126px; }
+.sa-stat::before { position: absolute; top: 0; right: 0; left: 0; height: 3px; background: linear-gradient(90deg,#16805d,#a8d5b8); content: ''; }
+.sa-stat strong { font-variant-numeric: tabular-nums; }
+.sa-panel { border-radius: 17px; }
+.sa-panel h2 { letter-spacing: -.02em; }
+.sa-table th { position: sticky; top: 0; z-index: 1; }
+.sa-table tbody tr:hover { background: #f8fbf8; }
+.sa-table td { vertical-align: middle; }
+.sa-error { border-radius: 12px; }
+@media (prefers-reduced-motion: reduce) { .sa-refresh { transition: none; } .sa-refresh:hover:not(:disabled) { transform: none; } }
