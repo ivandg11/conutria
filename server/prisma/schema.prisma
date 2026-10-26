@@ -30,6 +30,12 @@ model User {
   mealFoods      MealFood[]
 }
 
+model TrialRedemption {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique @db.VarChar(254)
+  createdAt DateTime @default(now())
+}
+
 model MealFood {
   id          Int      @id @default(autoincrement())
   userId      Int

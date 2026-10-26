@@ -18,7 +18,7 @@ const money = (value, currency = 'USD') =>
     value ?? 0,
   );
 const planName = (plan) =>
-  ({ WEEKLY_USD: 'Cada 7 días', MONTHLY_USD: 'Mensual', ANNUAL_USD: 'Anual', MONTHLY: 'Mensual (MXN)', ANNUAL: 'Anual (MXN)', PRODUCTION_TEST: 'Prueba temporal (MXN)', LIFETIME: 'De por vida' })[plan] ??
+  ({ WEEKLY_USD: 'Cada 7 días', MONTHLY_USD: 'Mensual', ANNUAL_USD: 'Anual', MONTHLY: 'Mensual (MXN)', ANNUAL: 'Anual (MXN)', PRODUCTION_TEST: 'Prueba temporal (MXN)', TRIAL_15D: 'Prueba gratuita (15 días)', LIFETIME: 'De por vida' })[plan] ??
   plan ??
   'Sin plan';
 const statusName = (status) =>

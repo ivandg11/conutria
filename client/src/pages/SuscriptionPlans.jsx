@@ -7,6 +7,15 @@ import './SuscriptionPlans.css';
 
 const plans = [
   {
+    id: 'trial',
+    name: 'Prueba gratis',
+    description: 'Conoce Conutria con acceso completo durante 15 días.',
+    price: 'Gratis',
+    period: '· 15 días',
+    features: ['Acceso completo a las herramientas', 'Sin cargos ni tarjeta', 'Una prueba por correo electrónico'],
+    button: 'Probar gratis 15 días',
+  },
+  {
     id: 'weekly',
     name: 'Plan de 7 días',
     description: 'Acceso completo con un periodo de pago corto.',
@@ -64,6 +73,7 @@ export default function SubscriptionPlans() {
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '' });
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function startCheckout(event) {
@@ -71,10 +81,15 @@ export default function SubscriptionPlans() {
     setError('');
     setLoading(true);
     try {
-      const { data } = user
-        ? await api.post('/checkout/renew', { plan: selectedPlan.id })
-        : await api.post('/checkout/start', { ...form, plan: selectedPlan.id });
-      window.location.assign(data.checkoutUrl);
+      const { data } = selectedPlan.id === 'trial'
+        ? await api.post('/checkout/trial', form)
+        : user
+          ? await api.post('/checkout/renew', { plan: selectedPlan.id })
+          : await api.post('/checkout/start', { ...form, plan: selectedPlan.id });
+      if (selectedPlan.id === 'trial') {
+        setSelectedPlan(null);
+        setNotice(data.message || 'Revisa tu correo para activar tu prueba gratuita de 15 días.');
+      } else window.location.assign(data.checkoutUrl);
     } catch (requestError) {
       setError(requestError.response?.data?.error || 'No se pudo iniciar el pago. Inténtalo de nuevo.');
       setLoading(false);
@@ -95,13 +110,12 @@ export default function SubscriptionPlans() {
       </div>
 
       <div className="nc-pricing-grid">
-        {plans.map((plan) => (
+        {plans.filter((plan) => !user || plan.id !== 'trial').map((plan) => (
           <article
             key={plan.id}
-            className={`nc-plan-card ${
-              plan.featured ? 'nc-plan-featured' : ''
-            }`}
+            className={`nc-plan-card ${plan.featured ? 'nc-plan-featured' : ''} ${plan.id === 'trial' ? 'nc-plan-trial' : ''}`}
           >
+            {plan.id === 'trial' && <span className="nc-plan-trial-badge">GRATIS</span>}
             {plan.featured && (
               <span className="nc-plan-badge">MEJOR AHORRO</span>
             )}
@@ -143,28 +157,29 @@ export default function SubscriptionPlans() {
               {plan.button} <span aria-hidden="true">→</span>
             </button>
 
-            <p className="nc-plan-footnote">{plan.id === 'weekly' ? 'Cargo recurrente cada 7 días. Cancela desde Cuenta para detener futuros cargos.' : plan.id === 'monthly' ? 'Cargo recurrente mensual. Cancela desde Cuenta para detener futuros cargos.' : 'Cargo anual anticipado. Cancela desde Cuenta para detener futuras renovaciones.'}</p>
+            <p className="nc-plan-footnote">{plan.id === 'trial' ? 'Al terminar los 15 días, tu membresía vencerá y podrás elegir un plan.' : plan.id === 'weekly' ? 'Cargo recurrente cada 7 días. Cancela desde Cuenta para detener futuros cargos.' : plan.id === 'monthly' ? 'Cargo recurrente mensual. Cancela desde Cuenta para detener futuros cargos.' : 'Cargo anual anticipado. Cancela desde Cuenta para detener futuras renovaciones.'}</p>
           </article>
         ))}
       </div>
 
-      <p className="nc-pricing-note">Precios en USD. El pago seguro se procesa con Stripe.</p>
+      {notice && <p className="nc-pricing-note" role="status">{notice}</p>}
+      <p className="nc-pricing-note">Planes de pago en USD. El pago seguro se procesa con Stripe.</p>
       {selectedPlan && (
         <div className="nc-checkout-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget && !loading) setSelectedPlan(null); }}>
           <section className="nc-checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="nc-checkout-title">
             <button className="nc-checkout-close" type="button" aria-label="Cerrar" disabled={loading} onClick={() => setSelectedPlan(null)}>×</button>
             <span className="nc-pricing-eyebrow">CONTINUAR CON {selectedPlan.name.toUpperCase()}</span>
-            <h2 id="nc-checkout-title">{user ? 'Confirma tu renovación' : 'Tus datos de contacto'}</h2>
-            <p>{user ? 'Confirma la renovación de tu cuenta con Stripe.' : 'Te enviaremos el acceso a este correo después de confirmar tu pago.'}</p>
+            <h2 id="nc-checkout-title">{selectedPlan.id === 'trial' ? 'Tus datos para activar la prueba' : user ? 'Confirma tu renovación' : 'Tus datos de contacto'}</h2>
+            <p>{selectedPlan.id === 'trial' ? 'Te enviaremos un enlace para crear tu contraseña. Cada correo puede iniciar una prueba.' : user ? 'Confirma la renovación de tu cuenta con Stripe.' : 'Te enviaremos el acceso a este correo después de confirmar tu pago.'}</p>
             <form onSubmit={startCheckout}>
-              {!user && <>
+              {(!user || selectedPlan.id === 'trial') && <>
                 <label>Nombre<input autoComplete="given-name" required minLength={2} maxLength={50} value={form.firstName} onChange={(event) => setForm({ ...form, firstName: event.target.value })} /></label>
                 <label>Apellido<input autoComplete="family-name" required minLength={2} maxLength={50} value={form.lastName} onChange={(event) => setForm({ ...form, lastName: event.target.value })} /></label>
                 <label>Correo electrónico<input type="email" autoComplete="email" required value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} /></label>
               </>}
               <label className="nc-legal-consent"><input type="checkbox" required checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} /><span>Leí y acepto los <Link to="/terminos-de-uso" target="_blank" rel="noreferrer">Términos de uso</Link>. He leído el <Link to="/aviso-de-privacidad" target="_blank" rel="noreferrer">Aviso de privacidad</Link>.</span></label>
               {error && <p className="nc-checkout-error" role="alert">{error}</p>}
-              <button className="nc-checkout-submit" disabled={loading}>{loading ? 'Conectando con Stripe…' : `Continuar al pago · ${selectedPlan.price} USD`}</button>
+              <button className="nc-checkout-submit" disabled={loading}>{loading ? (selectedPlan.id === 'trial' ? 'Creando tu prueba…' : 'Conectando con Stripe…') : selectedPlan.id === 'trial' ? 'Activar prueba gratis' : `Continuar al pago · ${selectedPlan.price} USD`}</button>
             </form>
           </section>
         </div>

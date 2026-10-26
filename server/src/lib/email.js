@@ -43,13 +43,16 @@ export async function sendWeeklyCheckInEmail(patient, nutritionistName, rawToken
   await sendEmail({ to: patient.email, subject: 'Tu seguimiento semanal de Conutria', html, text });
 }
 
-export async function sendWelcomeEmail(user, rawToken) {
+export async function sendWelcomeEmail(user, rawToken, { trialDays } = {}) {
   const { url: baseUrl } = getEmailConfig('/crear-contrasena');
   const url = `${baseUrl}?token=${encodeURIComponent(rawToken)}`;
   const name = escapeHtml(user.name);
-  const html = `<!doctype html><html lang="es"><body style="margin:0;padding:32px;background:#f4f7f3;font-family:Arial,sans-serif;color:#193d35"><main style="max-width:560px;margin:auto;padding:32px;background:#fff;border:1px solid #e0e7de;border-radius:18px"><p style="color:#0e8060;font-weight:bold">Conutria</p><h1>¡Te damos la bienvenida!</h1><p>Hola ${name},</p><p>Confirmamos tu suscripción. Crea una contraseña para activar tu cuenta y comenzar a organizar tu consulta nutricional.</p><p style="margin:28px 0"><a href="${url}" style="padding:14px 22px;border-radius:10px;background:#f8cb59;color:#103f34;font-weight:bold;text-decoration:none">Crear mi contraseña</a></p><p style="color:#71847c;font-size:13px">Este enlace se puede usar una sola vez y vence en 36 horas.</p><p style="color:#71847c;font-size:12px;word-break:break-all">Si el botón no funciona, abre este enlace: ${url}</p></main></body></html>`;
-  const text = `Hola ${user.name},\n\nTe damos la bienvenida a Conutria. Confirmamos tu suscripción. Crea una contraseña para activar tu cuenta: ${url}\n\nEl enlace es de un solo uso y vence en 36 horas.`;
-  await sendEmail({ to: user.email, subject: 'Te damos la bienvenida a Conutria', html, text });
+  const welcomeMessage = trialDays
+    ? `Tu prueba gratuita de ${trialDays} días ya está activa. Crea una contraseña para entrar a Conutria y organizar tu consulta nutricional.`
+    : 'Confirmamos tu suscripción. Crea una contraseña para activar tu cuenta y comenzar a organizar tu consulta nutricional.';
+  const html = `<!doctype html><html lang="es"><body style="margin:0;padding:32px;background:#f4f7f3;font-family:Arial,sans-serif;color:#193d35"><main style="max-width:560px;margin:auto;padding:32px;background:#fff;border:1px solid #e0e7de;border-radius:18px"><p style="color:#0e8060;font-weight:bold">Conutria</p><h1>¡Te damos la bienvenida!</h1><p>Hola ${name},</p><p>${welcomeMessage}</p><p style="margin:28px 0"><a href="${url}" style="padding:14px 22px;border-radius:10px;background:#f8cb59;color:#103f34;font-weight:bold;text-decoration:none">Crear mi contraseña</a></p><p style="color:#71847c;font-size:13px">Este enlace se puede usar una sola vez y vence en 36 horas.</p><p style="color:#71847c;font-size:12px;word-break:break-all">Si el botón no funciona, abre este enlace: ${url}</p></main></body></html>`;
+  const text = `Hola ${user.name},\n\nTe damos la bienvenida a Conutria. ${welcomeMessage} Crea tu contraseña desde este enlace: ${url}\n\nEl enlace es de un solo uso y vence en 36 horas.`;
+  await sendEmail({ to: user.email, subject: trialDays ? 'Activa tu prueba gratis de Conutria' : 'Te damos la bienvenida a Conutria', html, text });
 }
 
 export async function sendPasswordResetEmail(user, rawToken) {
