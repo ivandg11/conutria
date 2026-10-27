@@ -45,7 +45,7 @@ export function somatotype(c) {
     'Pliegue tríceps': num(m.pliegues?.triceps),
     'Pliegue subescapular': num(m.pliegues?.subescapular),
     'Pliegue supraespinal': num(m.pliegues?.supraespinal),
-    'Pliegue pierna': num(m.pliegues?.pierna),
+    'Pliegue pantorrilla': num(m.pliegues?.pierna),
     'Perímetro brazo flexionado': num(m.perimetros?.brazoContraido),
     'Perímetro pierna': num(m.perimetros?.piernaPerimetro),
     'Diámetro húmero': num(m.diametros?.humero),
@@ -71,7 +71,7 @@ export function somatotype(c) {
   // Mesomorfia (pliegues mm -> cm para corregir los perímetros)
   const armCorrected = required['Perímetro brazo flexionado'] - triceps / 10;
   const calfCorrected =
-    required['Perímetro pierna'] - required['Pliegue pierna'] / 10;
+    required['Perímetro pierna'] - required['Pliegue pantorrilla'] / 10;
   const meso =
     0.858 * required['Diámetro húmero'] +
     0.601 * required['Diámetro fémur'] +

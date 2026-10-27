@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../lib/api';
 import { HISTORY_FIELDS, parseHistoryValue, serializeHistoryValue } from '../lib/clinical';
 import { invalidatePatientLists } from '../lib/patientCache';
+import { readDraft, removeDraft, writeDraft } from '../lib/localDraft';
+import { useAuth } from '../context/useAuth';
 const empty = {
   firstName: '',
   lastName: '',
@@ -19,7 +21,13 @@ const empty = {
 export default function PatientForm() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const draftKey = `patient:${user?.id ?? user?.email ?? 'user'}:${id ?? 'new'}`;
+  const [draftAvailable, setDraftAvailable] = useState(() => Boolean(readDraft(draftKey)));
+  const [draftResolved, setDraftResolved] = useState(() => !readDraft(draftKey));
+  const [formReady, setFormReady] = useState(!id);
   const [form, setForm] = useState(empty);
+  const baselineRef = useRef(empty);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const submittingRef = useRef(false);
@@ -28,13 +36,22 @@ export default function PatientForm() {
     if (!id) return;
     api.get(`/patients/${id}`).then((res) => {
       const p = res.data;
-      setForm({
+      const loadedForm = {
         ...empty,
         ...Object.fromEntries(Object.entries(p).filter(([, v]) => v !== null)),
         birthDate: p.birthDate ? p.birthDate.slice(0, 10) : '',
-      });
+      };
+      baselineRef.current = loadedForm;
+      setForm(loadedForm);
+      setFormReady(true);
     });
   }, [id]);
+
+  useEffect(() => {
+    if (!draftResolved || !formReady || saving || JSON.stringify(form) === JSON.stringify(baselineRef.current)) return undefined;
+    const timer = window.setTimeout(() => writeDraft(draftKey, form), 400);
+    return () => window.clearTimeout(timer);
+  }, [draftKey, draftResolved, form, formReady, saving]);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -64,6 +81,7 @@ export default function PatientForm() {
     try {
       if (id) await api.put(`/patients/${id}`, payload);
       else await api.post('/patients', payload);
+      removeDraft(draftKey);
       invalidatePatientLists();
       navigate('/dashboard');
     } catch (err) {
@@ -88,6 +106,22 @@ export default function PatientForm() {
       <h2 className="text-xl font-semibold">
         {id ? 'Editar paciente' : 'Nuevo paciente'}
       </h2>
+      {draftAvailable && (
+        <div className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          Hay un borrador de este formulario en esta pestaña.
+          <button type="button" className="ml-2 underline" onClick={() => {
+            const draft = readDraft(draftKey);
+            if (draft?.value) setForm(draft.value);
+            setDraftAvailable(false);
+            setDraftResolved(true);
+          }}>Restaurar</button>
+          <button type="button" className="ml-2 underline" onClick={() => {
+            removeDraft(draftKey);
+            setDraftAvailable(false);
+            setDraftResolved(true);
+          }}>Descartar</button>
+        </div>
+      )}
       {error && (
         <p className="rounded bg-red-100 p-2 text-sm text-red-700">{error}</p>
       )}

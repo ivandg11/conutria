@@ -5,6 +5,8 @@ import Dietocalculo from '../components/Dietocalculo';
 import { MEASURE_GROUPS } from '../lib/measures';
 import { DEFAULT_MEALS, FREQ_GROUPS, FREQ_OPTIONS } from '../lib/clinical';
 import MealPlans from '../components/MealPlans';
+import { readDraft, removeDraft, writeDraft } from '../lib/localDraft';
+import { useAuth } from '../context/useAuth';
 
 const today = () => new Date().toISOString().slice(0, 10);
 const defaultRecall = () =>
@@ -65,6 +67,11 @@ export default function ConsultationForm() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const editing = Boolean(consultationId);
+  const { user } = useAuth();
+  const draftKey = `consultation:${user?.id ?? user?.email ?? 'user'}:${consultationId ?? patientIdParam ?? 'new'}`;
+  const [draftAvailable, setDraftAvailable] = useState(() => Boolean(readDraft(draftKey)));
+  const [draftResolved, setDraftResolved] = useState(() => !readDraft(draftKey));
+  const [formReady, setFormReady] = useState(!editing);
 
   const [patientId, setPatientId] = useState(patientIdParam);
   const [form, setForm] = useState({
@@ -81,8 +88,13 @@ export default function ConsultationForm() {
   const [recall, setRecall] = useState(defaultRecall());
   const [freq, setFreq] = useState({});
   const [patientReport, setPatientReport] = useState({});
+  const baselineRef = useRef(null);
   const [errors, setErrors] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+
+  if (baselineRef.current === null) {
+    baselineRef.current = { patientId, form, measures, recall, freq, patientReport };
+  }
 
   useEffect(() => {
     if (!patientId) return undefined;
@@ -109,8 +121,34 @@ export default function ConsultationForm() {
       setRecall(c.recall24h?.length ? c.recall24h : defaultRecall());
       setFreq(c.foodFrequency ?? {});
       setPatientReport(c.patientReport ?? {});
+      baselineRef.current = {
+        patientId: c.patientId,
+        form: {
+          type: c.type,
+          date: c.date.slice(0, 10),
+          weightKg: c.weightKg ?? '',
+          heightCm: c.heightCm ?? '',
+          bodyFatPct: c.bodyFatPct ?? '',
+          bodyMusclePct: c.bodyMusclePct ?? '',
+          notes: c.notes ?? '',
+        },
+        measures: c.measures ?? {},
+        recall: c.recall24h?.length ? c.recall24h : defaultRecall(),
+        freq: c.foodFrequency ?? {},
+        patientReport: c.patientReport ?? {},
+      };
+      setFormReady(true);
     });
   }, [editing, consultationId]);
+
+  useEffect(() => {
+    const currentDraft = { patientId, form, measures, recall, freq, patientReport };
+    if (!draftResolved || !formReady || submitting || JSON.stringify(currentDraft) === JSON.stringify(baselineRef.current)) return undefined;
+    const timer = window.setTimeout(() => writeDraft(draftKey, {
+      patientId, form, measures, recall, freq, patientReport,
+    }), 400);
+    return () => window.clearTimeout(timer);
+  }, [draftKey, draftResolved, formReady, submitting, patientId, form, measures, recall, freq, patientReport]);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -152,6 +190,7 @@ export default function ConsultationForm() {
       };
       if (editing) await api.put(`/consultations/${consultationId}`, payload);
       else await api.post(`/patients/${patientId}/consultations`, payload);
+      removeDraft(draftKey);
       navigate(`/patients/${patientId}`);
     } catch (err) {
       const details = err.response?.data?.details;
@@ -176,6 +215,30 @@ export default function ConsultationForm() {
       <h1 className="text-xl font-bold">
         {editing ? 'Editar consulta' : 'Crear consulta'}
       </h1>
+
+      {draftAvailable && (
+        <div className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          Hay un borrador de esta consulta en esta pestaña.
+          <button type="button" className="ml-2 underline" onClick={() => {
+            const draft = readDraft(draftKey)?.value;
+            if (draft) {
+              setPatientId(draft.patientId);
+              setForm(draft.form);
+              setMeasures(draft.measures);
+              setRecall(draft.recall);
+              setFreq(draft.freq);
+              setPatientReport(draft.patientReport);
+            }
+            setDraftAvailable(false);
+            setDraftResolved(true);
+          }}>Restaurar</button>
+          <button type="button" className="ml-2 underline" onClick={() => {
+            removeDraft(draftKey);
+            setDraftAvailable(false);
+            setDraftResolved(true);
+          }}>Descartar</button>
+        </div>
+      )}
 
       {errors.length > 0 && (
         <ul className="rounded bg-red-50 p-3 text-sm text-red-700">

@@ -18,7 +18,7 @@ export const MEASURE_GROUPS = [
       { key: 'supraespinal', label: 'Supraespinal', unit: 'mm' },
       { key: 'abdominal', label: 'Abdominal', unit: 'mm' },
       { key: 'muslo', label: 'Muslo', unit: 'mm' },
-      { key: 'pierna', label: 'Pierna', unit: 'mm' },
+      { key: 'pierna', label: 'Pantorrilla', unit: 'mm' },
     ],
   },
   {

@@ -47,7 +47,6 @@ export default function Login() {
           <h2>Inicia sesión</h2>
           <p className="login-form-description">Ingresa tus datos para continuar con tu consulta.</p>
           {searchParams.get('registered') === '1' && <p className="login-success" role="status">Tu cuenta se registró correctamente. Inicia sesión para continuar.</p>}
-          {searchParams.get('expired') === '1' && <p className="login-session-notice" role="status">Tu sesión se cerró después de 10 minutos sin actividad. Inicia sesión de nuevo.</p>}
           {error && <p className="login-error" role="alert">{error}</p>}
           <label className="login-field">
             <span>Correo electrónico</span>

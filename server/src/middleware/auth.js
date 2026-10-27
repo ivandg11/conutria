@@ -1,8 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { prisma } from '../lib/prisma.js';
 
-const SESSION_IDLE_MS = 10 * 60 * 1000;
-
 export async function requireAuth(req, res, next) {
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ error: 'No autenticado' });
@@ -17,7 +15,6 @@ export async function requireAuth(req, res, next) {
   try {
     const userId = Number(payload.sub);
     const now = new Date();
-    const activeSince = new Date(now.getTime() - SESSION_IDLE_MS);
     if (!Number.isInteger(userId) || typeof payload.sid !== 'string') {
       return res.status(401).json({ error: 'Invalid session' });
     }
@@ -27,7 +24,6 @@ export async function requireAuth(req, res, next) {
         userId,
         revokedAt: null,
         expiresAt: { gt: now },
-        lastActivity: { gt: activeSince },
       },
       data: { lastActivity: now },
     });
