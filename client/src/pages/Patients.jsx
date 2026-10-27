@@ -76,7 +76,8 @@ export default function Patients() {
   return (
     <div className="patient-page">
       {successMessage && (
-        <div role="status" className="mb-4 rounded border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+        <div role="status" className="mb-4 flex items-center gap-3 rounded-lg border border-emerald-900 bg-emerald-800 px-4 py-3 text-sm font-semibold text-white shadow-md">
+          <span aria-hidden="true" className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-emerald-800">✓</span>
           {successMessage}
         </div>
       )}
