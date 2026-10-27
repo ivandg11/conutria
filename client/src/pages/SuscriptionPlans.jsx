@@ -68,7 +68,7 @@ function CheckIcon() {
 }
 
 export default function SubscriptionPlans() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '' });
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -95,6 +95,15 @@ export default function SubscriptionPlans() {
       setLoading(false);
     }
   }
+  if (authLoading) return (
+    <section className="nc-pricing nc-pricing-loading" id="planes" aria-busy="true">
+      <div className="nc-pricing-loading-indicator" role="status" aria-live="polite">
+        <span className="nc-pricing-spinner" aria-hidden="true" />
+        <p>Estamos preparando los planes...</p>
+      </div>
+    </section>
+  );
+
   return (
     <section className="nc-pricing" id="planes">
       <div className="nc-pricing-heading">

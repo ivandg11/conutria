@@ -364,3 +364,35 @@
   color: #103f34;
   text-decoration: underline;
 }
+
+
+.nc-pricing-loading {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+
+.nc-pricing-loading-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #6b827b;
+  font-size: 14px;
+}
+
+.nc-pricing-loading-indicator p {
+  margin: 0;
+}
+
+.nc-pricing-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #d8eee1;
+  border-top-color: #0e8060;
+  border-radius: 50%;
+  animation: nc-pricing-spin 0.8s linear infinite;
+}
+
+@keyframes nc-pricing-spin {
+  to { transform: rotate(360deg); }
+}
