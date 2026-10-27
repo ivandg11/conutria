@@ -191,7 +191,9 @@ export default function ConsultationForm() {
       if (editing) await api.put(`/consultations/${consultationId}`, payload);
       else await api.post(`/patients/${patientId}/consultations`, payload);
       removeDraft(draftKey);
-      navigate(`/patients/${patientId}`);
+      navigate(`/patients/${patientId}`, {
+        state: { successMessage: 'Consulta guardada correctamente.' },
+      });
     } catch (err) {
       const details = err.response?.data?.details;
       setErrors(

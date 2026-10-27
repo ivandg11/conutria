@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   LineChart,
   Line,
@@ -41,12 +41,27 @@ function getValue(c, metric) {
 
 export default function PatientDetail() {
   const { id } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [successMessage, setSuccessMessage] = useState(location.state?.successMessage ?? '');
   const [patient, setPatient] = useState(null);
   const [consultations, setConsultations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [metric, setMetric] = useState('weightKg');
   const [confirmation, setConfirmation] = useState(null);
   const [pdfConsultation, setPdfConsultation] = useState(null);
+
+  useEffect(() => {
+    if (!location.state?.successMessage) return;
+    setSuccessMessage(location.state.successMessage);
+    navigate(`${location.pathname}${location.search}`, { replace: true, state: null });
+  }, [location.pathname, location.search, location.state, navigate]);
+
+  useEffect(() => {
+    if (!successMessage) return undefined;
+    const timer = window.setTimeout(() => setSuccessMessage(''), 5000);
+    return () => window.clearTimeout(timer);
+  }, [successMessage]);
 
   useEffect(() => {
     Promise.all([
@@ -132,6 +147,11 @@ export default function PatientDetail() {
 
   return (
     <div className="space-y-6">
+      {successMessage && (
+        <div role="status" className="rounded border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+          {successMessage}
+        </div>
+      )}
       {confirmation && (
         <ConfirmDialog
           {...confirmation}
