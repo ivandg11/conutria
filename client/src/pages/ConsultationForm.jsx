@@ -281,15 +281,16 @@ export default function ConsultationForm() {
           />
         </div>
         <div>
-          <label className={label}>Talla (cm)</label>
+          <label className={label}>Estatura (cm)</label>
           <input
             name="heightCm"
             type="number"
-            step="0.1"
+            step="1"
             value={form.heightCm}
             onChange={handleChange}
             className={input}
           />
+          <p className="mt-1 text-xs text-gray-500">Ingresa la estatura en centímetros, sin punto: por ejemplo, 160 (no 1.60).</p>
         </div>
         <div>
           <label className={label}>% de grasa (báscula)</label>
