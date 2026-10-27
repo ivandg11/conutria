@@ -1,11 +1,14 @@
 ﻿import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useAuth } from '../context/useAuth';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { getCachedPatients, getPatients, invalidatePatientLists } from '../lib/patientCache';
 
 export default function Patients() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [successMessage, setSuccessMessage] = useState(location.state?.successMessage ?? '');
   const { user } = useAuth();
   const [patients, setPatients] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -14,6 +17,18 @@ export default function Patients() {
   const [pendingDelete, setPendingDelete] = useState(null);
   const [loading, setLoading] = useState(() => !getCachedPatients({ q: '', status: 'ACTIVE' }));
   const [loadError, setLoadError] = useState('');
+
+  useEffect(() => {
+    if (!location.state?.successMessage) return;
+    setSuccessMessage(location.state.successMessage);
+    navigate(`${location.pathname}${location.search}`, { replace: true, state: null });
+  }, [location.pathname, location.search, location.state, navigate]);
+
+  useEffect(() => {
+    if (!successMessage) return undefined;
+    const timer = window.setTimeout(() => setSuccessMessage(''), 5000);
+    return () => window.clearTimeout(timer);
+  }, [successMessage]);
 
   useEffect(() => {
     let active = true;
@@ -60,6 +75,11 @@ export default function Patients() {
 
   return (
     <div className="patient-page">
+      {successMessage && (
+        <div role="status" className="mb-4 rounded border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+          {successMessage}
+        </div>
+      )}
       {pendingDelete && (
         <ConfirmDialog
           title="Eliminar paciente"

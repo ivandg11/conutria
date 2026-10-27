@@ -83,7 +83,13 @@ export default function PatientForm() {
       else await api.post('/patients', payload);
       removeDraft(draftKey);
       invalidatePatientLists();
-      navigate('/dashboard');
+      navigate('/dashboard', {
+        state: {
+          successMessage: id
+            ? 'Cambios del paciente guardados correctamente.'
+            : 'Paciente creado correctamente.',
+        },
+      });
     } catch (err) {
       const details = err.response?.data?.details;
       setError(
