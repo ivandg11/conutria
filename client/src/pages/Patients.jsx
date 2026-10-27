@@ -68,6 +68,7 @@ export default function Patients() {
     await api.delete(`/patients/${id}`);
     invalidatePatientLists();
     setPatients((list) => list.filter((p) => p.id !== id));
+    setSuccessMessage('Paciente eliminado correctamente.');
     api.get('/patients/summary').then(({ data }) => setSummary(data)).catch(() => {});
   }
 
